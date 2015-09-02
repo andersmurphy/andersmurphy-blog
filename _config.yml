@@ -8,7 +8,7 @@ relative_permalinks: true
 title:               Anders Murphy
 tagline:             A blog about Android development
 url:                 http://andersmurphy.github.io
-paginate:            1
+paginate:            3
 baseurl:             ""
 
 # Assets
@@ -21,5 +21,5 @@ sass:
 # About/contact
 author:
   name:              Anders Murphy
-  url:               
+  url:
   email:
