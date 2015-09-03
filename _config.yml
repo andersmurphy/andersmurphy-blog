@@ -6,7 +6,7 @@ relative_permalinks: true
 
 # Setup
 title:               Anders Murphy
-tagline:             A blog about Android development
+tagline:             My blog about Android development
 url:                 http://andersmurphy.com
 paginate:            3
 baseurl:             ""
