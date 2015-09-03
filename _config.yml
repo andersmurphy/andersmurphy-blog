@@ -18,9 +18,3 @@ google_analytics:    UA-67134330-1
 sass:
   sass_dir:          _sass
   style:            :compressed
-
-# About/contact
-author:
-  name:              Anders Murphy
-  url:
-  email:
