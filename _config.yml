@@ -11,6 +11,7 @@ url:                 http://andersmurphy.com
 paginate:            3
 baseurl:             ""
 google_analytics:    UA-67134330-1
+github:              https://github.com/andersmurphy
 
 # Assets
 #
