@@ -1,2 +1,1 @@
-# andersmurphy.github.io
-My blog about Android development
+A simple Jekyll blog.
