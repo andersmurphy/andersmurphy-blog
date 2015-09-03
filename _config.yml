@@ -7,7 +7,7 @@ relative_permalinks: true
 # Setup
 title:               Anders Murphy
 tagline:             A blog about Android development
-url:                 http://andersmurphy.github.io
+url:                 http://andersmurphy.com
 paginate:            3
 baseurl:             ""
 google_analytics:    UA-67134330-1
