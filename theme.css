@@ -1,8 +1,5 @@
 /*
  * Sidebar
- *
- * Flexible banner for housing site name, intro, and "footer" content. Starts
- * out above content in mobile and later moves to the side with wider viewports.
  */
 
 .sidebar {
@@ -51,10 +48,8 @@ a.sidebar-nav-item:focus {
   font-weight: bold;
 }
 
-/* Sticky sidebar
- *
- * Add the `sidebar-sticky` class to the sidebar's container to affix it the
- * contents to the bottom of the sidebar in tablets and up.
+/*
+ * Sticky sidebar
  */
 
 @media (min-width: 48em) {
@@ -67,10 +62,8 @@ a.sidebar-nav-item:focus {
 }
 
 
-/* Container
- *
- * Align the contents of the site above the proper threshold with some margin-fu
- * with a 25%-wide `.sidebar`.
+/*
+ * Container
  */
 
 .content {
@@ -101,8 +94,6 @@ a.sidebar-nav-item:focus {
 
 /*
  * Custom type
- *
- * Extend paragraphs with `.lead` for larger introductory text.
  */
 
 .lead {
