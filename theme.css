@@ -109,3 +109,8 @@ a.sidebar-nav-item:focus {
   font-size: 1.25rem;
   font-weight: 300;
 }
+
+.portrait {
+  margin: auto;
+    width: 24%;
+}
