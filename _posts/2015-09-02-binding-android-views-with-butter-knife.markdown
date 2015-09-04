@@ -25,7 +25,7 @@ Button trueButton;
 {% endhighlight %}
 
 ###Step 3: Remove boilerplate
-Now remove the instantiation of the view:
+Now remove the old view binding:
 
 {% highlight java %}
 trueButton = (Button) findViewById(R.id.true_button);
