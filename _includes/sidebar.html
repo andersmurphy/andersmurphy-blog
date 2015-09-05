@@ -12,8 +12,14 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" href="{{ site.github }}">GitHub</a>
-      <a class="sidebar-nav-item" href="{{ site.twitter }}">Twitter</a>
+      {% if site.github %}
+        <a class="sidebar-nav-item" href="{{ site.github }}">GitHub</a>
+      {% endif %}
+
+      {% if site.twitter %}
+        <a class="sidebar-nav-item" href="{{ site.twitter }}">Twitter</a>
+      {% endif %}
+
       <a class="sidebar-nav-item" href="{{ site.baseurl }}/feed.xml">RSS</a>
     </nav>
 
