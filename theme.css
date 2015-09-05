@@ -1,4 +1,13 @@
 /*
+ * Global resets
+ */
+
+html {
+  font-family: "Roboto", Helvetica, Arial, sans-serif;
+}
+
+
+/*
  * Sidebar
  */
 
