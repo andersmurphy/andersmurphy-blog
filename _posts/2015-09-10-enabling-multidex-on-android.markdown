@@ -21,7 +21,8 @@ The other option, and the only option for apps that exceed the limit even after 
 
 If your app has hit “The 65K limit”, don't panic. Enabling MultiDex is relatively simple.
 
-First add the following to the application class:
+###Step 1: Install
+Add the following to the application class:
 
 {% highlight java %}
 @Override
@@ -31,7 +32,8 @@ protected void attachBaseContext(Context base) {
 }
 {% endhighlight %}
 
-Then add the following to the app **build.gradle** file:
+###Step 2: Enable and download dependency
+Add the following to the app **build.gradle** file:
 
 {% highlight groovy %}
 defaultConfig {
@@ -47,7 +49,8 @@ dependencies {
 
 *Note: Make sure you are using buildToolsVersion '21.1.2' or higher.*
 
-Finally, sync the project with the gradle files and MultiDex will now be enabled. No more 65k limit for your app!
+###Step 3: Sync
+Sync the project with the gradle files and MultiDex will now be enabled. No more 65k limit for your app!
 
 
 [ProGuard]: http://proguard.sourceforge.net/
