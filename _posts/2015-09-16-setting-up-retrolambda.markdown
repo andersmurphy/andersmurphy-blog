@@ -3,7 +3,7 @@ layout: post
 title:  "Setting up Retrolambda"
 ---
 
-Java 8 introduces the much awaited [lambda expression]. Unfortunately, at the time of writing, Android does not support Java 8. Thankfully, there is a project called [Retrolambda] that allows you to backport lambda expressions to Java 7. As Android uses the [Gradle] build system, this guide will be using the [Retrolambda gradle plugin] to add Retrolambda to an Android project.
+Java 8 introduces the much awaited [lambda expression] and [method reference]. Unfortunately, at the time of writing, Android does not support Java 8. Thankfully, there is a project called [Retrolambda] that allows you to backport lambda expressions and method references to Java 7. As Android uses the [Gradle] build system, this guide will be using the [Retrolambda gradle plugin] to add Retrolambda to an Android project.
 
 ###Prerequisite
 Retrolambda requires that Java 7 and Java 8 are installed on your machine.
@@ -74,9 +74,14 @@ JAVA8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home
 ###Step 7: Update .gitignore
 Add  **gradle.properties** to your projects **.gitignore** file. This allows local gradle.properties files to point to different locations, depending on where java 7 and java 8 are located on the machine.
 
+###Step 8: Update Android Studio Inspections
+Although the source compatibility of the project has been set to Java 8, you won't have access to the Java 8 libraries. So it's important to uncheck the Android Studio inspection that suggests "foreach loop can be replaced with stream api" as using the Java 8 stream API will cause a runtime exception:
+
+![Android Studio Inspections](/assets/retrolambda_inspections.jpg)
+
 At this point you will be able to use lambda expression in your java source files. The additional steps bellow are helpful if you use [ProGuard] or a CI server like [Jenkins].
 
-###Step 8 (Bonus): Update proguard-rules.txt
+###Step 9 (Bonus): Update proguard-rules.txt
 If you are using ProGuard make sure to update the apps **proguard-rules.txt** file with the following to prevent it from failing:
 
 {% highlight bash %}
@@ -84,7 +89,7 @@ If you are using ProGuard make sure to update the apps **proguard-rules.txt** fi
 -dontwarn java.lang.invoke.*
 {% endhighlight %}
 
-###Step 9 (Bonus): Set properties using switches on the build server
+###Step 10 (Bonus): Set properties using switches on the build server
 If you are using a CI server, like Jenkins, you can set the gradle properties of JAVA7_HOME and JAVA8_HOME using a switch. For example:
 
 {% highlight bash %}
@@ -98,3 +103,4 @@ gradle -P JAVA7_HOME=/Volumes/Jenkins/tools/hudson.model.JDK/Java_7 assembleRele
 [Jenkins]: https://jenkins-ci.org/
 [lambda expression]:https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
 [Gradle]:https://gradle.org/
+[method reference]:https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
