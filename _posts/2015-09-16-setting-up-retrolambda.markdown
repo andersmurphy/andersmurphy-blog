@@ -5,7 +5,7 @@ title:  "Setting up Retrolambda"
 
 Java 8 introduces the much awaited [lambda expression] and [method reference]. Unfortunately, at the time of writing, Android does not support Java 8. Thankfully, there is a project called [Retrolambda] that allows you to backport lambda expressions and method references to Java 7. As Android uses the [Gradle] build system, this guide will be using the [Retrolambda gradle plugin] to add Retrolambda to an Android project.
 
-###Prerequisite
+###Prerequisites
 Retrolambda requires that Java 7 and Java 8 are installed on your machine.
 
 ###Step 1: Add the buildscript dependencies
@@ -53,9 +53,6 @@ retrolambda {
     jdk JAVA8_HOME
 }
 {% endhighlight %}
-
-*Note: If you are building your project with Java 8 you only need to add `oldJdk JAVA7_HOME`.
-If you are building your project with Java 7 you only need to add `jdk JAVA8_HOME`.*
 
 ###Step 5: Create a gradle properties file
 Create a file named **gradle.properties** in the root level of your project directory.
