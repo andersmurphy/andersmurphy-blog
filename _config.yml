@@ -22,3 +22,7 @@ sass:
 # Comments
 disqus:
     shortname:      andersmurphy
+
+# Gems
+gems:
+  - jekyll-sitemap
