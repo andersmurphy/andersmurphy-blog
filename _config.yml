@@ -18,3 +18,7 @@ twitter:             https://twitter.com/anders_murphy
 sass:
   sass_dir:          _sass
   style:            :compressed
+
+# Comments
+disqus:
+    shortname:      andersmurphy
