@@ -65,7 +65,6 @@ to the location of the Java 7 and Java 8 jdks on your machine:
 {% highlight bash %}
 JAVA7_HOME=/Library/Java/JavaVirtualMachines/jdk1.7.0_71.jdk/Contents/Home
 JAVA8_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home
-}
 {% endhighlight %}
 
 *Note: the retrolambda project README suggests you set these fields as environment variable. However, on OSX Yosemite, Android Studio seems to be unable to find these variables ([see this issue]). Setting them in a gradle.properties file gets around this.*
