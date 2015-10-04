@@ -11,6 +11,8 @@ Too many field references: 131000; max is 65536.
 You may try using --multi-dex option.
 {% endhighlight %}
 
+<!--more-->
+
 65,536 is the total number of method that can be referenced by the code within a single Dalvik Executable (dex) bytecode file. This includes Android framework methods, library methods, and of course your own methods.
 
 What pushes most apps over "The 65k limit" is the inclusion of external libraries. Often when importing external library, only a few methods are actually used. However, all the unused methods in that library will still count to "The 65k limit".

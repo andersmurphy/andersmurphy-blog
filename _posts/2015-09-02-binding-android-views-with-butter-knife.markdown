@@ -7,6 +7,8 @@ As Android apps get more complex activities tend to get cluttered with calls to 
 
 Butter Knife is a field and method binding library for Android views which uses annotations to reduce boilerplate.
 
+<!--more-->
+
 This is a quick tutorial for getting started with Butter Knife.
 
 ###Step 1: Download dependency

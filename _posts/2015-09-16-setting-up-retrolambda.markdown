@@ -5,6 +5,8 @@ title:  "Setting up Retrolambda"
 
 Java 8 introduces the much awaited [lambda expression] and [method reference]. Unfortunately, at the time of writing, Android does not support Java 8. Thankfully, there is a project called [Retrolambda] that allows you to backport lambda expressions and method references to Java 7. As Android uses the [Gradle] build system, this guide will be using the [Retrolambda gradle plugin] to add Retrolambda to an Android project.
 
+<!--more-->
+
 ###Prerequisites
 Retrolambda requires that Java 7 and Java 8 are installed on your machine.
 
