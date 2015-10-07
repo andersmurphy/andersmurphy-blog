@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Getting started with Kotlin on Android"
+title:  "Introduction to Kotlin on Android"
 ---
 
 Java is a very verbose language. The simplest tasks often require writing a lot
