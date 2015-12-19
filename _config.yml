@@ -1,6 +1,5 @@
 # Permalinks
 permalink:           pretty
-relative_permalinks: true
 
 # Setup
 title:               Anders Murphy
@@ -27,5 +26,6 @@ disqus:
 # Gems
 gems:
   - jekyll-sitemap
+  - jekyll-paginate
 
 excerpt_separator: <!--more-->
