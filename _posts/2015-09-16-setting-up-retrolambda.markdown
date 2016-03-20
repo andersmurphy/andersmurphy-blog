@@ -40,10 +40,14 @@ apply plugin: 'me.tatarka.retrolambda'
 Add the following to your `app` **build.gradle** file:
 
 {% highlight groovy %}
-compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-}
+android {
+    ...
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    ...
+  }
 {% endhighlight %}
 
 ###Step 4: Configure the plugin
@@ -94,6 +98,8 @@ If you are using a CI server, like Jenkins, you can set the gradle properties of
 gradle -P JAVA7_HOME=/Volumes/Jenkins/tools/hudson.model.JDK/Java_7 assembleRelease
 {% endhighlight %}
 
+Check out [this project] for an example of how to set up Retrilambda.
+
 [Retrolambda]:https://github.com/orfjackal/retrolambda
 [Retrolambda gradle plugin]:https://github.com/evant/gradle-retrolambda
 [ProGuard]: http://proguard.sourceforge.net/
@@ -102,3 +108,4 @@ gradle -P JAVA7_HOME=/Volumes/Jenkins/tools/hudson.model.JDK/Java_7 assembleRele
 [lambda expression]:https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
 [Gradle]:https://gradle.org/
 [method reference]:https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
+[this project]: https://github.com/andersmurphy/chain/commit/1afec87e14f609bd5c7deb6aff8c5a00774be92b

@@ -12,5 +12,9 @@ Test writing becomes easier as there are no dependencies on Android objects. The
 
 What about testing the modules that do depend on the Android libraries?  The simple answer? Don’t. Instead keep the code, that depends on Android libraries, simple and without logic ([Humble Object Pattern]). The android layer of the app effectively becomes a thin adapter layer, that doesn’t need to be brought under test.
 
+Check out [this project] for an example of how to set up an "Android Free Zone".
+
+
 [Robolectric]: http://robolectric.org/
 [Humble Object Pattern]: http://xunitpatterns.com/Humble%20Object.html
+[this project]:https://github.com/andersmurphy/chain
