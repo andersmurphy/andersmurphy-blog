@@ -98,7 +98,7 @@ If you are using a CI server, like Jenkins, you can set the gradle properties of
 gradle -P JAVA7_HOME=/Volumes/Jenkins/tools/hudson.model.JDK/Java_7 assembleRelease
 {% endhighlight %}
 
-Check out [this project] for an example of how to set up Retrilambda.
+Check out [this project] for an example of how to set up Retrolambda.
 
 [Retrolambda]:https://github.com/orfjackal/retrolambda
 [Retrolambda gradle plugin]:https://github.com/evant/gradle-retrolambda
