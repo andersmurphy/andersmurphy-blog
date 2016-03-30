@@ -7,7 +7,7 @@ Java 8 introduces the much awaited [lambda expression] and [method reference]. U
 
 <!--more-->
 
-###Prerequisites
+### Prerequisites
 Retrolambda requires that Java 7 and Java 8 are installed on your machine.
 
 ### Step 1: Add the buildscript dependencies
