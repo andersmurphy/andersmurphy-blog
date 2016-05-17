@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Signing your app"
+title:  "Signing your App"
 ---
 Android requires that all apps be digitally signed with a certificate before they can be installed. To install a release version of your app on a device it will need to signed. Thankfully signing an app is relatively straightforward.
 
@@ -49,7 +49,7 @@ Create a file named **gradle.properties** in the root level of your project dire
 ### Step 2: Specify the fields in the gradle.properties file
 Add the `myExampleKeystore`, `myExampleKeystorePassword`,  `myExampleKeyAlias` and `myExampleKeyPassword` fields to the **gradle.properties** file, and set them to their respective values.
 {% highlight bash %}
-myExampleKeystore=/Users/anders/Projects/myexample.keystore
+myExampleKeystore=/Users/anders/myexample.keystore
 myExampleKeystorePassword=password
 myExampleKeyAlias=myexample
 myExampleKeyPassword=password
