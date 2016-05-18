@@ -3,11 +3,12 @@ permalink:           pretty
 
 # Setup
 title:               Anders Murphy
-tagline:             My blog about Android development
+tagline:             A blog mostly about Android development
 url:                 http://andersmurphy.com
 paginate:            10
 baseurl:             ""
 google_analytics:    UA-67134330-1
+future: false
 
 # Social
 github:              https://github.com/andersmurphy
