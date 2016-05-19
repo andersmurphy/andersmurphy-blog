@@ -5,7 +5,7 @@ title:  "Using ProGuard instead of MultiDex"
 One of the downsides of using MultiDex to overcome "The 65k limit" is that build times can increase significantly.
 Another option is to use [ProGuard]. ProGuard overcomes "The 65k limit" by removing unused method references,
 this can make a big difference if you are using large third party libraries like [Guava]. If configured
-correctly (disabling optimization/obfuscation) ProGuard can have little to no [impact on your build times] (in the case of larger project it can even decrease build time).
+correctly (disabling optimization/obfuscation) ProGuard can have little to no negative [impact on your build times] (in the case of larger project it can even decrease build time).
 
 <!--more-->
 
@@ -49,7 +49,7 @@ buildTypes {
 }
 {% endhighlight %}
 
-The release build uses the release header file and the debug build uses the debug header file. We have also set `minifyEnabled true` in both builds. This means that regardless of which build we are using ProGuard will strip out any unused method references. This should keep your app bellow "The 65k limit" even if you are using large third party libraries. More importantly, if set up in this way, ProGuard won't increase your debug build times (unlike MultiDex), keeping your development feedback loop tight.
+The release build uses the release header file and the debug build uses the debug header file. We have also set `minifyEnabled true` in both builds. This means that regardless of which build we are using ProGuard will strip out any unused method references. This should keep your app bellow "The 65k limit" even if you are using large third party libraries. More importantly, if set up in this way, ProGuard will have little to no negative [impact on your build times] (unlike MultiDex), keeping your development feedback loop tight.
 
 Check out [this project] for an example of how to set up ProGuard in your app.
 
