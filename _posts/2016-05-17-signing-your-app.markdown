@@ -15,7 +15,7 @@ in order to generate the key.
 
 ### Step 2: Update the app build.gradle
 
-Add the `signingConfig` block to your app's `build.gradle` file. Set the `storeFile` field to the location of your keystore. Set the `storePassword`, `keyAlias`, `keyPassword` fields to their respective values. Finally set the `signingConfig` field in the `buildTypes` `release` block to `signingConfigs.release`.
+Add the `signingConfig` block to your app's **build.gradle** file. Set the `storeFile` field to the location of your keystore. Set the `storePassword`, `keyAlias`, `keyPassword` fields to their respective values. Finally set the `signingConfig` field in the `buildTypes` `release` block to `signingConfigs.release`.
 
 {% highlight groovy %}
 android {
@@ -49,14 +49,14 @@ Create a file named **gradle.properties** in the root level of your project dire
 ### Step 2: Specify the fields in the gradle.properties file
 Add the `myExampleKeystore`, `myExampleKeystorePassword`,  `myExampleKeyAlias` and `myExampleKeyPassword` fields to the **gradle.properties** file, and set them to their respective values.
 {% highlight bash %}
-myExampleKeystore=/Users/anders/myexample.keystore
+myExampleKeystore=/Users/anders/Projects/myexample.keystore
 myExampleKeystorePassword=password
 myExampleKeyAlias=myexample
 myExampleKeyPassword=password
 {% endhighlight %}
 
 ### Step 3: Update the app build.gradle
-Change the values of the `storeFile` , `storePassword`, `keyAlias` and `keyPassword` to reference the values stored in the gradle.properties file
+Change the values of the `storeFile` , `storePassword`, `keyAlias` and `keyPassword` to reference the values stored in the **gradle.properties** file
 
 {% highlight groovy %}
     signingConfigs {
