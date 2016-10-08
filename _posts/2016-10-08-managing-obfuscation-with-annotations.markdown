@@ -9,7 +9,7 @@ The simplest way to get around this problem is to add the appropriate `-keep` li
 <!--more-->
 
 ### Step 1: Create a DontObfuscate annotation
-Create an annotation called**DontObfuscate** in your project. The retention policy should be set to CLASS, as we don't need the annotation at runtime, but will need it for bytecode-level post-processing as that's when ProGuard performs obfuscation.
+Create an annotation called **DontObfuscate** in your project. The retention policy should be set to CLASS, as we don't need the annotation at runtime, but will need it for bytecode-level post-processing as that's when ProGuard performs obfuscation.
 
 {% highlight java %}
 @Retention(RetentionPolicy.CLASS)
@@ -37,7 +37,7 @@ public final class TwitterFeedJson {
 }
 {% endhighlight %}
 
-That's all there is to it, now you can prevent classes from being obfuscated with an annotation without having to modify your **proguard-rules.pro** file, it also serves to documents your code. 
+That's all there is to it, now you can prevent classes from being obfuscated with an annotation without having to modify your **proguard-rules.pro** file, it also helps document your code. 
 
 It is worth pointing out that this annotation will not prevent inner classes from being obfuscated. So if you don't want a class' inner class to be obfuscated make sure to annotate them as well.
 
