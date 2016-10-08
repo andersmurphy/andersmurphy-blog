@@ -1,0 +1,48 @@
+
+---
+layout: post
+title:  "Managing obfuscation with annotations"
+---
+If you use [ProGuard] to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. This is because ProGuard has obfuscate the class name, method name or field name that you are trying to use reflectively. A common example is when using GSON to parse JSON.
+
+The simplest way to get around this problem is to add the appropriate `-keep` line to your ProGuard file. However, this is tedious and error prone and is often forgotten.  Instead this post will cover another solution that is my opinion more practical.
+
+<!--more-->
+
+### Step 1: Create a DontObfuscate annotation
+Create an annotation called**DontObfuscate** in your project. The retention policy should be set to CLASS, as we don't need the annotation at runtime, but will need it for bytecode-level post-processing as that's when ProGuard performs obfuscation.
+
+{% highlight java %}
+@Retention(RetentionPolicy.CLASS)
+public @interface DontObfuscate {
+}
+{% endhighlight %}
+
+### Step 2: Update your projects ProGuard file
+Add the following lines to your project **proguard-rules.pro** file.
+
+{% highlight bash %}
+-keep class com.your.package.name.DontObfuscate
+-keep @com.example.DontObfuscate class * { *; }
+{% endhighlight %}
+
+This will ensure ProGuard doesn't obfuscate any class that has the DonObfuscate annotation. 
+
+### Step 3: Annotate the classes that you don't want obfuscated
+Add the DontObfuscate annotation to the classes you don't want ProGuard to obfuscate.
+
+{% highlight java %}
+@DontObfuscate
+public final class TwitterFeedJson {
+		...
+}
+{% endhighlight %}
+
+That's all there is to it, now you can prevent classes from being obfuscated with an annotation without having to modify your **proguard-rules.pro** file, it also serves to documents your code. 
+
+It is worth pointing out that this annotation will not prevent inner classes from being obfuscated. So if you don't want a class' inner class to be obfuscated make sure to annotate them as well.
+
+Check out [this project] for an example of how to set up the DontObfuscate annotation in your app.
+
+[this project]: https://github.com/andersmurphy/demo-app/commit/5a89952a4d6cd7bf2ca7119b8468b763fe9ead87
+[ProGuard]: http://proguard.sourceforge.net/
