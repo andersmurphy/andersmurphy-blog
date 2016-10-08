@@ -22,7 +22,7 @@ Add the following lines to your project **proguard-rules.pro** file.
 
 {% highlight bash %}
 -keep class com.your.package.name.DontObfuscate
--keep @com.example.DontObfuscate class * { *; }
+-keep @com.your.package.name.DontObfuscate class * { *; }
 {% endhighlight %}
 
 This will ensure ProGuard doesn't obfuscate any class that has the DonObfuscate annotation. 
