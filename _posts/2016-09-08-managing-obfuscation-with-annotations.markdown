@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "Managing obfuscation with annotations"
@@ -46,4 +45,3 @@ Check out [this project] for an example of how to set up the DontObfuscate annot
 
 [this project]: https://github.com/andersmurphy/demo-app/commit/5a89952a4d6cd7bf2ca7119b8468b763fe9ead87
 [ProGuard]: http://proguard.sourceforge.net/
-
