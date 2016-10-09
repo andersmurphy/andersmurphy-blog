@@ -2,11 +2,35 @@
 layout: post
 title:  "Managing obfuscation with annotations"
 ---
-If you use [ProGuard] to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. This is because ProGuard has obfuscate the class name, method name or field name that you are trying to use reflectively. A common example is when using GSON to parse JSON.
+Obfuscation is when you deliberatly make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. For example:
 
-The simplest way to get around this problem is to add the appropriate `-keep` line to your ProGuard file. However, this is tedious and error prone and is often forgotten.  Instead this post will cover another solution that is my opinion more practical.
+{% highlight java %}
+public final class TwitterFeedJson {
+	public List<Tweet> tweets
+	...
+}
+{% endhighlight %}
+
+Becomes: 
+
+{% highlight java %}
+public final class a {
+	public b<c> d
+	...
+}
+{% endhighlight %}
 
 <!--more-->
+
+If you use [ProGuard] to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. The stack trace will look something like this:
+
+{% highlight java %}
+java.lang.NullPointerException: Attempt to read from field 'java.util.List com.example.a.b' on a null object reference
+{% endhighlight %}
+
+This is because ProGuard has obfuscate the class name, method name or field name that you are trying to use reflectively. A common example is when using GSON to parse JSON.
+
+The simplest way to get around this problem is to add the appropriate `-keep` line to your ProGuard file. However, this is tedious and error prone and is often forgotten.  Instead this post will cover another solution that is my opinion more practical.
 
 ### Step 1: Create a DontObfuscate annotation
 Create an annotation called **DontObfuscate** in your project. The retention policy should be set to CLASS, as we don't need the annotation at runtime, but will need it for bytecode-level post-processing as that's when ProGuard performs obfuscation.
