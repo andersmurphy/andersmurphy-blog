@@ -2,7 +2,11 @@
 layout: post
 title:  "Managing obfuscation with annotations"
 ---
-Obfuscation is when you deliberatly make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. For example:
+Obfuscation is when you deliberatly make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. 
+
+<!--more-->
+
+For example:
 
 {% highlight java %}
 public final class TwitterFeedJson {
@@ -19,8 +23,6 @@ public final class a {
 	...
 }
 {% endhighlight %}
-
-<!--more-->
 
 If you use [ProGuard] to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. The stack trace will look something like this:
 
