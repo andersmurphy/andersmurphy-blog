@@ -2,7 +2,7 @@
 layout: post
 title:  "Managing obfuscation with annotations"
 ---
-Obfuscation is when you deliberatly make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. 
+Obfuscation is when you deliberately make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. 
 
 <!--more-->
 
