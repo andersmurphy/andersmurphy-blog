@@ -14,7 +14,7 @@ filter!
 
 A cruel fate indeed.
 
-But wait what if we were to write out own implementations of: map, filter and reduce?
+But wait what if we were to write our own implementations of: map, filter and reduce?
 
 ### Reduce
 
