@@ -3,7 +3,7 @@ permalink:           pretty
 
 # Setup
 title:               Anders Murphy
-tagline:             A blog mostly about Android development
+tagline:             A blog mostly about software development
 url:                 http://andersmurphy.com
 paginate:            10
 baseurl:             ""
