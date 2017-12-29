@@ -22,10 +22,10 @@ Map and filter can be built with reduce, so lets start with implementing that.
 Good old for loop to the rescue.
 
 {% highlight javascript %}
-const reduce = (reduceFunction, startingValue, collection) => {
+const reduce = (reduceFunc, startingValue, collection) => {
   let accumulator = startingValue
   for(let i = 0; i < collection.length; i++) {
-    accumulator = reduceFunction(accumulator, collection[i])
+    accumulator = reduceFunc(accumulator, collection[i])
   }
   return accumulator
 }
@@ -39,9 +39,9 @@ Whenever you want to derive a new value from
 a collection you can use reduce. Let see how we can use it to implement Map.
 
 {% highlight javascript %}
-const map = (mapFunction, collection) => reduce(
+const map = (mapFunc, collection) => reduce(
   (accumulator, item) => {
-    accumulator.push(mapFunction(item))
+    accumulator.push(mapFunc(item))
     return accumulator
   },
   [],
@@ -56,9 +56,9 @@ map(x => x + 1, [ 1, 2, 3, 4, 5]) // [ 2, 3, 4, 5, 6]
 Finally lets implement filter.
 
 {% highlight javascript %}
-const filter = (filterFunction, collection) => reduce(
+const filter = (filterFunc, collection) => reduce(
   (accumulator, item) => {
-    if(filterFunction(item)) {
+    if(filterFunc(item)) {
       accumulator.push(item)
     }
     return accumulator
