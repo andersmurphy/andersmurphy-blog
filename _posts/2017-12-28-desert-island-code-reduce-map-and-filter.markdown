@@ -22,9 +22,9 @@ Map and filter can be built with reduce, so lets start with implementing that.
 Good old for loop to the rescue.
 
 {% highlight javascript %}
-function reduce(reduceFunction, startingValue, collection) {
-  var accumulator = startingValue
-  for(var i = 0; i < collection.length; i++) {
+const reduce = (reduceFunction, startingValue, collection) => {
+  let accumulator = startingValue
+  for(let i = 0; i < collection.length; i++) {
     accumulator = reduceFunction(accumulator, collection[i])
   }
   return accumulator
@@ -39,16 +39,14 @@ Whenever you want to derive a new value from
 a collection you can use reduce. Let see how we can use it to implement Map.
 
 {% highlight javascript %}
-function map(mapFunction, collection) {
-  return reduce(
-    function(accumulator, item) {
-      accumulator.push(mapFunction(item))
-      return accumulator
-    },
-    [],
-    collection
-  )
-}
+const map = (mapFunction, collection) => reduce(
+  (accumulator, item) => {
+    accumulator.push(mapFunction(item))
+    return accumulator
+  },
+  [],
+  collection
+)
 
 map(x => x + 1, [ 1, 2, 3, 4, 5]) // [ 2, 3, 4, 5, 6]
 {% endhighlight %}
@@ -58,18 +56,16 @@ map(x => x + 1, [ 1, 2, 3, 4, 5]) // [ 2, 3, 4, 5, 6]
 Finally lets implement filter.
 
 {% highlight javascript %}
-function filter(filterFunction, collection) {
-  return reduce(
-    function(accumulator, item) {
-      if(filterFunction(item)) {
-        accumulator.push(item)
-      }
-      return accumulator
-    },
-    [],
-    collection
-  )
-}
+const filter = (filterFunction, collection) => reduce(
+  (accumulator, item) => {
+    if(filterFunction(item)) {
+      accumulator.push(item)
+    }
+    return accumulator
+  },
+  [],
+  collection
+)
 
 filter(x => x === 3, [ 3, 2, 3, 4, 3]) // [3, 3, 3]
 {% endhighlight %}
