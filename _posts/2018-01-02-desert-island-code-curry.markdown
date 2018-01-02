@@ -6,11 +6,11 @@ You awake a castaway on a desert island. After some time you come
 across an ancient computation device, the programming of which might hold your
 salvation!
 
-<!--more-->
-
 The device, though limitless in computational power, for better or worse only
 understands javascript. Alas this dialect of javascript doesn't have access to:
 curry!
+
+<!--more-->
 
 A cruel fate indeed.
 
