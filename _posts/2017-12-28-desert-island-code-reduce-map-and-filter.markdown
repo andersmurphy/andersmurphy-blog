@@ -2,19 +2,19 @@
 layout: post
 title:  "Desert Island Code: reduce, map and filter"
 ---
-You awake, a castaway on a desert island. After some time you come
-across a ancient computation device. The programming of which might hold your
+You awake a castaway on a desert island. After some time you come
+across an ancient computation device. The programming of which might hold your
 salvation!
 
 <!--more-->
 
-The device though limitless in computational power, for better or worse only
+The device, though limitless in computational power, for better or worse only
 understands javascript. Alas this dialect of javascript doesn't have map, reduce or
 filter!
 
 A cruel fate indeed.
 
-But wait what if we were to write our own implementations of: map, filter and reduce?
+But wait, what if we were to write our own implementations of: map, filter and reduce?
 
 ### Reduce
 
@@ -53,7 +53,7 @@ map(x => x + 1, [ 1, 2, 3, 4, 5]) // [ 2, 3, 4, 5, 6]
 
 ### Filter
 
-Finally lets implement filter.
+Finally, lets implement filter.
 
 {% highlight javascript %}
 const filter = (filterFunc, coll) => reduce(
