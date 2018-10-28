@@ -4,7 +4,7 @@ permalink:           pretty
 # Setup
 title:               Anders Murphy
 tagline:             A blog mostly about software development
-url:                 http://andersmurphy.com
+url:                 https://andersmurphy.com
 paginate:            10
 baseurl:             ""
 google_analytics:    UA-67134330-1

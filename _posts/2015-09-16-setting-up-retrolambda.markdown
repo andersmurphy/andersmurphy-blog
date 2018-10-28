@@ -102,7 +102,7 @@ Check out [this project] for an example of how to set up Retrolambda.
 
 [Retrolambda]:https://github.com/orfjackal/retrolambda
 [Retrolambda gradle plugin]:https://github.com/evant/gradle-retrolambda
-[ProGuard]: http://proguard.sourceforge.net/
+[ProGuard]: https://proguard.sourceforge.net/
 [see this issue]: https://github.com/evant/gradle-retrolambda/issues/61
 [Jenkins]: https://jenkins-ci.org/
 [lambda expression]:https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html

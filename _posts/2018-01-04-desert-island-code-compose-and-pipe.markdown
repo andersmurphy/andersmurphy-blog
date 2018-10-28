@@ -98,4 +98,4 @@ reduceRight((acc, item) => acc + item, 0, [ 1, 2, 3, 4]) // 10
 
 So there you have it. Pipe, compose and reduce right on a desert island.
 
-[this post]: http://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter/
+[this post]: https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter/

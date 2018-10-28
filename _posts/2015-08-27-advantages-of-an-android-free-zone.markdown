@@ -15,6 +15,6 @@ What about testing the modules that do depend on the Android libraries?  The sim
 Check out [this project] for an example of how to set up an "Android Free Zone".
 
 
-[Robolectric]: http://robolectric.org/
-[Humble Object Pattern]: http://xunitpatterns.com/Humble%20Object.html
+[Robolectric]: https://robolectric.org/
+[Humble Object Pattern]: https://xunitpatterns.com/Humble%20Object.html
 [this project]:https://github.com/andersmurphy/chain

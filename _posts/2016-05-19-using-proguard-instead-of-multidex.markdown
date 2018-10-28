@@ -54,6 +54,6 @@ The release build uses the release header file and the debug build uses the debu
 Check out [this project] for an example of how to set up ProGuard in your app.
 
 [this project]: https://github.com/andersmurphy/chain/commit/9d2241a2a6d2571696a1d3ad5ba37e521d8641f5
-[ProGuard]: http://proguard.sourceforge.net/
+[ProGuard]: https://proguard.sourceforge.net/
 [Guava]: https://github.com/google/guava
-[impact on your build times]: http://image.slidesharecdn.com/jackandjilldroidconlondon2015-160314154239/95/eric-lafortune-the-jack-and-jill-build-system-16-638.jpg?cb=1457972343
+[impact on your build times]: https://image.slidesharecdn.com/jackandjilldroidconlondon2015-160314154239/95/eric-lafortune-the-jack-and-jill-build-system-16-638.jpg?cb=1457972343

@@ -2,7 +2,7 @@
 layout: post
 title:  "Managing obfuscation with annotations"
 ---
-Obfuscation is when you deliberately make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish. 
+Obfuscation is when you deliberately make source code difficult to read. Often code is obfuscated to conceal its purpose and deter reverse engineering. Most obfuscation tools do this by replacing class, method and field names with gibberish.
 
 <!--more-->
 
@@ -10,17 +10,17 @@ For example:
 
 {% highlight java %}
 public final class TwitterFeedJson {
-	public List<Tweet> tweets
-	...
+  public List<Tweet> tweets
+  ...
 }
 {% endhighlight %}
 
-Becomes: 
+Becomes:
 
 {% highlight java %}
 public final class a {
-	public b<c> d
-	...
+  public b<c> d
+  ...
 }
 {% endhighlight %}
 
@@ -51,7 +51,7 @@ Add the following lines to your project **proguard-rules.pro** file.
 -keep @com.your.package.name.DontObfuscate class * { *; }
 {% endhighlight %}
 
-This will ensure ProGuard doesn't obfuscate any class that has the DonObfuscate annotation. 
+This will ensure ProGuard doesn't obfuscate any class that has the DonObfuscate annotation.
 
 ### Step 3: Annotate the classes that you don't want obfuscated
 Add the DontObfuscate annotation to the classes you don't want ProGuard to obfuscate.
@@ -59,15 +59,15 @@ Add the DontObfuscate annotation to the classes you don't want ProGuard to obfus
 {% highlight java %}
 @DontObfuscate
 public final class TwitterFeedJson {
-		...
+    ...
 }
 {% endhighlight %}
 
-That's all there is to it, now you can prevent classes from being obfuscated with an annotation without having to modify your **proguard-rules.pro** file, it also helps document your code. 
+That's all there is to it, now you can prevent classes from being obfuscated with an annotation without having to modify your **proguard-rules.pro** file, it also helps document your code.
 
 It is worth pointing out that this annotation will not prevent inner classes from being obfuscated. So if you don't want a class' inner class to be obfuscated make sure to annotate them as well.
 
 Check out [this project] for an example of how to set up the DontObfuscate annotation in your app.
 
 [this project]: https://github.com/andersmurphy/demo-app/commit/5a89952a4d6cd7bf2ca7119b8468b763fe9ead87
-[ProGuard]: http://proguard.sourceforge.net/
+[ProGuard]: https://proguard.sourceforge.net/

@@ -181,9 +181,9 @@ Hopefully, that's enough for you to get started. For more examples, feel free to
 I plan on convering more of the exciting features in later posts.*
 
 [IntelliJ IDEA]:https://www.jetbrains.com/idea/
-[Android Studio]:http://developer.android.com/sdk/index.html?gclid=CPGB_bHzqMgCFSWw2wodRF0JGQ
+[Android Studio]:https://developer.android.com/sdk/index.html?gclid=CPGB_bHzqMgCFSWw2wodRF0JGQ
 [Retrolambda]:https://github.com/orfjackal/retrolambda
-[Kotlin]:http://kotlinlang.org/
+[Kotlin]:https://kotlinlang.org/
 [this article by Jake Wharton]:https://docs.google.com/document/d/1ReS3ep-hjxWA8kZi0YqDbEhCqTt29hG8P44aA9W0DM8/edit?hl=en&forcehl=1
 [this Kotlin Android app github repository]:https://github.com/andersmurphy/geo-quiz
 [Butter Knife]: https://github.com/JakeWharton/butterknife

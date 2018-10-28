@@ -136,5 +136,5 @@ So there you have it. Curry on a desert island.
 
 [Lodash]: https://github.com/lodash/lodash
 [Ramda]: https://github.com/ramda/ramda
-[ECMAScript 6]: http://www.ecma-international.org/ecma-262/6.0/
+[ECMAScript 6]: https://www.ecma-international.org/ecma-262/6.0/
 [recursive]: https://en.wikipedia.org/wiki/Recursion_(computer_science)

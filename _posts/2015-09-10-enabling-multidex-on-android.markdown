@@ -56,5 +56,5 @@ Sync the project with the gradle files and MultiDex will now be enabled. No more
 
 Check out [this project] for an example of how to set up MultiDex.
 
-[ProGuard]: http://proguard.sourceforge.net/
+[ProGuard]: https://proguard.sourceforge.net/
 [this project]: https://github.com/andersmurphy/chain/commit/4462327da5849f6ac7c4a41e290d84dc6f016b21
