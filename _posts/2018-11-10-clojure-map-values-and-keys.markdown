@@ -35,15 +35,15 @@ Another common task I run into is transforming the keys of a map. This is especi
              {:sign-up "event" :log-out "event" })
 {:sign-up "beta-event", :log-out "beta-event"}
 
-=> (def keys->analytics-event-names
-     {:message-sent         "Primary anouncement made to group"
-      :transaction-complete "Item purchased"})
-#'user/keys->analytics-event-names
+(def keys->analytics-event-names
+  {:message-sent         "Primary anouncement made to group"
+   :transaction-complete "Item purchased"})
 
 => (map-keys keys->analytics-event-names
              {:message-sent         "event"
               :transaction-complete "event"})
-{"Primary anouncement made to group" "event", "Item purchased" "event"}
+{"Primary anouncement made to group" "event",
+ "Item purchased"                    "event"}
 {% endhighlight %}
 
 Hope these functions come in handy. :D
