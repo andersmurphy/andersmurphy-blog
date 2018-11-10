@@ -3,13 +3,13 @@ layout: post
 title:  "Clojure: map-values & map-keys"
 ---
 
-Some useful clojure function for transforming the keys and values of maps.
+Some useful clojure functions for transforming the keys and values of maps.
 
 <!--more-->
 
 ### map-values
 
-When working in clojure I often find I want to transform the values of a map and apply the same function to each value. This is easy to do in clojure as the map function will break a map data structure into key value tuples that are easy to manipulate. That being said I find it comes up often enough that having a more specialised function is not only more convenient but conveys the code's intention more clearly.
+When working in clojure I often find I want to transform the values of a map and apply the same function to each value. This is easy to do in clojure as the map function will break a map data structure into key value tuples that are easy to manipulate. That being said, I find it comes up often enough that having a more specialised function is not only more convenient but conveys the code's intention more clearly.
 
 {% highlight clojure %}
 (defn map-values [f m]
@@ -24,7 +24,7 @@ This function is specifically for map collection types but there is a more gener
 
 ### map-keys
 
-Another common task I run into is transforming the keys of a map. This is especially useful when you are at the edge of your codebase and wanting to communicate to another system that might have different conventions. For example when sending up analytic events. The analytic system might camel case its keys or map keys to completely different words or domain language.
+Another common task I run into is transforming the keys of a map. This is especially useful when you are at the edge of your codebase and wanting to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to completely different words or domain language.
 
 {% highlight clojure %}
 (defn map-keys [f m]
