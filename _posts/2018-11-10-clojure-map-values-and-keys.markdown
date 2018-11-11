@@ -36,7 +36,7 @@ Another common task I run into is transforming the keys of a map. This is especi
 {:sign-up "beta-event", :log-out "beta-event"}
 
 (def keys->analytics-event-names
-  {:message-sent         "Primary anouncement made to group"
+  {:message-sent         "Primary announcement made to group"
    :transaction-complete "Item purchased"})
 
 => (map-keys keys->analytics-event-names
@@ -46,6 +46,6 @@ Another common task I run into is transforming the keys of a map. This is especi
  "Item purchased"                    "event"}
 {% endhighlight %}
 
-Hope these functions come in handy. :D
+I hope these functions come in handy.
 
 [fmap]: https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19
