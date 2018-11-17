@@ -11,7 +11,7 @@ When working in clojure I often find I want to transform the values of a map and
   (->> (map (fn [[k v]] [k (f v)]) m)
        (into {})))
 
-user=> (map-values #(inc %) {:a 1 :b 2 :c 3})
+user=> (map-values inc {:a 1 :b 2 :c 3})
 {:a 2 :b 3 :c 4}
 ```
 
