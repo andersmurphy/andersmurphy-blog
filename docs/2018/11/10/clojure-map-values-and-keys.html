@@ -4,14 +4,14 @@
        &#40;into {}&#41;&#41;&#41;
 
 user=&gt; &#40;map-values #&#40;inc %&#41; {:a 1 :b 2 :c 3}&#41;
-{:a 2 :b 3, :c 4}
+{:a 2 :b 3 :c 4}
 </code></pre><p>This function is specifically for map collection types but there is a more generic version called <a href='https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19'>fmap</a> available in the <code>clojure/algo.generic</code> library.</p><h3>map-keys</h3><p>Another common task I run into is transforming the keys of a map. This is especially useful when you are at the edge of your codebase and wanting to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to completely different words or domain language.</p><pre><code class="clojure">&#40;defn map-keys &#91;f m&#93;
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
 user=&gt; &#40;map-keys #&#40;str &quot;beta-&quot; &#40;name %&#41;&#41;
          {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
-{:sign-up &quot;beta-event&quot;, :log-out &quot;beta-event&quot;}
+{:sign-up &quot;beta-event&quot; :log-out &quot;beta-event&quot;}
 
 &#40;def keys-&gt;analytics-event-names
   {:message-sent         &quot;Primary announcement made to group&quot;

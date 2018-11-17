@@ -12,7 +12,7 @@ When working in clojure I often find I want to transform the values of a map and
        (into {})))
 
 user=> (map-values #(inc %) {:a 1 :b 2 :c 3})
-{:a 2 :b 3, :c 4}
+{:a 2 :b 3 :c 4}
 ```
 
 This function is specifically for map collection types but there is a more generic version called [fmap](https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19) available in the `clojure/algo.generic` library.
@@ -28,7 +28,7 @@ Another common task I run into is transforming the keys of a map. This is especi
 
 user=> (map-keys #(str "beta-" (name %))
          {:sign-up "event" :log-out "event"})
-{:sign-up "beta-event", :log-out "beta-event"}
+{:sign-up "beta-event" :log-out "beta-event"}
 
 (def keys->analytics-event-names
   {:message-sent         "Primary announcement made to group"
