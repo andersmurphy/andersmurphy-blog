@@ -10,8 +10,7 @@ When working in clojure I often find I want to transform the values of a map and
 (defn map-values [f m]
   (->> (map (fn [[k v]] [k (f v)]) m)
        (into {})))
-```
-```clojure-repl
+
 user=> (map-values #(inc %) {:a 1 :b 2 :c 3})
 {:a 2 :b 3, :c 4}
 ```
@@ -26,13 +25,11 @@ Another common task I run into is transforming the keys of a map. This is especi
 (defn map-keys [f m]
   (->> (map (fn [[k v]] [(f k) v]) m)
        (into {})))
-```
-```clojure-repl
+
 user=> (map-keys #(str "beta-" (name %))
          {:sign-up "event" :log-out "event"})
 {:sign-up "beta-event", :log-out "beta-event"}
-```
-```clojure
+
 (def keys->analytics-event-names
   {:message-sent         "Primary announcement made to group"
    :transaction-complete "Item purchased"})
