@@ -6,7 +6,7 @@
             [clojure.java.io :as io])
   (:import [java.time LocalDateTime]))
 
-(def site-url "///Users/anders/projects/andersmurphy.github.io/docs/")
+(def site-url "https://andersmurphy.com")
 (def site-title "Anders Murphy")
 (def site-tagline "A blog mostly about software development")
 (def site-github "https://github.com/andersmurphy")
@@ -119,7 +119,7 @@
 (defn add-content [{:keys [file] :as m}]
   (assoc m :content (-> file slurp md-to-html-string)))
 
-(defn add-page [{:keys [post-name post-date content] :as m}]
+(defn add-page [{:keys [post-name post-date content post-datetime] :as m}]
   (->> (html [:html
               head
               [:body
@@ -135,9 +135,6 @@
        (assoc m :page)))
 
 (defn create-index-string [ms]
-  (println
-   (map #(select-keys % [:post-datetime :post-date])
-        ms))
   (->> (html [:html
               head
               [:body
