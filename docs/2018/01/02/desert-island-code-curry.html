@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Anders Murphy</title><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//styles.css" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//theme.css" rel="stylesheet" type="text/css" /><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="///Users/anders/projects/andersmurphy.github.io/docs//assets/anderspixel.png" /><h1><a href="///Users/anders/projects/andersmurphy.github.io/docs/">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2018. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Desert island code curry</h1><time class="post-date">02 Jan 2018</time><p>You awake a castaway on a desert island. After some time you come across an ancient computation device, the programming of which might hold your salvation!</p><p>The device, though limitless in computational power, for better or worse only understands javascript. Alas this dialect of javascript doesn't have access to: curry!</p><p><!&ndash;more&ndash;></p><p>A cruel fate indeed.</p><p>But wait, what if we were to write our own implementation of: curry?</p><h3>Curry</h3><p>Currying is a technique for translating the evaluation of a function that takes multiple arguments (multiple arity/n-ary function) into evaluating a sequence of functions, each with a single argument (single arity/unary function).</p><p><a href='https://www.ecma-international.org/ecma-262/6.0/'>ECMAScript 6</a> has an elegant way of currying functions using multiple arrow functions.</p><pre><code class="javascript">const curryMap = mapFunc =&gt; coll =&gt; map&#40;mapFunc, coll&#41;
+const addOneToEachElement = curryMap&#40;x =&gt; x + 1&#41;
+
+addOneToEachElement&#40;&#91; 1, 2, 3, 4, 5&#93;&#41; // &#91; 2, 3, 4, 5, 6&#93;
+</code></pre><p>The above approach works fine for converting binary functions into unary functions. However, this can quickly get cumbersome for n-ary functions. This is one of the reasons libraries like <a href='https://github.com/lodash/lodash'>Lodash</a> and <a href='https://github.com/ramda/ramda'>Ramda</a> have a curry function.</p><p>So how would we go about implementing our own curry function?</p><p>Well, our goal is to eventually pass all the supplied arguments into the original function. So if we have a function called <code>f</code> and passed in the arguments <code>a</code>, <code>b</code> and <code>c</code> we would want to call <code>f&#40;a, b, c&#41;</code>. In other words:</p><p><code>a =&gt; b =&gt; c =&gt; f&#40;a, b, c&#41;</code></p><p>When do we want to pass in all the arguments to the original function?</p><p>When the number of arguments supplied is the same as the number of arguments required by the function. So if we accumulate our arguments in an array, when that array is the same size as the number of arguments the function requires, we can call the function with the accumulated arguments.</p><p>In javascript, we can use <code>functionName.length</code> to find out how many arguments a function takes. Then the spread syntax <code>...</code> can be used to expand an array in place into multiple arguments for a function. This gives us the start of a <a href='https://en.wikipedia.org/wiki/Recursion_(computer_science'>recursive</a>) function whose base case (a condition in which the function doesn't recur) would look like this:</p><pre><code class="javascript">if &#40;args.length === func.length&#41; {
+  return func&#40;...args&#41;
+}
+</code></pre><p>Now we can wrap the above in a function called <code>curry</code>. We know that this function needs to take a function <code>func</code> and return a function that takes a variable number of arguments <code>...nextArgs</code>.</p><pre><code class="javascript">const curry = func =&gt; &#40;...nextArgs&#41; =&gt; {
+  const args = nextArgs
+  if &#40;args.length === func.length&#41; {
+    return func&#40;...args&#41;
+  }
+}
+
+const zeroArg = &#40;&#41; =&gt; 0
+curry&#40;zeroArg&#41;&#40;&#41; // 0
+
+const oneArg = a =&gt; a
+curry&#40;oneArg&#41;&#40;1&#41; // 1
+
+const twoArgs = &#40;a, b&#41; =&gt; a - b
+curry&#40;twoArgs&#41;&#40;2, 1&#41; // 1
+</code></pre><p>The above works for the base case when all the arguments are supplied in one go.</p><p>Next, we need an accumulator to collect the previous arguments passed into the <code>curry</code> function. We can do this by concatenating <code>nextArgs</code> to <code>previousArgs</code>. The starting value of <code>previousArgs</code> is an empty array (as there are no previous arguments):</p><pre><code class="javascript">const curry = &#40;func, previousArgs = &#91;&#93;&#41; =&gt; &#40;...nextArgs&#41; =&gt; {
+  const args = previousArgs.concat&#40;nextArgs&#41;
+  if &#40;args.length === func.length&#41; {
+    return func&#40;...args&#41;
+  }
+}
+
+const twoArgs = &#40;a, b&#41; =&gt; a - b
+curry&#40;twoArgs&#41;&#40;2, 1&#41; // 1
+</code></pre><p>Finally, we need to add the recur case where the <code>curry</code> function recurs taking the accumulated value <code>args</code>.</p><pre><code class="javascript">const curry = &#40;func, previousArgs = &#91;&#93;&#41; =&gt; &#40;...nextArgs&#41; =&gt; {
+  const args = previousArgs.concat&#40;nextArgs&#41;
+  if &#40;args.length === func.length&#41; {
+    return func&#40;...args&#41;
+  } else {
+    return curry&#40;func, args&#41;
+  }
+}
+
+const zeroArg = &#40;&#41; =&gt; 0
+curry&#40;zeroArg&#41;&#40;&#41; // 0
+
+const oneArg = a =&gt; a
+curry&#40;oneArg&#41;&#40;1&#41; // 1
+
+const twoArgs = &#40;a, b&#41; =&gt; a - b
+curry&#40;twoArgs&#41;&#40;2&#41;&#40;1&#41; // 1
+curry&#40;twoArgs&#41;&#40;2, 1&#41; // 1
+
+const threeArgs = &#40;a, b, c&#41; =&gt; a - b + c
+curry&#40;threeArgs&#41;&#40;3&#41;&#40;2&#41;&#40;1&#41; // 2
+curry&#40;threeArgs&#41;&#40;3&#41;&#40;2, 1&#41; // 2
+curry&#40;threeArgs&#41;&#40;3, 2&#41;&#40;1&#41; // 2
+curry&#40;threeArgs&#41;&#40;3, 2, 1&#41; // 2
+</code></pre><p>So there you have it. Curry on a desert island.</p></article></div></body></html>

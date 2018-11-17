@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Anders Murphy</title><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//styles.css" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//theme.css" rel="stylesheet" type="text/css" /><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="///Users/anders/projects/andersmurphy.github.io/docs//assets/anderspixel.png" /><h1><a href="///Users/anders/projects/andersmurphy.github.io/docs/">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2018. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Signing your app</h1><time class="post-date">17 May 2016</time><p>Android requires that all apps be digitally signed with a certificate before they can be installed. To install a release version of your app on a device it will need to signed. Thankfully signing an app is relatively straightforward.</p><p><!&ndash;more&ndash;></p><h3>Step 1: Generate a private key</h3><p>To generate a private key enter the following into your terminal, making sure to replace <code>myexample</code> with the desired keystore name, and <code>examplekey</code> with the desired alias. You will then be prompted to answer some questions in order to generate the key.</p><p><code>keytool -genkey -v -keystore myexample.keystore -alias examplekey -keyalg RSA -keysize 2048 -validity 10000</code></p><h3>Step 2: Update the app build.gradle</h3><p>Add the <code>signingConfig</code> block to your app's <strong>build.gradle</strong> file. Set the <code>storeFile</code> field to the location of your keystore. Set the <code>storePassword</code>, <code>keyAlias</code>, <code>keyPassword</code> fields to their respective values. Finally set the <code>signingConfig</code> field in the <code>buildTypes</code> <code>release</code> block to <code>signingConfigs.release</code>.</p><pre><code class="groovy">android {
+    ...
+    signingConfigs {
+        release {
+            storeFile file&#40;&quot;/Users/anders/myexample.keystore&quot;&#41;
+            storePassword &quot;password&quot;
+            keyAlias &quot;examplekey&quot;
+            keyPassword &quot;password&quot;
+        }
+    }
+
+    buildTypes {
+        release {
+            ...
+            signingConfig signingConfigs.release
+            ...
+        }
+    }
+    ...
+}
+</code></pre><h2>Keeping your signing credentials secure</h2><p>If you use a hosted git repository service like GitHub you might not want to commit your keystore and password details for security reasons. You can do this by using a <strong>gradle.properties</strong> file.</p><h3>Step 1: Create a gradle.properties file</h3><p>Create a file named <strong>gradle.properties</strong> in the root level of your project directory.</p><h3>Step 2: Specify the fields in the gradle.properties file</h3><p>Add the <code>myExampleKeystore</code>, <code>myExampleKeystorePassword</code>,  <code>myExampleKeyAlias</code> and <code>myExampleKeyPassword</code> fields to the <strong>gradle.properties</strong> file, and set them to their respective values.<pre><code class="bash">myExampleKeystore=/Users/anders/Projects/myexample.keystore
+myExampleKeystorePassword=password
+myExampleKeyAlias=myexample
+myExampleKeyPassword=password
+</code></pre></p><h3>Step 3: Update the app build.gradle</h3><p>Change the values of the <code>storeFile</code> , <code>storePassword</code>, <code>keyAlias</code> and <code>keyPassword</code> to reference the values stored in the <strong>gradle.properties</strong> file</p><pre><code class="groovy">    signingConfigs {
+        release {
+            storeFile file&#40;myExampleKeystore&#41;
+            storePassword myExampleKeystorePassword
+            keyAlias myExampleKeyAlias
+            keyPassword myExampleKeyPassword
+        }
+    }
+</code></pre><h3>Step 4: Update .gitignore</h3><p>Add  <strong>gradle.properties</strong> to your projects <strong>.gitignore</strong> file. So that it doesn't get tracked by git. This ensures that your signing credentials will only be stored locally on your machine.</p><p>Check out <a href='https://github.com/andersmurphy/chain/commit/531597724d68cf27d6e9fdd2e88f54fe4082c841'>this project</a> for an example of how to sign your app's release build.</p></article></div></body></html>

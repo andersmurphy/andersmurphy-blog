@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Anders Murphy</title><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//styles.css" rel="stylesheet" type="text/css" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//theme.css" rel="stylesheet" type="text/css" /><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/atom-one-light.min.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="///Users/anders/projects/andersmurphy.github.io/docs//assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="///Users/anders/projects/andersmurphy.github.io/docs//assets/anderspixel.png" /><h1><a href="///Users/anders/projects/andersmurphy.github.io/docs/">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2018. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Desert island code reduce map and filter</h1><time class="post-date">28 Dec 2017</time><p>You awake a castaway on a desert island. After some time you come across an ancient computation device. The programming of which might hold your salvation!</p><p>The device, though limitless in computational power, for better or worse only understands javascript. Alas this dialect of javascript doesn't have map, reduce or filter!</p><p><!&ndash;more&ndash;></p><p>A cruel fate indeed.</p><p>But wait, what if we were to write our own implementations of: map, filter and reduce?</p><h3>Reduce</h3><p>Map and filter can be built with reduce, so lets start with implementing that. Good old for loop to the rescue.</p><pre><code class="javascript">const reduce = &#40;reduceFunc, startingValue, coll&#41; =&gt; {
+  let accumulator = startingValue
+  for&#40;let i = 0; i &lt; coll.length; i++&#41; {
+    accumulator = reduceFunc&#40;accumulator, coll&#91;i&#93;&#41;
+  }
+  return accumulator
+}
+
+reduce&#40;&#40;acc, item&#41; =&gt; acc + item, 0, &#91; 1, 2, 3, 4&#93;&#41; // 10
+</code></pre><h3>Map</h3><p>Whenever you want to derive a new value from a collection you can use reduce. Let see how we can use it to implement Map.</p><pre><code class="javascript">const map = &#40;mapFunc, coll&#41; =&gt; reduce&#40;
+  &#40;accumulator, item&#41; =&gt; {
+    accumulator.push&#40;mapFunc&#40;item&#41;&#41;
+    return accumulator
+  },
+  &#91;&#93;,
+  coll
+&#41;
+
+map&#40;x =&gt; x + 1, &#91; 1, 2, 3, 4, 5&#93;&#41; // &#91; 2, 3, 4, 5, 6&#93;
+</code></pre><h3>Filter</h3><p>Finally, lets implement filter.</p><pre><code class="javascript">const filter = &#40;filterFunc, coll&#41; =&gt; reduce&#40;
+  &#40;accumulator, item&#41; =&gt; {
+    if&#40;filterFunc&#40;item&#41;&#41; {
+      accumulator.push&#40;item&#41;
+    }
+    return accumulator
+  },
+  &#91;&#93;,
+  coll
+&#41;
+
+filter&#40;x =&gt; x === 3, &#91; 3, 2, 3, 4, 3&#93;&#41; // &#91;3, 3, 3&#93;
+</code></pre><p>So there you have it. Reduce, map, and filter on a desert island.</p></article></div></body></html>

@@ -1,1 +1,0 @@
-A simple Jekyll blog.
