@@ -134,7 +134,7 @@
        (str "<!DOCTYPE html>\n")
        (assoc m :page)))
 
-(defn create-index-string [ms]
+(defn index-html [ms]
   (->> (html [:html
               head
               [:body
@@ -173,8 +173,29 @@
        (map add-content)
        (map add-page)))
 
+(def html-404
+  (->> (html [:html
+              head
+              [:body
+               sidebar
+               [:div {:class "content container"}
+                [:article {:class "post"}
+                 [:h1 {:class "post-title"} "404: Page not found"]
+                 [:p "Sorry, we've misplaced that URL or it's
+                 pointing to something that doesn't exist."
+                  [:a {:href site-url} "Head back home"]
+                  " to try finding it again."]]]]])
+       (str "<!DOCTYPE html>\n")))
+
+(defn write-404! [s]
+  (let [path-name "docs/404.html"]
+    (make-parents path-name)
+    (spit path-name s)))
+
 (defn generate-site []
   (let [posts (get-posts files)]
-    (-> (create-index-string posts)
+    (-> (index-html posts)
         write-index!)
+    (-> html-404
+        write-404!)
     (run! write-post! posts)))
