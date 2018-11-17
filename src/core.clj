@@ -83,7 +83,7 @@
            :href (str site-url "/theme.css")}]
    ;; code highlights
    [:link {:rel  "stylesheet"
-           :href (str highlight-url "/styles/atom-one-dark.min.css")}]
+           :href (str site-url "/nord.css")}]
    [:script {:src (str highlight-url "/highlight.min.js")}]
    [:script {:src (str highlight-url "/languages/clojure.min.js")}]
    [:script "hljs.initHighlightingOnLoad();"]
