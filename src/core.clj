@@ -28,8 +28,7 @@
   {:file file})
 
 (defn add-path-name [{:keys [file] :as m}]
-  (assoc m :path-name (str "docs/"
-                           (-> (.getName file)
+  (assoc m :path-name (str (-> (.getName file)
                                (str/split #".md")
                                first
                                (replace-n 3 #"-" "/"))
@@ -154,8 +153,9 @@
        (str "<!DOCTYPE html>\n")))
 
 (defn write-post! [{:keys [page path-name]}]
-  (make-parents path-name)
-  (spit path-name page))
+  (let [docs-path-name (str "docs/" path-name)]
+    (make-parents docs-path-name)
+    (spit docs-path-name page)))
 
 (defn write-index! [s]
   (let [path-name "docs/index.html"]
