@@ -22,9 +22,9 @@ any arity; but the remaining functions must be unary.
 The `pipe` function takes a variable number of functions `...fns` and returns
 a function that takes a single argument which we will call `seed`.
 
-{% highlight javascript %}
+```javascript
 const pipe = (...fns) => seed => console.log('do stuff here')
-{% endhighlight %}
+```
 
 Then, we reduce over the functions `...fns` passing the previous output
 `previousOutput` of each function into the next function until there are no
