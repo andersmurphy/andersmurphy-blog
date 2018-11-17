@@ -84,7 +84,9 @@
    ;; code highlights
    [:link {:rel  "stylesheet"
            :href (str highlight-url "/styles/atom-one-light.min.css")}]
-   [:script {:src (str highlight-url "/highlight.min.js") }]
+   [:script {:src (str highlight-url "/highlight.min.js")}]
+   [:script {:src (str highlight-url "/clojure.min.js")}]
+   [:script {:src (str highlight-url "/clojure-repl.min.js")}]
    [:script "hljs.initHighlightingOnLoad();"]
    ;; icons
    [:link {:rel   "apple-touch-icon-precomposed"
