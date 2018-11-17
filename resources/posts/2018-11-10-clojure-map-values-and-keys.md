@@ -31,14 +31,14 @@ user=> (map-keys #(str "beta-" (name %))
 {:sign-up "beta-event" :log-out "beta-event"}
 
 (def keys->analytics-event-names
-  {:message-sent         "Primary announcement made to group"
+  {:message-sent         "Primary announcement sent"
    :transaction-complete "Item purchased"})
 
 user=> (map-keys keys->analytics-event-names
          {:message-sent         "event"
           :transaction-complete "event"})
-{"Primary anouncement made to group" "event",
- "Item purchased"                    "event"}
+{"Primary anouncement sent" "event",
+ "Item purchased"           "event"}
 ```
 
 I hope these functions come in handy.
