@@ -160,18 +160,23 @@
 
 (defn write-index! [s]
   (let [path-name "docs/index.html"]
-    (make-parents path-name)
+    (spit path-name s)))
+
+(defn write-404! [s]
+  (let [path-name "docs/404.html"]
     (spit path-name s)))
 
 (defn get-posts [files]
-  (->> (map add-file files)
-       reverse
-       (map add-path-name)
-       (map add-post-name)
-       (map add-post-date)
-       (map add-post-datetime)
-       (map add-content)
-       (map add-page)))
+  (-> (sequence
+       (comp (map add-file)
+             (map add-path-name)
+             (map add-post-name)
+             (map add-post-date)
+             (map add-post-datetime)
+             (map add-content)
+             (map add-page))
+       files)
+      reverse))
 
 (def html-404
   (->> (html [:html
@@ -186,11 +191,6 @@
                   [:a {:href site-url} "Head back home"]
                   " to try finding it again."]]]]])
        (str "<!DOCTYPE html>\n")))
-
-(defn write-404! [s]
-  (let [path-name "docs/404.html"]
-    (make-parents path-name)
-    (spit path-name s)))
 
 (defn generate-site []
   (let [posts (get-posts files)]
