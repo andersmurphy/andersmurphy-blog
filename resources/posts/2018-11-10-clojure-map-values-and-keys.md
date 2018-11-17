@@ -29,18 +29,17 @@ Another common task I run into is transforming the keys of a map. This is especi
 ```
 ```clojure-repl
 user=> (map-keys #(str "beta-" (name %))
-             {:sign-up "event" :log-out "event" })
+         {:sign-up "event" :log-out "event"})
 {:sign-up "beta-event", :log-out "beta-event"}
 ```
 ```clojure
 (def keys->analytics-event-names
   {:message-sent         "Primary announcement made to group"
    :transaction-complete "Item purchased"})
-```
-```clojure-repl
+
 user=> (map-keys keys->analytics-event-names
-             {:message-sent         "event"
-              :transaction-complete "event"})
+         {:message-sent         "event"
+          :transaction-complete "event"})
 {"Primary anouncement made to group" "event",
  "Item purchased"                    "event"}
 ```

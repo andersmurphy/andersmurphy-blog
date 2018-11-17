@@ -8,14 +8,15 @@
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 </code></pre><pre><code class="clojure-repl">user=&gt; &#40;map-keys #&#40;str &quot;beta-&quot; &#40;name %&#41;&#41;
-             {:sign-up &quot;event&quot; :log-out &quot;event&quot; }&#41;
+         {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
 {:sign-up &quot;beta-event&quot;, :log-out &quot;beta-event&quot;}
 </code></pre><pre><code class="clojure">&#40;def keys-&gt;analytics-event-names
   {:message-sent         &quot;Primary announcement made to group&quot;
    :transaction-complete &quot;Item purchased&quot;}&#41;
-</code></pre><pre><code class="clojure-repl">user=&gt; &#40;map-keys keys-&gt;analytics-event-names
-             {:message-sent         &quot;event&quot;
-              :transaction-complete &quot;event&quot;}&#41;
+
+user=&gt; &#40;map-keys keys-&gt;analytics-event-names
+         {:message-sent         &quot;event&quot;
+          :transaction-complete &quot;event&quot;}&#41;
 {&quot;Primary anouncement made to group&quot; &quot;event&quot;,
  &quot;Item purchased&quot;                    &quot;event&quot;}
 </code></pre><p>I hope these functions come in handy.</p></article></div></body></html>
