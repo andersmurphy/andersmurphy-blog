@@ -67,10 +67,10 @@
   (assoc m :post-datetime (-> (str/split (.getName file) #"-")
                               file-name->datetime)))
 
-(def head
+(defn head [title]
   [:head
    [:meta {:charset "UTF-8"}]
-   [:title site-title]
+   [:title title]
    ;; styles
    [:link {:rel  "stylesheet"
            :type "text/css"
@@ -121,7 +121,7 @@
 
 (defn add-page [{:keys [post-name post-date content post-datetime] :as m}]
   (->> (html [:html
-              head
+              (head post-name)
               [:body
                sidebar
                [:div {:class "content container"}
@@ -136,7 +136,7 @@
 
 (defn index-html [ms]
   (->> (html [:html
-              head
+              (head site-title)
               [:body
                sidebar
                [:div {:class "content container"}
@@ -175,7 +175,7 @@
 
 (def html-404
   (->> (html [:html
-              head
+              (head site-title)
               [:body
                sidebar
                [:div {:class "content container"}
