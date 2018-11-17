@@ -144,7 +144,7 @@
                                    content post-datetime]}]
                         [:article {:class "post"}
                          [:h1 {:class "post-title"}
-                          [:a {:href path-name} post-name]]
+                          [:a {:href (str site-url "/" path-name)} post-name]]
                          [:time {:class    "post-date"
                                  :datetime post-datetime}
                           post-date]
