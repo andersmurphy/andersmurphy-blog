@@ -12,6 +12,7 @@ When working in clojure I often find I want to transform the values of a map and
        (into {})))
 
 user=> (map-values inc {:a 1 :b 2 :c 3})
+
 {:a 2 :b 3 :c 4}
 ```
 
@@ -28,6 +29,7 @@ Another common task I run into is transforming the keys of a map. This is especi
 
 user=> (map-keys #(str "beta-" (name %))
          {:sign-up "event" :log-out "event"})
+
 {:sign-up "beta-event" :log-out "beta-event"}
 
 (def keys->analytics-event-names
@@ -37,6 +39,7 @@ user=> (map-keys #(str "beta-" (name %))
 user=> (map-keys keys->analytics-event-names
          {:message-sent         "event"
           :transaction-complete "event"})
+
 {"Primary anouncement sent" "event",
  "Item purchased"           "event"}
 ```

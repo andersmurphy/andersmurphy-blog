@@ -24,6 +24,7 @@ order is determined by comparing the key function of each item. If you want to h
 ```clojure
 => (sort-by (juxt :a :b)
      [{:a 3 :b 4} {:a 2 :b 2} {:a 2 :b 1}])
+
 ({:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4})
 ```
 
@@ -46,6 +47,7 @@ Group-by returns a map of elements grouped by key, where the grouping is determi
             {:name "Gazkral" :faction :orcs :health 65}
             {:name "Varok" :faction :orcs :health 31}
             {:name "Gork" :faction :orcs :health 29}])
+
 {[:orcs :below-half-health]
  [{:name "Grug" :faction :orcs :health 49}
   {:name "Varok" :faction :orcs :health 31}
@@ -54,6 +56,24 @@ Group-by returns a map of elements grouped by key, where the grouping is determi
  [{:name "Elendil" :faction :elves :health 98}]
  [:orcs :above-half-health]
  [{:name "Gazkral" :faction :orcs :health 65}]}
+
+(defn cleave-attack [actors]
+  (dissoc actors [:orcs :below-half-health]))
+
+=> (cleave-attack
+    {[:orcs :below-half-health]
+     [{:name "Grug" :faction :orcs :health 49}
+      {:name "Varok" :faction :orcs :health 31}
+      {:name "Gork" :faction :orcs :health 29}]
+     [:elves :above-half-health]
+     [{:name "Elendil" :faction :elves :health 98}]
+     [:orcs :above-half-health]
+     [{:name "Gazkral" :faction :orcs :health 65}]})
+
+{[:elves :above-half-health]
+ [{:name "Elendil", :faction :elves, :health 98}]
+ [:orcs :above-half-health]
+ [{:name "Gazkral", :faction :orcs, :health 65}]}
 ```
 
 Now we know how many orcs will get cut down by Elendil's cleave attack.
@@ -67,6 +87,7 @@ There was once a function in the now deprecated `clojure.contrib.seq-utils` libr
   [(filter pred s) (remove pred s)])
 
 => (separate odd? [1 2 3 2 1])
+
 [(1 3 1) (2 2)]
 ```
 
@@ -77,6 +98,7 @@ However, we can make this more succinct with `juxt`. Removing the need to pass t
   ((juxt filter remove) pred s))
 
 => (separate odd? [1 2 3 2 1])
+
 [(1 3 1) (2 2)]
 ```
 Hopefully these examples give you a taste of what `juxt` can do.
