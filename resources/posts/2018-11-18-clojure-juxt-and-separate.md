@@ -1,4 +1,4 @@
-Title: Clojure: juxt, sort-by and separate
+Title: Clojure: juxt and separate
 
 Juxt is one of those higher order function that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
 
@@ -28,6 +28,35 @@ order is determined by comparing the key function of each item. If you want to h
 ```
 
 This can be handy when you need to sort items by criteria of decreasing importance.
+
+### Group-by multiple keys
+
+Group-by returns a map of elements grouped by key, where the grouping is determined by the supplied function. If you want to group by multiple functions you can use `juxt` to pass in two or more functions.
+
+```clojure
+(defn health-status [{:keys [health]}]
+  (if (< health 50)
+    :below-half-health
+    :above-half-health))
+
+=> (group-by
+     (juxt :faction health-status)
+           [{:name "Grug" :faction :orcs :health 49}
+            {:name "Elendil" :faction :elves :health 98}
+            {:name "Gazkral" :faction :orcs :health 65}
+            {:name "Varok" :faction :orcs :health 31}
+            {:name "Gork" :faction :orcs :health 29}])
+{[:orcs :below-half-health]
+ [{:name "Grug" :faction :orcs :health 49}
+  {:name "Varok" :faction :orcs :health 31}
+  {:name "Gork" :faction :orcs :health 29}]
+ [:elves :above-half-health]
+ [{:name "Elendil" :faction :elves :health 98}]
+ [:orcs :above-half-health]
+ [{:name "Gazkral" :faction :orcs :health 65}]}
+```
+
+Now we know how many orcs will get cut down by Elendil's cleave attack.
 
 ### Separate
 
