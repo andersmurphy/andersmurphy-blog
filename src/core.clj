@@ -163,7 +163,6 @@
   (-> (sequence
        (comp (map add-file)
              (map add-path-name)
-             (map add-post-name)
              (map add-post-date)
              (map add-post-datetime)
              (map add-content)
