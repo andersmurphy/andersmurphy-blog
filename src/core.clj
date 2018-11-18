@@ -112,6 +112,9 @@
     (assoc m :content html
            :post-name (-> metadata :title first))))
 
+(defn prepend-doctype-header [html]
+  (str "<!DOCTYPE html>\n" html))
+
 (defn add-page [{:keys [post-name post-date content post-datetime] :as m}]
   (->> (html [:html
               (head post-name)
@@ -124,7 +127,7 @@
                          :datetime post-datetime}
                   post-date]
                  content]]]])
-       (str "<!DOCTYPE html>\n")
+       prepend-doctype-header
        (assoc m :page)))
 
 (defn index-html [ms]
@@ -144,7 +147,21 @@
                           post-date]
                          [:p (first-paragraph content)]])
                       ms)]]]])
-       (str "<!DOCTYPE html>\n")))
+       prepend-doctype-header))
+
+(def html-404
+  (->> (html [:html
+              (head site-title)
+              [:body
+               sidebar
+               [:div {:class "content container"}
+                [:article {:class "post"}
+                 [:h1 {:class "post-title"} "404: Page not found"]
+                 [:p "Sorry, we've misplaced that URL or it's
+                 pointing to something that doesn't exist."
+                  [:a {:href site-url} "Head back home"]
+                  " to try finding it again."]]]]])
+       prepend-doctype-header))
 
 (defn write-post! [{:keys [page path-name]}]
   (let [docs-path-name (str "docs/" path-name)]
@@ -169,20 +186,6 @@
              (map add-page))
        files)
       reverse))
-
-(def html-404
-  (->> (html [:html
-              (head site-title)
-              [:body
-               sidebar
-               [:div {:class "content container"}
-                [:article {:class "post"}
-                 [:h1 {:class "post-title"} "404: Page not found"]
-                 [:p "Sorry, we've misplaced that URL or it's
-                 pointing to something that doesn't exist."
-                  [:a {:href site-url} "Head back home"]
-                  " to try finding it again."]]]]])
-       (str "<!DOCTYPE html>\n")))
 
 (defn generate-site []
   (let [posts (get-posts files)]
