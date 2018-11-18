@@ -74,7 +74,7 @@
    ;; styles
    [:link {:rel  "stylesheet"
            :type "text/css"
-           :href "https://fonts.googleapis.com/css?family=Roboto"}]
+           :href "https://cdn.jsdelivr.net/gh/tonsky/FiraCode@1.206/distr/fira_code.css"}]
    [:link {:rel  "stylesheet"
            :type "text/css"
            :href (str site-url "/styles.css")}]

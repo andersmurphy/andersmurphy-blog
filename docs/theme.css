@@ -1,21 +1,22 @@
 /*
  * Global resets
  */
+@import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@1.206/distr/fira_code.css);
+
 
 html {
-  font-family: "Roboto", Helvetica, Arial, sans-serif;
+    font-family: "Fira Code";
 }
-
 
 /*
  * Sidebar
  */
 
 .sidebar {
-  text-align: center;
-  padding: 2rem 1rem;
-  color: rgba(255,255,255,.5);
-  background-color: #2E3440;
+    text-align: center;
+    padding: 2rem 1rem;
+    color: rgba(255,255,255,.5);
+    background-color: #2E3440;
 }
 @media (min-width: 48em) {
   .sidebar {
