@@ -63,7 +63,7 @@ h1,h2,h3,h4,h5,h6{
     margin-bottom:.5rem;
     font-weight:bold;
     line-height:1.25;
-    color:#313131;
+    color:#2E3440;
     text-rendering:optimizeLegibility
 }
 h1{
@@ -153,14 +153,8 @@ a[href^="#fn:"],a[href^="#fnref:"]{
 footer{
     margin-bottom:2rem
 }
-.page,.post{
+.post{
     margin-bottom:4em
-}
-.page-title,.post-title,.post-title a{
-    color:#303030
-}
-.page-title,.post-title{
-    margin-top:0
 }
 .post-date{
     display:block;
