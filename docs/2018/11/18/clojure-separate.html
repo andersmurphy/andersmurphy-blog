@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: juxt, sort-by and separate</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2018. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: juxt, sort-by and separate</h1><time class="post-date" datetime="2018-11-18T00:00:00+00:00">18 Nov 2018</time><p>Juxt is one of those higher order function that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.</p><pre><code class="clojure">=&gt; &#40;docs juxt&#41;
+-------------------------
+clojure.core/juxt
+&#40;&#91;f&#93; &#91;f g&#93; &#91;f g h&#93; &#91;f g h &amp; fs&#93;&#41;
+  Takes a set of functions and returns a fn that is the juxtaposition
+  of those fns.  The returned fn takes a variable number of args, and
+  returns a vector containing the result of applying each fn to the
+  args &#40;left-to-right&#41;.
+  &#40;&#40;juxt a b c&#41; x&#41; =&gt; &#91;&#40;a x&#41; &#40;b x&#41; &#40;c x&#41;&#93;
+</code></pre><p>So <code>juxt</code> takes a number of functions and returns a function that will apply each of those functions to its args.</p><h3>Sort-by multiple keys</h3><p>Sort-by returns a sorted sequence of the items in a collection, where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use <code>juxt</code> to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, etc.</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;juxt :a :b&#41;
+     &#91;{:a 3 :b 4} {:a 2 :b 2} {:a 2 :b 1}&#93;&#41;
+&#40;{:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4}&#41;
+</code></pre><p>This can be handy when you need to sort items by criteria of decreasing importance.</p><h3>Separated</h3><p>There was once a function in the now deprecated <code>clojure.contrib.seq-utils</code> library called <code>separate</code>. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function without <code>juxt</code> like so:</p><pre><code class="clojure">&#40;defn separate &#91;pred s&#93;
+  &#91;&#40;filter pred s&#41; &#40;remove pred s&#41;&#93;&#41;
+
+=&gt; &#40;separate odd? &#91;1 2 3 2 1&#93;&#41;
+&#91;&#40;1 3 1&#41; &#40;2 2&#41;&#93;
+</code></pre><p>However, we can make this more succinct with <code>juxt</code>. Removing the need to pass the same arguments into two different functions.</p><pre><code class="clojure">&#40;defn separate &#91;pred s&#93;
+  &#40;&#40;juxt filter remove&#41; pred s&#41;&#41;
+
+=&gt; &#40;separate odd? &#91;1 2 3 2 1&#93;&#41;
+&#91;&#40;1 3 1&#41; &#40;2 2&#41;&#93;
+</code></pre><p>Hopefully these examples give you a taste of what <code>juxt</code> can do.</p></article></div></body></html>
