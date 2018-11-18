@@ -1,11 +1,8 @@
 /*
  * Global resets
  */
-@import url(https://cdn.jsdelivr.net/gh/tonsky/FiraCode@1.206/distr/fira_code.css);
-
-
 html {
-    font-family: "Fira Code";
+    font-family: Open Sans;
 }
 
 /*
