@@ -1,7 +1,7 @@
 (ns core
   (:require [hiccup.core :refer [html]]
             [clojure.java.io :refer [make-parents]]
-            [markdown.core :refer [md-to-html-string]]
+            [markdown.core :refer [md-to-html-string-with-meta]]
             [clojure.string :as str]
             [clojure.java.io :as io])
   (:import [java.time LocalDateTime]))
@@ -33,12 +33,6 @@
                                first
                                (replace-n 3 #"-" "/"))
                            ".html")))
-
-(defn add-post-name [{:keys [path-name] :as m}]
-  (assoc m :post-name (-> (str/split path-name #"/") last
-                          (str/split #".html") first
-                          (str/replace #"-" " ")
-                          str/capitalize)))
 
 (def month-int->month-str
   {"01" "Jan" "02" "Feb" "03" "Mar" "04" "Apr" "05" "May" "06" "Jun"
@@ -114,7 +108,9 @@
     [:p (str "@ " (current-year) ". All rights reserved")]]])
 
 (defn add-content [{:keys [file] :as m}]
-  (assoc m :content (-> file slurp md-to-html-string)))
+  (let [{:keys [html metadata]} (-> file slurp (md-to-html-string-with-meta))]
+    (assoc m :content html
+           :post-name (-> metadata :title first))))
 
 (defn add-page [{:keys [post-name post-date content post-datetime] :as m}]
   (->> (html [:html

@@ -1,3 +1,5 @@
+Title: Desert island code: reduce map and filter
+
 You awake a castaway on a desert island. After some time you come
 across an ancient computation device. The programming of which might hold your
 salvation!

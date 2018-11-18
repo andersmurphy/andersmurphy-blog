@@ -1,6 +1,6 @@
-Some useful clojure functions for transforming the keys and values of maps.
+Title: Clojure: map-values and map-keys
 
-<!--more-->
+Some useful clojure functions for transforming the keys and values of maps.
 
 ### map-values
 

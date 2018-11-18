@@ -1,3 +1,5 @@
+Title: Signing your app
+
 Android requires that all apps be digitally signed with a certificate before they can be installed. To install a release version of your app on a device it will need to signed. Thankfully signing an app is relatively straightforward.
 
 <!--more-->

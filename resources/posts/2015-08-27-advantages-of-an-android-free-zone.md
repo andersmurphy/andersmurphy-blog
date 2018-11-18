@@ -1,3 +1,5 @@
+Title: Advantages of an Android free zone
+
 In Android projects I like to set up an “Android Free Zone”. This is a Java module that doesn’t have any dependencies on the Android libraries. This is where the business logic of the app lives.
 
 Shielding your business logic from changes to any third party library is always a good thing. But the “Android Free Zone” has other benefits. No need to launch an emulator or use a framework like [Robolectric](http://robolectric.org/) to test your business logic. This helps keep Red-Green-Refactor cycles short, for a more productive TDD workflow.

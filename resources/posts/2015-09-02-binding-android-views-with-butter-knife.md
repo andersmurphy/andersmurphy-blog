@@ -1,3 +1,5 @@
+Title: Binding Android views with Butter Knife
+
 As Android apps get more complex activities tend to get cluttered with calls to `findViewById(id)`. This unnecessary boilerplate takes time to write and makes code harder to read. [Butter Knife](https://github.com/JakeWharton/butterknife) to the rescue!
 
 Butter Knife is a field and method binding library for Android views which uses annotations to reduce boilerplate.

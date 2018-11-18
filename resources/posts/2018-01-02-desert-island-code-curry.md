@@ -1,3 +1,5 @@
+Title: Desert island code: curry
+
 You awake a castaway on a desert island. After some time you come
 across an ancient computation device, the programming of which might hold your
 salvation!
