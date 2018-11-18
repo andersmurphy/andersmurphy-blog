@@ -29,7 +29,7 @@ order is determined by comparing the key function of each item. If you want to h
 
 This can be handy when you need to sort items by criteria of decreasing importance.
 
-### Separated
+### Separate
 
 There was once a function in the now deprecated `clojure.contrib.seq-utils` library called `separate`. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function without `juxt` like so:
 
