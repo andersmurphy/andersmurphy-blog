@@ -11,7 +11,7 @@ First we add the `com.googlecode.libphonenumber` dependency to the leiningen `pr
 
 Then we import the `PhoneNumberUtil` class and use the `.parse` method which takes: an instance of `PhoneNumberUtil`, a phone number string, and a default region string (which in this case we have just left empty). It returns a `PhoneNumber` which we then parse into the `.isValidNumber` method for validation.
 
-*Note: According to the source code `PhoneNumberUtil/getInstance` implements the singleton pattern. So, calling it multiple times will only result in one instance being created.**
+*Note: According to the source code `PhoneNumberUtil/getInstance` implements the singleton pattern. So, calling it multiple times will only result in one instance being created.*
 
 ```clojure
 (ns core
