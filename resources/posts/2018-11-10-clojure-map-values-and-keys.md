@@ -82,9 +82,9 @@ The downside with this function is it takes a key-map not a function, meaning it
      :missing-key          "event"}
     keys->analytics-event-names)
 
-{:missing-key "event"
+{:missing-key                "event"
  "Primary announcement sent" "event"
- "Item purchased" "event"}
+ "Item purchased"            "event"}
 ```
 
 I hope these functions come in handy.
