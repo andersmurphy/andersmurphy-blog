@@ -49,7 +49,7 @@ Another common task I run into is transforming the keys of a map. This is especi
  "Item purchased"           "event"}
 ```
 
-There's also a core function called `clojure.set/rename-keys` which does a similar thing to `map-keys`.
+There's also a core function called `clojure.set/rename-keys` which does a similar thing to our `map-keys` function.
 
 ```clojure
 => (doc clojure.set/rename-keys)
