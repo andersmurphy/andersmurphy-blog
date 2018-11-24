@@ -1,6 +1,6 @@
 Title: Clojure: juxt and separate
 
-Juxt is one of those higher order function that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
+Juxt is one of those higher order functions that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
 
 ```clojure
 => (docs juxt)
@@ -18,7 +18,7 @@ So `juxt` takes a number of functions and returns a function that will apply eac
 
 ### Sort-by multiple keys
 
-Sort-by returns a sorted sequence of the items in a collection, where the sort
+Sort-by returns a sorted sequence of the items in a collection where the sort
 order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use `juxt` to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, etc.
 
 ```clojure
@@ -80,7 +80,7 @@ Now we know how many orcs will get cut down by Elendil's cleave attack.
 
 ### Separate
 
-There was once a function in the now deprecated `clojure.contrib.seq-utils` library called `separate`. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function without `juxt` like so:
+There was once a function, in the now deprecated `clojure.contrib.seq-utils` library, called `separate`. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function like this:
 
 ```clojure
 (defn separate [pred s]
@@ -91,7 +91,7 @@ There was once a function in the now deprecated `clojure.contrib.seq-utils` libr
 [(1 3 1) (2 2)]
 ```
 
-However, we can make this more succinct with `juxt`. Removing the need to pass the same arguments into two different functions.
+However, we can make this function more succinct with `juxt` removing the need to pass the same arguments into two different functions.
 
 ```clojure
 (defn separate [pred s]
