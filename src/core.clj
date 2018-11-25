@@ -27,23 +27,28 @@
 (defn add-file [file]
   {:file file})
 
-(defn add-path-name [{:keys [file] :as m}]
-  (assoc m :path-name (str (-> (.getName file)
-                               (str/split #".md")
+(defn add-file-name [{:keys [file] :as m}]
+  (assoc m :file-name (.getName file)))
+
+(defn add-path-name [{:keys [file-name] :as m}]
+  (assoc m :path-name (str (-> (str/split file-name #".md")
                                first
                                (replace-n 3 #"-" "/"))
                            ".html")))
+
+(defn add-date [{:keys [file-name] :as m}]
+  (assoc m :date (->> (str/split file-name #"-")
+                      (take 3))))
 
 (def month-int->month-str
   {"01" "Jan" "02" "Feb" "03" "Mar" "04" "Apr" "05" "May" "06" "Jun"
    "07" "Jul" "08" "Aug" "09" "Sep" "10" "Oct" "11" "Nov" "12" "Dec"})
 
-(defn file-name->post-date [[year month day]]
+(defn date->post-date [[year month day]]
   (str day " " (month-int->month-str month) " " year))
 
-(defn add-post-date [{:keys [file] :as m}]
-  (assoc m :post-date (-> (str/split (.getName file) #"-")
-                          file-name->post-date)))
+(defn date->datetime [[year month day]]
+  (str (str/join "-" [year month day]) "T00:00:00+00:00"))
 
 (defn current-year []
   (-> (LocalDateTime/now) str (str/split #"-") first))
@@ -53,13 +58,6 @@
       second
       (str/split #"</p>")
       first))
-
-(defn file-name->datetime [[year month day]]
-  (str (str/join "-" [year month day]) "T00:00:00+00:00"))
-
-(defn add-post-datetime [{:keys [file] :as m}]
-  (assoc m :post-datetime (-> (str/split (.getName file) #"-")
-                              file-name->datetime)))
 
 (defn head [title]
   [:head
@@ -115,7 +113,7 @@
 (defn prepend-doctype-header [html]
   (str "<!DOCTYPE html>\n" html))
 
-(defn add-page [{:keys [post-name post-date content post-datetime] :as m}]
+(defn add-page [{:keys [post-name date content date] :as m}]
   (->> (html [:html
               (head post-name)
               [:body
@@ -124,8 +122,8 @@
                 [:article {:class "post"}
                  [:h1 {:class "post-title"} post-name]
                  [:time {:class    "post-date"
-                         :datetime post-datetime}
-                  post-date]
+                         :datetime (date->datetime date)}
+                  (date->post-date date)]
                  content]]]])
        prepend-doctype-header
        (assoc m :page)))
@@ -137,14 +135,13 @@
                sidebar
                [:div {:class "content container"}
                 [:div {:class "posts"}
-                 (map (fn [{:keys [post-name post-date path-name
-                                   content post-datetime]}]
+                 (map (fn [{:keys [post-name date path-name content]}]
                         [:article {:class "post"}
                          [:h1 {:class "post-title"}
                           [:a {:href (str site-url "/" path-name)} post-name]]
                          [:time {:class    "post-date"
-                                 :datetime post-datetime}
-                          post-date]
+                                 :datetime (date->datetime date)}
+                          (date->post-date date)]
                          [:p (first-paragraph content)]])
                       ms)]]]])
        prepend-doctype-header))
@@ -179,9 +176,9 @@
 (defn get-posts [files]
   (-> (sequence
        (comp (map add-file)
+             (map add-file-name)
              (map add-path-name)
-             (map add-post-date)
-             (map add-post-datetime)
+             (map add-date)
              (map add-content)
              (map add-page))
        files)
