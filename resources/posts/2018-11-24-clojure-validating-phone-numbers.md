@@ -64,7 +64,7 @@ false
 
 false
 
-=> (valid-number? "rubish")
+=> (valid-number? "rubbish")
 
 false
 ```
