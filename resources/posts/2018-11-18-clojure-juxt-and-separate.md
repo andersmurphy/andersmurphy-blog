@@ -1,6 +1,6 @@
 Title: Clojure: juxt and separate
 
-Juxt is one of those higher order functions that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
+Juxt is one of those higher-order functions that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
 
 ```clojure
 => (docs juxt)
@@ -14,12 +14,11 @@ clojure.core/juxt
   ((juxt a b c) x) => [(a x) (b x) (c x)]
 ```
 
-So `juxt` takes a number of functions and returns a function that will apply each of those functions to its args.
+So `juxt` takes a number of functions and returns a function that applies each of those functions to its args.
 
 ### Sort-by multiple keys
 
-Sort-by returns a sorted sequence of the items in a collection where the sort
-order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use `juxt` to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, etc.
+Sort-by returns a sorted sequence of the items in a collection where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use `juxt` to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, and so on.
 
 ```clojure
 => (sort-by (juxt :a :b)
@@ -28,11 +27,11 @@ order is determined by comparing the key function of each item. If you want to h
 ({:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4})
 ```
 
-This can be handy when you need to sort items by criteria of decreasing importance.
+When you need to sort items by criteria of decreasing importance this comes in handy.
 
 ### Group-by multiple keys
 
-Group-by returns a map of elements grouped by key, where the grouping is determined by the supplied function. If you want to group by multiple functions you can use `juxt` to pass in two or more functions.
+Group-by returns a map of elements grouped by key, where the supplied function determines the grouping. If you want to group by multiple functions, you can use `juxt` to pass in two or more functions.
 
 ```clojure
 (defn health-status [{:keys [health]}]
@@ -76,7 +75,7 @@ Group-by returns a map of elements grouped by key, where the grouping is determi
  [{:name "Gazkral", :faction :orcs, :health 65}]}
 ```
 
-Now we know how many orcs will get cut down by Elendil's cleave attack.
+Now we know how many orcs get cut down by Elendil's cleave attack.
 
 ### Separate
 
@@ -101,4 +100,4 @@ However, we can make this function more succinct with `juxt` removing the need t
 
 [(1 3 1) (2 2)]
 ```
-Hopefully these examples give you a taste of what `juxt` can do.
+Hopefully, these examples give you a taste of what `juxt` can do.

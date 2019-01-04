@@ -1,17 +1,15 @@
-Title: Clojure: validating phone numbers
+Sometimes you need to validate phone numbers, [googlei18n/libphonenumber](https://github.com/googlei18n/libphonenumber/tree/master/java/libphonenumber/src/com/google/i18n/phonenumbers) is a Java library for doing just that (and more). Thanks to Clojure's great java interop using this library in your project is straightforward.
 
-Sometimes you need to validate phone numbers, [googlei18n/libphonenumber](https://github.com/googlei18n/libphonenumber/tree/master/java/libphonenumber/src/com/google/i18n/phonenumbers) is a java library for doing just that (and more). Thanks to clojure's great java interop using this library in your project is straight forward.
-
-First we add the `com.googlecode.libphonenumber` dependency to the leiningen `project.clj` file.
+First, we add the `com.googlecode.libphonenumber` dependency to the leiningen `project.clj` file.
 
 ```clojure
 (defproject phone-number-validation "0.1.0-SNAPSHOT"
   :dependencies [[com.googlecode.libphonenumber/libphonenumber "8.9.9"]
 ```
 
-Then we import the `PhoneNumberUtil` class and use the `.parse` method which takes: an instance of `PhoneNumberUtil`, a phone number string, and a default region string (which in this case we have just left empty). It returns a `PhoneNumber` which we then parse into the `.isValidNumber` method for validation.
+Then we import the `PhoneNumberUtil` class and use the `.parse` method which takes: an instance of `PhoneNumberUtil`, a phone number string, and a default region string (which in this case we have just left empty). It returns a `PhoneNumber` which we then passe into the `.isValidNumber` method for validation.
 
-*Note: According to the source code `PhoneNumberUtil/getInstance` implements the singleton pattern. So, calling it multiple times will only result in one instance being created.*
+*Note: According to the source code `PhoneNumberUtil/getInstance` implements the singleton pattern. So, calling it multiple times only results in one instance being created.*
 
 ```clojure
 (ns core
@@ -30,7 +28,7 @@ true
 false
 ```
 
-This seems to work well enough so far. But what if we try something more "obviously wrong"?
+The above works well enough so far. But, what if we try something more "obviously wrong"?
 
 ```clojure
 => (valid-number? "+41")
