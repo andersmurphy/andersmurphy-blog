@@ -1,10 +1,10 @@
 Title: Clojure: sending emails with SendGrid
 
-Your business needs you to generate an automated email report containing data from your app. In this example we will use the [SendGrid][https://sendgrid.com] web API to email a `.csv` file.
+Your business needs you to generate an automated email report containing data from your app. In this example we will use the [SendGrid](https://sendgrid.com) web API to email a `.csv` file.
 
 ### Get a SendGrid API key
 
-First, you need to get a SendGrid API key. I'm not going to cover this in any more detail as there is plenty of [documentation][https://sendgrid.com/docs/ui/account-and-settings/api-keys/] available on their website.
+First, you need to get a SendGrid API key. I'm not going to cover this in any more detail as there is plenty of [documentation](https://sendgrid.com/docs/ui/account-and-settings/api-keys/) available on their website.
 
 Once you have your API key, you can pass it into your app as an environment variable.
 
@@ -13,9 +13,10 @@ Once you have your API key, you can pass it into your app as an environment vari
 We want to send some data in `.csv` format as an attachment. We are just using a list of maps in this case. However, in a real-world application, this could be data you get back from a database query. Here's the data.
 
 ```clojure
-(def data [{:name "Bob" :age 27 :favourite-food "bagels"}
-           {:name "Sarah" :age 23 :favourite-food "apples"}
-           {:name "John" :age 41 :favourite-food "pasta"}])
+(def data
+  [{:name "Bob" :age 27 :favourite-food "bagels"}
+   {:name "Sarah" :age 23 :favourite-food "apples"}
+   {:name "John" :age 41 :favourite-food "pasta"}])
 ```
 
 Next, we need a function to convert this data into csv format.
@@ -39,7 +40,7 @@ Next, we need a function to convert this data into csv format.
 
 ### Sendgrid Rest API
 
-First lets look at the SendGrid Rest API [documentation][https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/index.html]. From the documentation, we can see that we need to make the following request.
+First lets look at the SendGrid Rest API [documentation](https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/index.html). From the documentation, we can see that we need to make the following request.
 
 ```
 POST https://api.sendgrid.com/v3/mail/send
@@ -79,7 +80,9 @@ Before we translate this request into Clojure, we need to be able to convert our
 
 ```clojure
 (defn encode-string-to-base64 [string]
-  (.encodeToString (java.util.Base64/getEncoder) (.getBytes string)))
+  (.encodeToString
+   (java.util.Base64/getEncoder)
+   (.getBytes string)))
 ```
 
 Finally, we write a function to make the request to the SendGrid API.
@@ -89,7 +92,8 @@ Finally, we write a function to make the request to the SendGrid API.
   (http/post
    "https://api.sendgrid.com/v3/mail/send"
    {:headers      {:authorization
-                   (str "Bearer " (System/getenv "SENGRID_API_KEY"))}
+                   (str "Bearer "
+                        (System/getenv "SENGRID_API_KEY"))}
     :content-type :json
     :form-params
     {:personalizations [{:to      [{:email to-email}]
@@ -109,9 +113,10 @@ That's all there is to it. Here's all the code.
   (:require [clj-http.client :as http]
             [clojure.string :as str]))
 
-(def data [{:name "Bob" :age 27 :favourite-food "bagels"}
-           {:name "Sarah" :age 23 :favourite-food "apples"}
-           {:name "John" :age 41 :favourite-food "pasta"}])
+(def data
+  [{:name "Bob" :age 27 :favourite-food "bagels"}
+   {:name "Sarah" :age 23 :favourite-food "apples"}
+   {:name "John" :age 41 :favourite-food "pasta"}])
 
 (defn escape-csv-value [value]
   (str "\"" value "\""))
@@ -129,13 +134,16 @@ That's all there is to it. Here's all the code.
          (str/join "\n"))))
 
 (defn encode-string-to-base64 [string]
-  (.encodeToString (java.util.Base64/getEncoder) (.getBytes string)))
+  (.encodeToString
+   (java.util.Base64/getEncoder)
+   (.getBytes string)))
 
 (defn send-email-with-csv [to-email csv-string]
   (http/post
    "https://api.sendgrid.com/v3/mail/send"
    {:headers      {:authorization
-                   (str "Bearer " (System/getenv "SENGRID_API_KEY"))}
+                   (str "Bearer "
+                        (System/getenv "SENGRID_API_KEY"))}
     :content-type :json
     :form-params
     {:personalizations [{:to      [{:email to-email}]
@@ -151,7 +159,6 @@ That's all there is to it. Here's all the code.
   (->> data
        ms->csv-string
        (send-email-with-csv "john@example.com")))
-
 ```
 
-The full example project is [here][https://github.com/andersmurphy/clj-sendgrid-example/blob/master/src/clj_sendgrid_example/core.clj].
+The full example project is [here](https://github.com/andersmurphy/clj-sendgrid-example/blob/master/src/clj_sendgrid_example/core.clj).
