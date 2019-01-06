@@ -40,7 +40,7 @@ Next, we need a function to convert this data into csv format.
 
 ### Sendgrid Rest API
 
-First lets look at the SendGrid Rest API [documentation](https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/index.html). From the documentation, we can see that we need to make the following request.
+First lets look at the SendGrid Web API [documentation](https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/index.html). From the documentation, we can see that we need to make the following request.
 
 ```
 POST https://api.sendgrid.com/v3/mail/send
