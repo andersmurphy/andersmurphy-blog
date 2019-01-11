@@ -3,7 +3,7 @@ Title: Clojure: juxt and separate
 Juxt is one of those higher-order functions that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
 
 ```clojure
-=> (docs juxt)
+=> (doc juxt)
 -------------------------
 clojure.core/juxt
 ([f] [f g] [f g h] [f g h & fs])
