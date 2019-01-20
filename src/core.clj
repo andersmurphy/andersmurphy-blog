@@ -128,7 +128,7 @@
        prepend-doctype-header
        (assoc m :page)))
 
-(defn index-html [ms]
+(defn page-html [{:keys [page-content previous-page-url next-page-url] :as m}]
   (->> (html [:html
               (head site-title)
               [:body
@@ -143,8 +143,15 @@
                                  :datetime (date->datetime date)}
                           (date->post-date date)]
                          [:p (first-paragraph content)]])
-                      ms)]]]])
-       prepend-doctype-header))
+                      page-content)]
+                (when previous-page-url
+                  [:a {:href (str site-url "/" previous-page-url)}
+                   "Newer Posts"])
+                (when next-page-url
+                  [:a {:href (str site-url "/" next-page-url)}
+                   "Older Posts"])]]])
+       prepend-doctype-header
+       (assoc m :page-content)))
 
 (def html-404
   (->> (html [:html
@@ -165,9 +172,34 @@
     (make-parents docs-path-name)
     (spit docs-path-name page)))
 
-(defn write-index! [s]
-  (let [path-name "docs/index.html"]
-    (spit path-name s)))
+(defn link-pages [pages]
+  (reduce (fn [pages next-page]
+            (let [previous-page (first pages)]
+              (if previous-page
+                (conj (drop 1 pages)
+                      (assoc previous-page
+                             :next-page
+                             (:page-path-name next-page))
+                      (assoc next-page
+                             :previous-page
+                             (:page-path-name previous-page)))
+                (conj pages next-page))))
+          '() pages))
+
+(defn add-page-urls [pages]
+  (let [number-of-pages (count pages)]
+    (->> (inc number-of-pages)
+         (range 2)
+         (map #(str "docs/page/" % ".html"))
+         (into ["docs/index.html"])
+         (map (fn [page url] {:page-content   page
+                              :page-path-name url})
+              pages)
+         link-pages)))
+
+(defn write-page! [{:keys [page-content page-path-name]}]
+  (make-parents page-path-name)
+  (spit page-path-name page-content))
 
 (defn write-404! [s]
   (let [path-name "docs/404.html"]
@@ -186,8 +218,10 @@
 
 (defn generate-site []
   (let [posts (get-posts files)]
-    (-> (index-html posts)
-        write-index!)
+    (->> (partition-all 10 posts)
+         add-page-urls
+         (map page-html)
+         (run! write-page!))
     (-> html-404
         write-404!)
     (run! write-post! posts)))
