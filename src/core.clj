@@ -178,10 +178,10 @@
               (if previous-page
                 (conj (drop 1 pages)
                       (assoc previous-page
-                             :next-page
+                             :next-page-url
                              (:page-path-name next-page))
                       (assoc next-page
-                             :previous-page
+                             :previous-page-url
                              (:page-path-name previous-page)))
                 (conj pages next-page))))
           '() pages))
