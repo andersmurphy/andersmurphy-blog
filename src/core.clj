@@ -30,11 +30,11 @@
 (defn add-file-name [{:keys [file] :as m}]
   (assoc m :file-name (.getName file)))
 
-(defn add-path-name [{:keys [file-name] :as m}]
-  (assoc m :path-name (str (-> (str/split file-name #".md")
-                               first
-                               (replace-n 3 #"-" "/"))
-                           ".html")))
+(defn add-post-path-name [{:keys [file-name] :as m}]
+  (assoc m :post-path-name (str (-> (str/split file-name #".md")
+                                    first
+                                    (replace-n 3 #"-" "/"))
+                                ".html")))
 
 (defn add-date [{:keys [file-name] :as m}]
   (assoc m :date (->> (str/split file-name #"-")
@@ -105,26 +105,26 @@
      [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]]
     [:p (str "@ " (current-year) ". All rights reserved")]]])
 
-(defn add-content [{:keys [file] :as m}]
+(defn add-post-content [{:keys [file] :as m}]
   (let [{:keys [html metadata]} (-> file slurp (md-to-html-string-with-meta))]
-    (assoc m :content html
+    (assoc m :post-content html
            :post-name (-> metadata :title first))))
 
 (defn prepend-doctype-header [html]
   (str "<!DOCTYPE html>\n" html))
 
-(defn add-page [{:keys [post-name date content date] :as m}]
+(defn add-post-page [{:keys [post-name date post-content date] :as m}]
   (->> (html [:html
               (head post-name)
               [:body
                sidebar
-               [:div {:class "content container"}
+               [:div {:class "post-content container"}
                 [:article {:class "post"}
                  [:h1 {:class "post-title"} post-name]
                  [:time {:class    "post-date"
                          :datetime (date->datetime date)}
                   (date->post-date date)]
-                 content]]]])
+                 post-content]]]])
        prepend-doctype-header
        (assoc m :page)))
 
@@ -135,14 +135,15 @@
                sidebar
                [:div {:class "content container"}
                 [:div {:class "posts"}
-                 (map (fn [{:keys [post-name date path-name content]}]
+                 (map (fn [{:keys [post-name date post-path-name post-content]}]
                         [:article {:class "post"}
                          [:h1 {:class "post-title"}
-                          [:a {:href (str site-url "/" path-name)} post-name]]
+                          [:a {:href (str site-url "/" post-path-name)}
+                           post-name]]
                          [:time {:class    "post-date"
                                  :datetime (date->datetime date)}
                           (date->post-date date)]
-                         [:p (first-paragraph content)]])
+                         [:p (first-paragraph post-content)]])
                       page-content)]
                 (when previous-page-url
                   [:a {:href (str site-url "/" previous-page-url)}
@@ -167,10 +168,16 @@
                   " to try finding it again."]]]]])
        prepend-doctype-header))
 
-(defn write-post! [{:keys [page path-name]}]
+(defn write-file! [path-name content]
   (let [docs-path-name (str "docs/" path-name)]
     (make-parents docs-path-name)
-    (spit docs-path-name page)))
+    (spit docs-path-name content)))
+
+(defn write-post! [{:keys [post-path-name post-content]}]
+  (write-file! post-path-name post-content))
+
+(defn write-page! [{:keys [page-path-name page-content]}]
+  (write-file! page-path-name page-content))
 
 (defn link-pages [pages]
   (reduce (fn [pages next-page]
@@ -190,16 +197,12 @@
   (let [number-of-pages (count pages)]
     (->> (inc number-of-pages)
          (range 2)
-         (map #(str "docs/page/" % ".html"))
-         (into ["docs/index.html"])
+         (map #(str "page/" % ".html"))
+         (into ["index.html"])
          (map (fn [page url] {:page-content   page
                               :page-path-name url})
               pages)
          link-pages)))
-
-(defn write-page! [{:keys [page-content page-path-name]}]
-  (make-parents page-path-name)
-  (spit page-path-name page-content))
 
 (defn write-404! [s]
   (let [path-name "docs/404.html"]
@@ -209,10 +212,10 @@
   (-> (sequence
        (comp (map add-file)
              (map add-file-name)
-             (map add-path-name)
+             (map add-post-path-name)
              (map add-date)
-             (map add-content)
-             (map add-page))
+             (map add-post-content)
+             (map add-post-page))
        files)
       reverse))
 
