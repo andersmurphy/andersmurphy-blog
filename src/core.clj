@@ -146,11 +146,13 @@
                          [:p (first-paragraph post-content)]])
                       page-content)]
                 (when previous-page-url
-                  [:a {:href (str site-url "/" previous-page-url)}
-                   "Newer Posts"])
+                  [:h1 {:class "post-title"}
+                   [:a {:href (str site-url "/" previous-page-url)}
+                    "<- Newer Posts"]])
                 (when next-page-url
-                  [:a {:href (str site-url "/" next-page-url)}
-                   "Older Posts"])]]])
+                  [:h1 {:class "post-title"}
+                   [:a {:href (str site-url "/" next-page-url)}
+                    "Older Posts ->"]])]]])
        prepend-doctype-header
        (assoc m :page-content)))
 
