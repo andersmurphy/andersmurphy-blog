@@ -125,14 +125,9 @@ a.sidebar-nav-item:focus {
 
 .pagination-item {
     display: block;
-    padding: 1rem;
 }
 
 @media (min-width: 30em) {
-    .pagination {
-        margin: 3rem 0;
-    }
-
     .pagination-item {
         float: left;
         width: 50%;
