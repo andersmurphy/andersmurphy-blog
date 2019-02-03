@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html><head><meta charset="UTF-8" /><title>Clojure: string interpolation</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: string interpolation</h1><time class="post-date" datetime="2019-01-15T00:00:00+00:00">15 Jan 2019</time><p>We have a url with some placeholder values that we want to replace.</p><pre><code>&quot;https://www.shop.com/$seller/items/$item-code/prices/$currency&quot;
+<p>We have a URL with some placeholder values that we want to replace.</p><pre><code>&quot;https://www.shop.com/$seller/items/$item-code/prices/$currency&quot;
 </code></pre><h3>str</h3><p>One way of doing this is to use <code>str</code> function.</p><pre><code class="clojure">&#40;defn shop-url &#91;seller item-code currency&#93;
   &#40;str &quot;https://www.shop.com/&quot; seller
        &quot;/items/&quot;               item-code
@@ -8,13 +7,13 @@
 &#40;shop-url &quot;bob&quot; &quot;A567&quot; &quot;EUR&quot;&#41;
 
 =&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
-</code></pre><p>There's noting wrong with this solution. However, it does encapsulate/hide a lot of information that might be useful at the call site: order of arguments and what url it is operating on.</p><h3>format</h3><p>Another approach would be to use the <code>format</code> function, which gives us string interpolation.</p><pre><code class="clojure">&#40;format &quot;https://www.shop.com/%s/items/%s/prices/%s&quot;
+</code></pre><p>There's nothing wrong with this solution. However, it does encapsulate/hide information that might be useful at the call site: order of arguments and what URL it is operating on.</p><h3>format</h3><p>Another approach would be to use the <code>format</code> function, which gives us string interpolation.</p><pre><code class="clojure">&#40;format &quot;https://www.shop.com/%s/items/%s/prices/%s&quot;
         &quot;bob&quot;
         &quot;A567&quot;
         &quot;EUR&quot;&#41;
 
 =&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
-</code></pre><p>The downside with this is that the placeholders in the url are not self documenting.</p><h3>replace-several</h3><p>What about using some sort of string replace function? Clojure core does have functions for replacing matches in strings but it doesn't have a built in function for replacing multiple different matches. So lets see how we could implement our own <code>replace-several</code> function.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
+</code></pre><p>The downside with this is that the placeholders in the URL are not self-documenting.</p><h3>replace-several</h3><p>What about using a string replace function? Clojure core does have functions for replacing matches in strings, but it doesn't have a built-in function for replacing multiple different matches. Let's see how we could implement our own <code>replace-several</code> function.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
   &#40;reduce &#40;fn &#91;s &#91;match replacement&#93;&#93;
             &#40;clojure.string/replace s match replacement&#41;&#41;
           s replacements&#41;&#41;
@@ -25,6 +24,6 @@
                  &quot;$currency&quot; &quot;EUR&quot;&#41;
 
 =&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
-</code></pre><p>This works and read better than our previous solutions as it's clear what each value is being replaced with. If you find the destructuring a in the <code>reduce</code> a bit cumbersome you can use <code>reduce-kv</code> which returns the accumulator, key and values for us.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
+</code></pre><p>The above works and reads better than our previous solutions as the value substitutions are clear. If you find the destructuring in the <code>reduce</code> a bit cumbersome you can use <code>reduce-kv</code> which returns the accumulator, key and values for us.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
   &#40;reduce-kv clojure.string/replace s replacements&#41;&#41;
-</code></pre><p>Hopefully, these examples come in handy the next time you need some psudo-string interpolation.</p></article></div></body></html>
+</code></pre><p>Hopefully, these examples come in handy the next time you need some pseudo-string interpolation.</p>
