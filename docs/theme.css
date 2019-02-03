@@ -124,4 +124,5 @@ a.sidebar-nav-item:focus {
 
 .pagination-item {
     display: block;
+    font-size: 1.5rem;
 }
