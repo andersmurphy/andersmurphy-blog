@@ -122,7 +122,3 @@ a.sidebar-nav-item:focus {
     color: #ccc;
     text-align: center;
 }
-
-.pagination-item {
-    display: block;
-}
