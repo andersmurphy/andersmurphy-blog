@@ -146,16 +146,14 @@
                          [:p (first-paragraph post-content)]])
                       page-content)]
                 [:div {:class "pagination"}
-                 [:div {:class "pagination-item"}
-                  (if previous-page-url
+                 (when previous-page-url
+                   [:div {:class "pagination-item"}
                     [:a {:href (str site-url "/" previous-page-url)}
-                     "<- Newer"]
-                    [:p "<- Newer"])]
-                 [:div {:class "pagination-item"}
-                  (if next-page-url
+                     "<- Newer"]])
+                 (when next-page-url
+                   [:div {:class "pagination-item"}
                     [:a {:href (str site-url "/" next-page-url)}
-                     "Older ->"]
-                    [:p "Older ->"])]]]]])
+                     "Older ->"]])]]]])
        prepend-doctype-header
        (assoc m :page-content)))
 

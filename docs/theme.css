@@ -119,6 +119,9 @@ a.sidebar-nav-item:focus {
 
 .pagination {
     overflow: hidden;
-    color: #ccc;
     text-align: center;
+}
+
+.pagination-item {
+    display: block;
 }
