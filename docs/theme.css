@@ -120,24 +120,16 @@ a.sidebar-nav-item:focus {
 .pagination {
     overflow: hidden;
     margin: 0 -1.5rem 1rem;
-    font-family: "PT Sans", Helvetica, Arial, sans-serif;
-    color: #ccc;
     text-align: center;
 }
 
 .pagination-item {
     display: block;
     padding: 1rem;
-    border: solid #eee;
-    border-width: 1px 0;
 
     &:first-child {
         margin-bottom: -1px;
     }
-}
-
-a.pagination-item:hover {
-    background-color: #f5f5f5;
 }
 
 @media (min-width: 30em) {
