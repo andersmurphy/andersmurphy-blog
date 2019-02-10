@@ -118,7 +118,7 @@
               (head post-name)
               [:body
                sidebar
-               [:div {:class "post-content container"}
+               [:div {:class "content container"}
                 [:article {:class "post"}
                  [:h1 {:class "post-title"} post-name]
                  [:time {:class    "post-date"
