@@ -126,7 +126,7 @@
                   (date->post-date date)]
                  post-content]]]])
        prepend-doctype-header
-       (assoc m :page)))
+       (assoc m :post-content)))
 
 (defn page-html [{:keys [page-content previous-page-url next-page-url] :as m}]
   (->> (html [:html
