@@ -126,7 +126,7 @@
                   (date->post-date date)]
                  post-content]]]])
        prepend-doctype-header
-       (assoc m :post-content)))
+       (assoc m :post-html)))
 
 (defn page-html [{:keys [page-content previous-page-url next-page-url] :as m}]
   (->> (html [:html
@@ -154,7 +154,7 @@
                     [:a {:href (str site-url "/" next-page-url)}
                      "->"]])]]]])
        prepend-doctype-header
-       (assoc m :page-content)))
+       (assoc m :page-html)))
 
 (def html-404
   (->> (html [:html
@@ -175,11 +175,11 @@
     (make-parents docs-path-name)
     (spit docs-path-name content)))
 
-(defn write-post! [{:keys [post-path-name post-content]}]
-  (write-file! post-path-name post-content))
+(defn write-post! [{:keys [post-path-name post-html]}]
+  (write-file! post-path-name post-html))
 
-(defn write-page! [{:keys [page-path-name page-content]}]
-  (write-file! page-path-name page-content))
+(defn write-page! [{:keys [page-path-name page-html]}]
+  (write-file! page-path-name page-html))
 
 (defn link-pages [pages]
   (reduce (fn [pages next-page]
