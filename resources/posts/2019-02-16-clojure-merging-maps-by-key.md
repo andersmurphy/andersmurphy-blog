@@ -35,7 +35,7 @@ We can achieve this using `concat`, `gourp-by` and `merge`. First we concatenate
     {:userid 3, :name "Sarah", :email "sarah@email.com"})
  ```
 
-This works for sequences of the same length, but what do we get if the sequences are the different lengths (one of the tables has missing rows)?
+This works for sequences of the same length, but what do we get if the sequences are different lengths (one of the tables has missing rows)?
 
  ```clojure
 (def name-table [{:userid 1 :name "Bob"}
@@ -54,7 +54,7 @@ This works for sequences of the same length, but what do we get if the sequences
     {:userid 3, :name "Sarah"})
  ```
 
-This returns all the user names, with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.
+This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.
 
 ### Using clojure.set/join
 
