@@ -14,7 +14,9 @@
 (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
 (def highlight-url "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0")
 (def directory (io/file "resources/posts"))
-(def files (sort (drop 1 (file-seq directory))))
+(defn desc [a b] (compare b a))
+(def files (sort desc (drop 1 (file-seq directory))))
+
 
 (defn replace-n [s n match replacement]
   (if (= n 0)
@@ -211,15 +213,14 @@
     (spit path-name s)))
 
 (defn get-posts [files]
-  (-> (sequence
-       (comp (map add-file)
-             (map add-file-name)
-             (map add-post-path-name)
-             (map add-date)
-             (map add-post-content)
-             (map add-post-page))
-       files)
-      reverse))
+  (sequence
+   (comp (map add-file)
+         (map add-file-name)
+         (map add-post-path-name)
+         (map add-date)
+         (map add-post-content)
+         (map add-post-page))
+   files))
 
 (defn generate-site []
   (let [posts (get-posts files)]
