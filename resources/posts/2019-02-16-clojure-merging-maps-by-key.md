@@ -26,13 +26,13 @@ We can achieve this using `concat`, `gourp-by` and `merge`. First we concatenate
        (map (fn [[row1 row2]]
               (merge row1 row2)))))
 
-(merge-on-key :userid
-              name-table
-              email-table)
+=> (merge-on-key :userid
+                 name-table
+                 email-table)
 
-=> ({:userid 1, :name "Bob", :email "bob@email.com"}
-    {:userid 2, :name "Jo", :email "jo@email.com"}
-    {:userid 3, :name "Sarah", :email "sarah@email.com"})
+({:userid 1, :name "Bob", :email "bob@email.com"}
+ {:userid 2, :name "Jo", :email "jo@email.com"}
+ {:userid 3, :name "Sarah", :email "sarah@email.com"})
  ```
 
 This works for sequences of the same length, but what do we get if the sequences are different lengths (one of the tables has missing rows)?
@@ -45,13 +45,13 @@ This works for sequences of the same length, but what do we get if the sequences
 (def email-table [{:userid 1 :email "bob@email.com"}
                   {:userid 2 :email "jo@email.com"}])
 
-(merge-on-key :userid
-              name-table
-              email-table)
+=> (merge-on-key :userid
+                 name-table
+                 email-table)
 
-=> ({:userid 1, :name "Bob", :email "bob@email.com"}
-    {:userid 2, :name "Jo", :email "jo@email.com"}
-    {:userid 3, :name "Sarah"})
+({:userid 1, :name "Bob", :email "bob@email.com"}
+ {:userid 2, :name "Jo", :email "jo@email.com"}
+ {:userid 3, :name "Sarah"})
  ```
 
 This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.
@@ -68,10 +68,10 @@ If we just want all user names with corresponding emails, also known as an INNER
 (def email-table [{:userid 1 :email "bob@email.com"}
                   {:userid 2 :email "jo@email.com"}])
 
-(clojure.set/join (set name-table) (set email-table))
+=> (clojure.set/join (set name-table) (set email-table))
 
-=> ({:userid 1, :name "Bob", :email "bob@email.com"}
-    {:userid 2, :name "Jo", :email "jo@email.com"})
+({:userid 1, :name "Bob", :email "bob@email.com"}
+ {:userid 2, :name "Jo", :email "jo@email.com"})
 ```
 
 This just scratches the surface of the relational algebra you can do with Clojure data structures. For more check out the [clojure.set](https://clojuredocs.org/clojure.set) namespace.
