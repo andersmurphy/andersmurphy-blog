@@ -1,8 +1,8 @@
 Title: Clojure: sorting
 
-This post covers sorting in Clojure.
+Sorting collections of items is something that comes up all the time in software development. This post covers a multitude of ways Clojure allows you to sort things.
 
-###Sorting numbers and dates
+###Sorting numbers
 
 To sort numbers we use the `sort` function.
 
