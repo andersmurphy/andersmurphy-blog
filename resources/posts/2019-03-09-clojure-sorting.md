@@ -1,6 +1,6 @@
 Title: Clojure: sorting
 
-Sorting collections of items is something that comes up all the time in software development. This post covers a multitude of ways Clojure allows you to sort things.
+Sorting collections of items is something that comes up all the time in software development. This post covers the multitude of ways you can sort things in Clojure.
 
 ###Sorting numbers
 
