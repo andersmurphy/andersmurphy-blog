@@ -12,7 +12,7 @@ To sort numbers we use the `sort` function.
 (1 2 3 8 9 9)
 ```
 
-To reverse the sort order we pass the `>` function to the `sort` function.
+To reverse the sort order we pass the `>` function into the `sort` function.
 
 ```clojure
 => (sort > [9 3 2 8 1 9])
@@ -38,7 +38,7 @@ Sorting strings and dates in ascending order is exactly the same as sorting numb
  #inst "2019-05-03T00:00:00.000-00:00")
 ```
 
-However, passing the `>` function to the `sort` function gives us an error.
+However, passing the `>` function into the `sort` function gives us an error.
 
 ```clojure
 => (sort > ["b" "a" "f" "c" "x"])
@@ -109,7 +109,7 @@ If we want to reverse the order but keep `nil` values at the front we can pass i
 
 ###Sorting maps by key
 
-To sort maps by key we use the `sort-by` function, passing the key we want to sort by as an argument.
+To sort maps by key we use the `sort-by` function, passing in the key we want to sort by as an argument.
 
 ```clojure
 => (sort-by :a [{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}])
@@ -181,4 +181,4 @@ This is useful as it means it doesn't matter what order you apply your sorts to 
 
 ```
 
-Hopefully this covers most of the day to day sorting needs you will run into.
+Hopefully this covers most of your day to day sorting needs.
