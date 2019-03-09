@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: sorting</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: sorting</h1><time class="post-date" datetime="2019-03-09T00:00:00+00:00">09 Mar 2019</time><p>This post covers sorting in Clojure.</p><h3>Sorting numbers and dates</h3><p>To sort numbers we use the <code>sort</code> function.</p><pre><code class="clojure">=&gt; &#40;sort &#91;9 3 2 8 1 9&#93;&#41;
+
+&#40;1 2 3 8 9 9&#41;
+</code></pre><p>To reverse the sort order we pass the <code>&gt;</code> function to the <code>sort</code> function.</p><pre><code class="clojure">=&gt; &#40;sort &gt; &#91;9 3 2 8 1 9&#93;&#41;
+
+&#40;9 9 8 3 2 1&#41;
+</code></pre><h3>Sorting strings and dates</h3><p>Sorting strings and dates in ascending order is exactly the same as sorting numbers.</p><pre><code class="clojure">=&gt; &#40;sort &#91;&quot;b&quot; &quot;a&quot; &quot;f&quot; &quot;c&quot; &quot;x&quot;&#93;&#41;
+
+&#40;&quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;f&quot; &quot;x&quot;&#41;
+
+=&gt; &#40;sort &#91;#inst &quot;2019-02-03&quot;
+          #inst &quot;2019-05-03&quot;
+          #inst &quot;2018-09-03&quot;&#93;&#41;
+
+&#40;#inst &quot;2018-09-03T00:00:00.000-00:00&quot;
+ #inst &quot;2019-02-03T00:00:00.000-00:00&quot;
+ #inst &quot;2019-05-03T00:00:00.000-00:00&quot;&#41;
+</code></pre><p>However, passing the <code>&gt;</code> function to the <code>sort</code> function gives us an error.</p><pre><code class="clojure">=&gt; &#40;sort &gt; &#91;&quot;b&quot; &quot;a&quot; &quot;f&quot; &quot;c&quot; &quot;x&quot;&#93;&#41;
+
+Execution error &#40;ClassCastException&#41; at java.util.TimSort/countRunAndMakeAscending &#40;TimSort.java:355&#41;.
+java.lang.String cannot be cast to java.lang.Number
+
+=&gt; &#40;sort &gt; &#91;#inst &quot;2019-02-03&quot;
+            #inst &quot;2019-05-03&quot;
+            #inst &quot;2018-09-03&quot;&#93;&#41;
+
+Execution error &#40;ClassCastException&#41; at java.util.TimSort/countRunAndMakeAscending &#40;TimSort.java:355&#41;.
+java.util.Date cannot be cast to java.lang.Number
+</code></pre><p>To reverse the sort we need to make our own <a href='https://clojure.org/guides/comparators'>comparator</a> the easiest way to do this is with the <code>compare</code> function. By changing the argument order to the compare function we can change the order of the sort.</p><pre><code class="clojure">&#40;defn desc &#91;a b&#93;
+  &#40;compare b a&#41;&#41;
+
+=&gt; &#40;sort desc &#91;&quot;b&quot; &quot;a&quot; &quot;f&quot; &quot;c&quot; &quot;x&quot;&#93;&#41;
+
+&#40;&quot;x&quot; &quot;f&quot; &quot;c&quot; &quot;b&quot; &quot;a&quot;&#41;
+
+=&gt; &#40;sort desc &#91;#inst &quot;2019-02-03&quot;
+               #inst &quot;2019-05-03&quot;
+               #inst &quot;2018-09-03&quot;&#93;&#41;
+
+&#40;#inst &quot;2019-05-03T00:00:00.000-00:00&quot;
+ #inst &quot;2019-02-03T00:00:00.000-00:00&quot;
+ #inst &quot;2018-09-03T00:00:00.000-00:00&quot;&#41;
+</code></pre><h3>Sorting with nil values</h3><p>The <code>sort</code> function moves <code>nil</code> values to the front.</p><pre><code class="clojure">=&gt; &#40;sort &#91;2 6 nil 7 4&#93;&#41;
+
+&#40;nil 2 4 6 7&#41;
+</code></pre><p>We can reverse this sort with the <code>desc</code> comparator we defined earlier. This, will move <code>nil</code> to the back but also reverse the sort.</p><pre><code class="clojure">=&gt; &#40;sort desc &#91;2 6 nil 7 4&#93;&#41;
+
+&#40;7 6 4 2 nil&#41;
+</code></pre><p>If we want to <code>nil</code> values to be at the back without changing the sort order we can use the <code>juxt</code>, <code>nil?</code> and <code>identity</code> functions (for more on <code>juxt</code> check out <a href='https://andersmurphy.com/2018/11/18/clojure-juxt-and-separate.html'>this post</a>).</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;juxt nil? identity&#41; &#91;2 6 nil 7 6&#93;&#41;
+
+&#40;2 6 6 7 nil&#41;
+</code></pre><p>If we want to reverse the order but keep <code>nil</code> values at the front we can pass in the <code>desc</code> comparator we defined earlier.</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;juxt nil? identity&#41; desc &#91;2 6 nil 7 6&#93;&#41;
+
+&#40;nil 7 6 6 2&#41;
+</code></pre><h3>Sorting maps by key</h3><p>To sort maps by key we use the <code>sort-by</code> function, passing the key we want to sort by as an argument.</p><pre><code class="clojure">=&gt; &#40;sort-by :a &#91;{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}&#93;&#41;
+
+&#40;{:a 1, :b 2} {:a 2, :b 1} {:a 3, :b 1}&#41;
+</code></pre><p>Like <code>sort</code>, the <code>sort-by</code> function can also take a comparator to change the order of the sort.</p><pre><code class="clojure">=&gt; &#40;sort-by :a &gt; &#91;{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}&#93;&#41;
+
+&#40;{:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2}&#41;
+</code></pre><h3>Secondary sort</h3><p>Secondary sorts can be achieved using the <code>juxt</code> function.</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;juxt :a :b&#41; &#91;{:a 2 :b 1} {:a 1 :b 3} {:a 1 :b 2}&#93;&#41;
+
+&#40;{:a 1, :b 2} {:a 1, :b 3} {:a 2, :b 1}&#41;
+</code></pre><h3>Stable sort</h3><p>Both <code>sort</code> and <code>sort-by</code> are stable meaning equal elements will not be reordered.</p><pre><code class="clojure">clojure.core/sort
+&#40;&#91;coll&#93; &#91;comp coll&#93;&#41;
+  Returns a sorted sequence of the items in coll. If no comparator is
+  supplied, uses compare.  comparator must implement
+  java.util.Comparator.  Guaranteed to be stable: equal elements will
+  not be reordered.  If coll is a Java array, it will be modified.  To
+  avoid this, sort a copy of the array.
+
+clojure.core/sort-by
+&#40;&#91;keyfn coll&#93; &#91;keyfn comp coll&#93;&#41;
+  Returns a sorted sequence of the items in coll, where the sort
+  order is determined by comparing &#40;keyfn item&#41;.  If no comparator is
+  supplied, uses compare.  comparator must implement
+  java.util.Comparator.  Guaranteed to be stable: equal elements will
+  not be reordered.  If coll is a Java array, it will be modified.  To
+  avoid this, sort a copy of the array.
+</code></pre><p>This is useful as it means it doesn't matter what order you apply your sorts to a collection. You can sort by the secondary sort and then sort by your primary sort and you won't lose the secondary sort order.</p><pre><code class="clojure">=&gt; &#40;sort-by :b &#91;{:a 2 :b 1} {:a 1 :b 3} {:a 1 :b 2}&#93;&#41;
+
+&#40;{:a 2, :b 1} {:a 1, :b 2} {:a 1, :b 3}&#41;
+
+=&gt; &#40;sort-by :a &#91;{:a 2, :b 1} {:a 1, :b 2} {:a 1, :b 3}&#93;&#41;
+
+&#40;{:a 1, :b 2} {:a 1, :b 3} {:a 2, :b 1}&#41;
+
+</code></pre><p>Hopefully this covers most of the day to day sorting needs you will run into.</p></article></div></body></html>
