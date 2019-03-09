@@ -135,6 +135,16 @@ Secondary sorts can be achieved using the `juxt` function.
 ({:a 1, :b 2} {:a 1, :b 3} {:a 2, :b 1})
 ```
 
+###Sorting by count
+
+If you want to sort by count, just pass the count function to `sort-by` (note: we pass it as the key function not the comparator).
+
+```clojure
+=> (sort-by count ["car" "airplane" "bike"])
+
+("car" "bike" "airplane")
+```
+
 ###Stable sort
 
 Both `sort` and `sort-by` are stable meaning equal elements will not be reordered.
