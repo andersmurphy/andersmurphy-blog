@@ -2,7 +2,7 @@ Title: Clojure: sorting
 
 Sorting collections of items is something that comes up all the time in software development. This post covers the multitude of ways you can sort things in Clojure.
 
-###Sorting numbers
+### Sorting numbers
 
 To sort numbers we use the `sort` function.
 
@@ -20,7 +20,7 @@ To reverse the sort order we pass the `>` function into the `sort` function.
 (9 9 8 3 2 1)
 ```
 
-###Sorting strings and dates
+### Sorting strings and dates
 
 Sorting strings and dates in ascending order is exactly the same as sorting numbers.
 
@@ -73,7 +73,7 @@ To reverse the sort we need to make our own [comparator](https://clojure.org/gui
  #inst "2018-09-03T00:00:00.000-00:00")
 ```
 
-###Sorting with nil values
+### Sorting with nil values
 
 The `sort` function moves `nil` values to the front.
 
@@ -107,7 +107,7 @@ If we want to reverse the order but keep `nil` values at the front we can pass i
 (nil 7 6 6 2)
 ```
 
-###Sorting maps by key
+### Sorting maps by key
 
 To sort maps by key we use the `sort-by` function, passing in the key we want to sort by as an argument.
 
@@ -125,7 +125,7 @@ Like `sort`, the `sort-by` function can also take a comparator to change the ord
 ({:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2})
 ```
 
-###Secondary sort
+### Secondary sort
 
 Secondary sorts can be achieved using the `juxt` function.
 
@@ -135,7 +135,7 @@ Secondary sorts can be achieved using the `juxt` function.
 ({:a 1, :b 2} {:a 1, :b 3} {:a 2, :b 1})
 ```
 
-###Sorting by count
+### Sorting by count
 
 If you want to sort by count, just pass the count function to `sort-by` (note: we pass it as the key function not the comparator).
 
@@ -145,7 +145,7 @@ If you want to sort by count, just pass the count function to `sort-by` (note: w
 ("car" "bike" "airplane")
 ```
 
-###Stable sort
+### Stable sort
 
 Both `sort` and `sort-by` are stable meaning equal elements will not be reordered.
 
