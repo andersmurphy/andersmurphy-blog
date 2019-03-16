@@ -14,7 +14,7 @@ We have two sequences of maps (tables) and we want to merge them on matching key
 
 ### Using concat, group-by and merge
 
-We can achieve this using `concat`, `gourp-by` and `merge`. First we concatenate the two sequences together, group the maps by `:userid` key. Then we map over the grouped maps (rows) merging them.
+We can achieve this using `concat`, `gourp-by` and `merge`. We concatenate the two sequences together, group the maps by `:userid` key and then map over the grouped maps (rows) merging them.
 
 ```clojure
 (defn merge-on-key

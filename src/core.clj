@@ -17,7 +17,6 @@
 (defn desc [a b] (compare b a))
 (def files (sort desc (drop 1 (file-seq directory))))
 
-
 (defn replace-n [s n match replacement]
   (if (= n 0)
     s

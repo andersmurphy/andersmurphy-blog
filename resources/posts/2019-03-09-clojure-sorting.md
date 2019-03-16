@@ -1,6 +1,6 @@
 Title: Clojure: sorting
 
-Sorting collections of items is something that comes up all the time in software development. This post covers the multitude of ways you can sort things in Clojure.
+Sorting collections of items is something that comes up frequently in software development. This post covers the multitude of ways you can sort things in Clojure.
 
 ### Sorting numbers
 
@@ -54,7 +54,7 @@ Execution error (ClassCastException) at java.util.TimSort/countRunAndMakeAscendi
 java.util.Date cannot be cast to java.lang.Number
 ```
 
-To reverse the sort we need to make our own [comparator](https://clojure.org/guides/comparators) the easiest way to do this is with the `compare` function. By changing the argument order to the compare function we can change the order of the sort.
+To reverse the sort we need to make our own [comparator](https://clojure.org/guides/comparators). The easiest way to do this is with the `compare` function. By changing the argument order to the compare function we can change the order of the sort.
 
 ```clojure
 (defn desc [a b]
@@ -91,7 +91,7 @@ We can reverse this sort with the `desc` comparator we defined earlier. This, wi
 (7 6 4 2 nil)
 ```
 
-If we want to `nil` values to be at the back without changing the sort order we can use the `juxt`, `nil?` and `identity` functions (for more on `juxt` check out [this post](https://andersmurphy.com/2018/11/18/clojure-juxt-and-separate.html)).
+If we want `nil` values to be at the back without changing the sort order, we can use the `juxt`, `nil?` and `identity` functions (for more on `juxt` check out [this post](https://andersmurphy.com/2018/11/18/clojure-juxt-and-separate.html)).
 
 ```clojure
 => (sort-by (juxt nil? identity) [2 6 nil 7 6])
@@ -99,7 +99,7 @@ If we want to `nil` values to be at the back without changing the sort order we 
 (2 6 6 7 nil)
 ```
 
-If we want to reverse the order but keep `nil` values at the front we can pass in the `desc` comparator we defined earlier.
+If we want to reverse the order but keep `nil` values at the front, we can pass in the `desc` comparator we defined earlier.
 
 ```clojure
 => (sort-by (juxt nil? identity) desc [2 6 nil 7 6])
@@ -147,7 +147,7 @@ If you want to sort by count, just pass the count function to `sort-by` (note: w
 
 ### Stable sort
 
-Both `sort` and `sort-by` are stable meaning equal elements will not be reordered.
+Both `sort` and `sort-by` are stable, meaning equal elements will not be reordered.
 
 ```clojure
 clojure.core/sort

@@ -36,7 +36,7 @@ Another approach would be to use the `format` function, which gives us string in
 "https://www.shop.com/bob/items/A567/prices/EUR"
 ```
 
-The downside with this is that the placeholders in the URL are not self-documenting.
+The downside of this is that the placeholders in the URL are not self-documenting.
 
 ### replace-several
 
