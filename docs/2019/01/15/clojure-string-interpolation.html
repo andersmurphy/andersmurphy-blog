@@ -14,7 +14,7 @@
            &quot;EUR&quot;&#41;
 
 &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
-</code></pre><p>The downside with this is that the placeholders in the URL are not self-documenting.</p><h3>replace-several</h3><p>What about using a string replace function? Clojure core does have functions for replacing matches in strings, but it doesn't have a built-in function for replacing multiple different matches. Let's see how we could implement our own <code>replace-several</code> function.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
+</code></pre><p>The downside of this is that the placeholders in the URL are not self-documenting.</p><h3>replace-several</h3><p>What about using a string replace function? Clojure core does have functions for replacing matches in strings, but it doesn't have a built-in function for replacing multiple different matches. Let's see how we could implement our own <code>replace-several</code> function.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
   &#40;reduce &#40;fn &#91;s &#91;match replacement&#93;&#93;
             &#40;clojure.string/replace s match replacement&#41;&#41;
           s replacements&#41;&#41;
