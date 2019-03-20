@@ -1,6 +1,5 @@
 (ns core
   (:require [hiccup.core :refer [html]]
-            [clojure.java.io :refer [make-parents]]
             [markdown.core :refer [md-to-html-string-with-meta]]
             [clojure.string :as str]
             [clojure.java.io :as io])
@@ -173,7 +172,7 @@
 
 (defn write-file! [path-name content]
   (let [docs-path-name (str "docs/" path-name)]
-    (make-parents docs-path-name)
+    (io/make-parents docs-path-name)
     (spit docs-path-name content)))
 
 (defn write-post! [{:keys [post-path-name post-html]}]
