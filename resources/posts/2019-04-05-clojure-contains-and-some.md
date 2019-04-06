@@ -1,6 +1,6 @@
 Title: Clojure: contains? and some
 
-Checking for containment, whether a collection contains an item, is a common task in software development.
+Checking for containment, whether a collection contains an item, is a common task in software development. This post covers the ways you can check for containment in Clojure.
 
 ### Contains?
 
