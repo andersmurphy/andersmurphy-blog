@@ -68,7 +68,7 @@ Combining `clojure.walk/postwalk` with our `map-keys` function we can create a `
 
 [{:characterId 1,
   :firstName "Olaf",
-  :secondName "Iondrake",
+  :secondName "Irondrake",
   :items {:bagOfHolding ["sword" "axe" "money"]}}
  {:characterId 2,
   :firstName "Sigurd",
