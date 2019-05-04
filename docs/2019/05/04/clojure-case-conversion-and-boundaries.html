@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: Case conversion and boundaries</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: Case conversion and boundaries</h1><time class="post-date" datetime="2019-05-04T00:00:00+00:00">04 May 2019</time><p>Inconsistent case is a problems that tends to come up at application boundaries in your software stack. For example your Clojure codebase might use <code>kebab-case</code> for keywords, whilst your database uses <code>snake&#95;case</code> for column names and your client wants <code>camelCase</code> in its json responses. Often, conventions and/or technical limitations prevent you from simply having a single case throughout your entire stack.</p><p>One "solution" to this problem is to accept the fact that your app will have a mix of cases. However, this can lead to mistake and frustration, does this function expect <code>customer-id</code>, <code>cutomerId</code> or <code>customer&#95;id</code>? What format does our mobile client expect? A more practical solution to this problem, the one this article will cover, is to add automatic case conversion at these boundaries in your software stack.</p><h3>Converting case of a key</h3><p>Let's start by writing a simple case conversion function for converting <code>kebab-case</code> keywords to <code>camelCase</code> keywords.</p><pre><code class="clojure">&#40;defn kebab-case-&gt;camelCase &#91;k&#93;
+  &#40;let &#91;words &#40;clojure.string/split &#40;name k&#41; #&quot;-&quot;&#41;&#93;
+    &#40;-&gt;&gt; &#40;map clojure.string/capitalize &#40;rest words&#41;&#41;
+         &#40;apply str &#40;first words&#41;&#41;
+         keyword&#41;&#41;&#41;
+
+=&gt; &#40;kebab-case-&gt;camelCase :foo-bar-baz&#41;
+
+:fooBarBaz
+</code></pre><h3>Converting the case of keys in a map</h3><p>Now that we have a function for converting case let's convert all the keys of a map using the <code>map-keys</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure">&#40;defn map-keys &#91;f m&#93;
+  &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
+       &#40;into {}&#41;&#41;&#41;
+
+&#40;map-keys kebab-case-&gt;camelCase
+    {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
+
+=&gt; {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
+</code></pre><h3>Converting case of keys in a nested data structure</h3><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">=&gt; &#40;doc clojure.walk/postwalk&#41;
+
+-------------------------
+clojure.walk/postwalk
+&#40;&#91;f form&#93;&#41;
+  Performs a depth-first, post-order traversal of form.  Calls f on
+  each sub-form, uses f's return value in place of the original.
+  Recognizes all Clojure data structures. Consumes seqs as with doall.
+</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>map-keys</code> function we can create a <code>transform-keys</code> function that will take a transformation function and apply it to all keys in a data structure.</p><pre><code class="clojure">&#40;defn transform-keys &#91;t form&#93;
+  &#40;clojure.walk/postwalk &#40;fn &#91;x&#93; &#40;if &#40;map? x&#41; &#40;map-keys t x&#41; x&#41;&#41; form&#41;&#41;
+
+=&gt; &#40;transform-keys kebab-case-&gt;camelCase
+    &#91;{:character-id 1
+      :first-name &quot;Olaf&quot;
+      :second-name &quot;Iondrake&quot;
+      :items {:bag-of-holding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
+     {:character-Id 2
+      :first-name &quot;Sigurd&quot;
+      :second-name &quot;Rockfist&quot;
+      :items {:bag-of-holding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;&#41;
+
+&#91;{:characterId 1,
+  :firstName &quot;Olaf&quot;,
+  :secondName &quot;Iondrake&quot;,
+  :items {:bagOfHolding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
+ {:characterId 2,
+  :firstName &quot;Sigurd&quot;,
+  :secondName &quot;Rockfist&quot;,
+  :items {:bagOfHolding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;
+</code></pre><p>There you have it, a function for converting the case of keys in an arbitrarily nested data structure. You can use this function at the boundaries of your software stack to keep you and your team sane.</p><p>For more robust case conversion checkout the awesome <a href='https://github.com/clj-commons/camel-snake-kebab'>camel-snake-kebab</a> library.</p></article></div></body></html>
