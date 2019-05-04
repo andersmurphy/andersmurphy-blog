@@ -4,7 +4,7 @@ Inconsistent case is a problems that tends to come up at application boundaries 
 
 One "solution" to this problem is to accept the fact that your app will have a mix of cases. However, this can lead to mistake and frustration, does this function expect `customer-id`, `cutomerId` or `customer_id`? What format does our mobile client expect? A more practical solution to this problem, the one this article will cover, is to add automatic case conversion at these boundaries in your software stack.
 
-### Converting case of a key
+### Converting the case of a key
 
 Let's start by writing a simple case conversion function for converting `kebab-case` keywords to `camelCase` keywords.
 
