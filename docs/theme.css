@@ -123,6 +123,6 @@ a.sidebar-nav-item:focus {
 }
 
 .pagination-item {
-    display: block;
+    display: inline-block;
     font-size:2rem;
 }

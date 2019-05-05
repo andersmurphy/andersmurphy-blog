@@ -148,11 +148,11 @@
                 [:div {:class "pagination"}
                  (when previous-page-url
                    [:div {:class "pagination-item"}
-                    [:a {:href (str site-url "/" previous-page-url)} "<-"]])
+                    [:a {:href (str site-url "/" previous-page-url)} "<- "]])
                  (when next-page-url
                    [:div {:class "pagination-item"}
                     [:a {:href (str site-url "/" next-page-url)}
-                     "->"]])]]]])
+                     "-> "]])]]]])
        prepend-doctype-header
        (assoc m :page-html)))
 
