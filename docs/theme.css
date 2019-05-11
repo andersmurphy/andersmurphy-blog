@@ -124,5 +124,6 @@ a.sidebar-nav-item:focus {
 
 .pagination-item {
     display: inline-block;
-    font-size:2rem;
+    font-size: 2rem;
+    margin-right: 1rem;
 }
