@@ -1,4 +1,4 @@
-Title: Clojure: Case conversion and boundaries
+Title: Clojure: case conversion and boundaries
 
 Inconsistent case is a problems that tends to come up at application boundaries in your software stack. For example your Clojure codebase might use `kebab-case` for keywords, whilst your database uses `snake_case` for column names and your client wants `camelCase` in its json responses. Often, conventions and/or technical limitations prevent you from simply having a single case throughout your entire stack.
 
