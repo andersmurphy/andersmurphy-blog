@@ -29,10 +29,10 @@ Now that we have a function for converting case let's convert all the keys of a 
   (->> (map (fn [[k v]] [(f k) v]) m)
        (into {})))
 
-(map-keys kebab-case->camelCase
-    {:character-id 1 :first-name "John" :second-name "Snow"})
+=> (map-keys kebab-case->camelCase
+             {:character-id 1 :first-name "John" :second-name "Snow"})
 
-=> {:characterId 1, :firstName "John", :secondName "Snow"}
+{:characterId 1, :firstName "John", :secondName "Snow"}
 ```
 
 ### Converting case of keys in a nested data structure
