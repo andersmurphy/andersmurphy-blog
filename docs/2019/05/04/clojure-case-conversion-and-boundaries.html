@@ -12,10 +12,10 @@
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-&#40;map-keys kebab-case-&gt;camelCase
-    {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
+=&gt; &#40;map-keys kebab-case-&gt;camelCase
+             {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
 
-=&gt; {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
+{:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
 </code></pre><h3>Converting case of keys in a nested data structure</h3><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">=&gt; &#40;doc clojure.walk/postwalk&#41;
 
 -------------------------
