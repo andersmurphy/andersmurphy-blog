@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: personalising text</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: personalising text</h1><time class="post-date" datetime="2019-05-18T00:00:00+00:00">18 May 2019</time><p>Sometimes you want to make a user's experience feel more personal. An easy way to achieve this is by personalising text based content. For example in a text base adventure game you could replace placeholders in the text with information relevant to that particular player such as their name or class. This could help make your game more engaging.</p><h3>Personalising a string</h3><p>Let's start by writing a simple function for personalising strings.</p><pre><code class="clojure">&#40;defn personalise &#91;personalisations initial-string&#93;
+  &#40;reduce &#40;fn &#91;s &#91;k v&#93;&#93;
+            &#40;clojure.string/replace s &#40;str k&#41; v&#41;&#41;
+          initial-string
+          personalisations&#41;&#41;
+
+=&gt; &#40;personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}
+                &quot;The :class called :name entered the dungeon.&quot;&#41;
+
+&quot;The warrior called Ivan entered the dungeon.&quot;
+</code></pre><h3>Personalising the string values of a map</h3><p>Now that we have a function for personalising strings let's convert all the string values of a map using the <code>map-values</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure">&#40;defn map-values &#91;f m&#93;
+    &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;k &#40;f v&#41;&#93;&#41; m&#41;
+       &#40;into {}&#41;&#41;&#41;
+
+=&gt; &#40;map-values &#40;partial personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+               {:journal &quot;:name's journal&quot;
+                :weapon  &quot;The :class's sword&quot;}&#41;
+
+{:journal &quot;Ivan's journal&quot;, :weapon &quot;The warrior's sword&quot;}
+</code></pre><p>This works for strings but what about none homogeneous maps?</p><pre><code class="clojure">&#40;defn map-values &#91;f m&#93;
+    &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;k &#40;f v&#41;&#93;&#41; m&#41;
+       &#40;into {}&#41;&#41;&#41;
+
+=&gt; &#40;map-values &#40;partial personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+               {:journal &quot;:name's journal&quot;
+                :weapon  &quot;The :class's sword&quot;
+                :treasures-found 1}
+&#41;
+
+{:journal &quot;Ivan's journal&quot;, :weapon &quot;The warrior's sword&quot; :treasures-found &quot;1&quot;}
+</code></pre><p>Although this doesn't throw any exceptions, if we look closely it has caused unexpected behaviour. The number of treasures found has been converted to a string. Let's change the personalise function to prevent this unexpected behaviour from happening.</p><pre><code class="clojure">&#40;defn safe-personalise &#91;personalisations initial-string&#93;
+  &#40;if &#40;string? initial-string&#41;
+    &#40;reduce &#40;fn &#91;s &#91;k v&#93;&#93;
+              &#40;clojure.string/replace s &#40;str k&#41; v&#41;&#41;
+            initial-string
+            personalisations&#41;
+    initial-string&#41;&#41;
+
+=&gt; &#40;map-values &#40;partial safe-personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+               {:journal &quot;:name's journal&quot;
+                :weapon  &quot;The :class's sword&quot;
+                :treasures-found 1}&#41;
+
+{:journal &quot;Ivan's journal&quot;, :weapon &quot;The warrior's sword&quot; :treasures-found 1}
+</code></pre><h3>Personalising strings in a nested data structure</h3><p>To apply a function to all the nodes of an arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Here are the docs.</p><pre><code class="clojure">=&gt; &#40;doc clojure.walk/postwalk&#41;
+
+-------------------------
+clojure.walk/postwalk
+&#40;&#91;f form&#93;&#41;
+  Performs a depth-first, post-order traversal of form.  Calls f on
+  each sub-form, uses f's return value in place of the original.
+  Recognizes all Clojure data structures. Consumes seqs as with doall.
+</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>safe-personalise</code> function we can personalise all the strings in a nested data structure.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/postwalk &#40;partial safe-personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+                          &#91;{:item &quot;:name's bag of holding&quot;
+                            :contain {:items &#91;&quot;The :class's sword&quot;
+                                              &quot;The :class's shield&quot;&#93;}
+                            :id 1}
+                           {:item &quot;:name elven cloack&quot;
+                            :id 2}&#93;&#41;
+</code></pre><p>There we have it personalised text for our text based adventure.</p></article></div></body></html>
