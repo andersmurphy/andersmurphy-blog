@@ -28,11 +28,13 @@ Now that we have a function for personalising strings let's convert all the stri
     (->> (map (fn [[k v]] [k (f v)]) m)
        (into {})))
 
-=> (map-values (partial personalise {:class "warrior" :name "Ivan"})
+=> (map-values (partial personalise
+                        {:class "warrior" :name "Ivan"})
                {:journal ":name's journal"
                 :weapon  "The :class's sword"})
 
-{:journal "Ivan's journal", :weapon "The warrior's sword"}
+{:journal "Ivan's journal"
+ :weapon  "The warrior's sword"}
 ```
 
 This works for strings but what about none homogeneous maps?
@@ -45,10 +47,11 @@ This works for strings but what about none homogeneous maps?
 => (map-values (partial personalise {:class "warrior" :name "Ivan"})
                {:journal ":name's journal"
                 :weapon  "The :class's sword"
-                :treasures-found 1}
-)
+                :treasures-found 1})
 
-{:journal "Ivan's journal", :weapon "The warrior's sword" :treasures-found "1"}
+{:journal         "Ivan's journal"
+ :weapon          "The warrior's sword"
+ :treasures-found "1"}
 ```
 
 Although this doesn't throw any exceptions, if we look closely it has caused unexpected behaviour. The number of treasures found has been converted to a string. Let's change the personalise function to prevent this unexpected behaviour from happening.
@@ -62,12 +65,15 @@ Although this doesn't throw any exceptions, if we look closely it has caused une
             personalisations)
     initial-string))
 
-=> (map-values (partial safe-personalise {:class "warrior" :name "Ivan"})
-               {:journal ":name's journal"
-                :weapon  "The :class's sword"
+=> (map-values (partial safe-personalise
+                        {:class "warrior" :name "Ivan"})
+               {:journal         ":name's journal"
+                :weapon          "The :class's sword"
                 :treasures-found 1})
 
-{:journal "Ivan's journal", :weapon "The warrior's sword" :treasures-found 1}
+{:journal         "Ivan's journal"
+ :weapon          "The warrior's sword"
+ :treasures-found 1}
 ```
 
 ### Personalising strings in a nested data structure
@@ -88,13 +94,19 @@ clojure.walk/postwalk
 Combining `clojure.walk/postwalk` with our `safe-personalise` function we can personalise all the strings in a nested data structure.
 
 ```clojure
-=> (clojure.walk/postwalk (partial safe-personalise {:class "warrior" :name "Ivan"})
-                          [{:item ":name's bag of holding"
-                            :contain {:items ["The :class's sword"
-                                              "The :class's shield"]}
-                            :id 1}
-                           {:item ":name elven cloack"
-                            :id 2}])
+=> (clojure.walk/postwalk
+    (partial safe-personalise {:class "warrior" :name "Ivan"})
+    [{:item    ":name's bag of holding"
+      :contain {:items ["The :class's sword"
+                        "The :class's shield"]}
+      :id      1}
+     {:item ":name elven cloack"
+      :id   2}])
+
+[{:item "Ivan's bag of holding"
+  :contain {:items ["The warrior's sword" "The warrior's shield"]}
+  :id 1}
+ {:item "Ivan elven cloack" :id 2}]
 ```
 
 There we have it personalised text for our text based adventure.
