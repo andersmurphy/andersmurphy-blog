@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: sorting a sequence based on another sequence</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about software development</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: sorting a sequence based on another sequence</h1><time class="post-date" datetime="2019-05-25T00:00:00+00:00">25 May 2019</time><p>Sometimes web responses contain an unordered sequence of items along with a separate manifest that specifies the ordering. This article will cover how you can go about sorting that list of items by the manifest order as well as using <a href='(https://clojure.org/guides/spec#_exercise'>Clojure Spec</a>.) to generate test data and verify the output.</p><h3>Sorting by manifest order</h3><p>Let's start by writing some test data.</p><pre><code class="clojure">&#40;def manifest
+  {:item-order &#91;&quot;x234&quot; &quot;d543&quot; &quot;g090&quot; &quot;z001&quot; &quot;a362&quot;&#93;}&#41;
+
+&#40;def items
+  &#91;{:id &quot;z001&quot; :type &quot;food&quot;}
+   {:id &quot;g090&quot; :type &quot;drink&quot;}
+   {:id &quot;a362&quot; :type &quot;food&quot;}
+   {:id &quot;x234&quot; :type &quot;drink&quot;}
+   {:id &quot;d543&quot; :type &quot;food&quot;}&#93;&#41;
+</code></pre><p>Now that we have some data we can use the <code>sort-by</code> function and the <code>.indexOf</code> method to make the order of the items match the order in the manifest.</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
+              &#40;.indexOf &#40;manifest :item-order&#41; id&#41;&#41;
+     items&#41;
+
+&#40;{:id &quot;x234&quot; :type &quot;drink&quot;}
+ {:id &quot;d543&quot; :type &quot;food&quot;}
+ {:id &quot;g090&quot; :type &quot;drink&quot;}
+ {:id &quot;z001&quot; :type &quot;food&quot;}
+ {:id &quot;a362&quot; :type &quot;food&quot;}&#41;
+</code></pre><p>This seems to work. However, <code>.indexOf</code> gets called for every item in our list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.</p><h3>Generating data</h3><p>First we need to write a function that generates a large number of unique string ids. This is so that we can use it later to generate the same set of ids for our manifest and our items. We use the <code>shuffle</code> function to make sure every call to this function returns the result in a random order.</p><pre><code class="clojure">&#40;defn large-shuffled-vec-of-ids &#91;&#93;
+  &#40;-&gt;&gt; &#40;range 1000&#41;
+       &#40;map &#40;partial str &quot;xid&quot;&#41;&#41;
+       shuffle
+       vec&#41;&#41;
+</code></pre><p>We can then define our various specs using <code>s/def</code>. We use <code>s/with-gen</code> to provide a custom generator for our item-order and our item ids. We do this to ensure that both the manifest and the items have the same set of ids. We use a single item set as our spec because we always want the generator to return the same result.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.alpha :as s&#93;&#41;
+&#40;require '&#91;clojure.spec.gen.alpha :as gen&#93;&#41;
+
+&#40;s/def ::id string?&#41;
+&#40;s/def ::item-order
+  &#40;s/with-gen
+    &#40;s/coll-of ::id :distinct true&#41;
+    #&#40;s/gen #{&#40;large-shuffled-vec-of-ids&#41;}&#41;&#41;&#41;
+&#40;s/def ::manifest &#40;s/keys :req-un &#91;::item-order&#93;&#41;&#41;
+&#40;s/def ::type #{&quot;food&quot; &quot;drink&quot;}&#41;
+&#40;s/def ::item &#40;s/keys :req-un &#91;::id ::type&#93;&#41;&#41;
+</code></pre><p>For our <code>::items</code> spec we use <code>s/exercise</code> to generate as many items as we have ids. We <code>concat</code> the result because <code>s/exercise</code> returns pairs. We then use <code>map</code> and  <code>merge</code> to overwrite the random ids with the ids from our <code>large-shuffled-vec-of-ids</code> function.</p><pre><code class="clojure">&#40;s/def ::items
+  &#40;s/with-gen
+    &#40;s/coll-of ::item :distinct true&#41;
+    #&#40;s/gen #{&#40;let &#91;ids &#40;large-shuffled-vec-of-ids&#41;&#93;
+                &#40;map &#40;fn &#91;item id&#93; &#40;merge item {:id id}&#41;&#41;
+                     &#40;apply concat &#40;s/exercise ::item &#40;count ids&#41;&#41;&#41;
+                     ids&#41;&#41;}&#41;&#41;&#41;
+</code></pre><p>We use <code>s/and</code> to add a <code>consistent-ids?</code> spec to ensure that our items and manifest share the same set of ids. This isn't strictly necessary as our <code>large-shuffled-vec-of-ids</code> function should ensure this, but it's always good to capture our intent in a spec as they also serve as valuable documentation.</p><pre><code class="clojure">&#40;defn consistent-ids? &#91;{:keys &#91;manifest items&#93;}&#93;
+  &#40;= &#40;set &#40;manifest :item-order&#41;&#41;
+     &#40;set &#40;map :id items&#41;&#41;&#41;&#41;
+
+&#40;s/def ::items-with-manifest
+  &#40;s/and
+   &#40;s/keys :req-un &#91;::manifest ::items&#93;&#41;
+   consistent-ids?&#41;&#41;
+</code></pre><p>Now we can use the <code>::items-with-manifest</code> spec to generate a large amount of test data for our performance test.</p><pre><code class="clojure">=&gt; &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;
+
+{:manifest
+ {:item-order
+  &#91;&quot;xid313&quot;
+   &quot;xid544&quot;
+   &quot;xid846&quot;
+   &quot;xid351&quot;
+   &quot;xid67&quot;
+   ...
+   }}
+</code></pre><p>Warning! The output is quite large and will flood your repl.</p><h3>Performance test</h3><p>Now that we can generate loads of test data we can use it to test our initial implementation using the <code>time</code> function. It's worth noting we use <code>do</code> to avoid flooding the repl with output results.</p><pre><code class="clojure">&#40;def large-manifest &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;&#41;
+
+&#40;defn index-of-sort &#91;{:keys &#91;items manifest&#93;}&#93;
+  &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
+             &#40;.indexOf &#40;manifest :item-order&#41; id&#41;&#41;
+           items&#41;&#41;
+
+=&gt; &#40;time &#40;do &#40;index-of-sort large-manifest&#41; nil&#41;&#41;
+
+&quot;Elapsed time: 561.437815 msecs&quot;
+</code></pre><p>As suspected our function is very slow for our large input. This is because each call of <code>.indexOf</code> has <code>O&#40;n&#41;</code> complexity. We can avoid this cost by building a map of values to index. This can be done using <code>&#40;iterate inc 0&#41;</code> to generate a sequence of numbers starting from 0 and then using <code>zipmap</code> to map the numbers to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
+  &#40;let &#91;value-&gt;index &#40;-&gt; &#40;manifest :item-order&#41;
+                         &#40;zipmap &#40;iterate inc 0&#41;&#41;&#41;&#93;
+    &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
+               &#40;value-&gt;index id&#41;&#41;
+             items&#41;&#41;&#41;
+
+=&gt; &#40;time &#40;do &#40;hash-map-index-sort large-manifest&#41; nil&#41;&#41;
+
+&quot;Elapsed time: 2.564776 msecs&quot;
+</code></pre><p>The results from <code>time</code> show this implementation is much faster than our initial implementation.</p><h3>Validation and generative testing</h3><p>We can also spec our function using <code>s/fdef</code> and use the spec to create a generative test for our function. The <code>:args</code> key defines the input to our function (also used for generating the input test data). The <code>:ret</code> key defines the output data. Finally, the <code>:fn</code> key defines the relation between input and output that we want to validate; in this case we want to check that the order of the output items is the same as the order of ids in the input manifest.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.test.alpha :as stest&#93;&#41;
+
+&#40;s/fdef hash-map-index-sort
+  :args &#40;s/cat :m ::items-with-manifest&#41;
+  :ret  ::items
+  :fn #&#40;= &#40;-&gt; % :args :m :manifest :item-order&#41;
+          &#40;-&gt;&gt; % :ret &#40;map :id&#41;&#41;&#41;&#41;
+
+=&gt; &#40;-&gt; &#40;stest/check `hash-map-index-sort&#41;
+       first
+       :clojure.spec.test.check/ret&#41;
+
+{:result true,
+ :pass? true,
+ :num-tests 1000,
+ :time-elapsed-ms 14614,
+ :seed 1558893244714}
+</code></pre><p>This concludes our exploration of how to order items by a manifest as well as some use cases for Clojure Spec.</p></article></div></body></html>
