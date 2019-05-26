@@ -1,6 +1,6 @@
 Title: Clojure: sorting a sequence based on another sequence
 
-Sometimes web responses contain an unordered sequence of items along with a separate manifest that specifies the ordering. This article will cover how you can go about sorting that list of items by the manifest order as well as using [Clojure Spec]((https://clojure.org/guides/spec#_exercise).) to generate test data and verify the output.
+Sometimes web responses contain an unordered sequence of items along with a separate manifest that specifies the ordering. This article will cover how you can go about sorting that list of items by the manifest order as well as using [Clojure Spec](https://clojure.org/guides/spec#_exercise). to generate test data and verify the output.
 
 ### Sorting by manifest order
 
