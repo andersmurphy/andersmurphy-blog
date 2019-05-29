@@ -7,7 +7,7 @@
 
 (def site-url "https://andersmurphy.com")
 (def site-title "Anders Murphy")
-(def site-tagline "A blog mostly about software development")
+(def site-tagline "A blog mostly about functional programming")
 (def site-github "https://github.com/andersmurphy")
 (def site-twitter "https://twitter.com/anders_murphy")
 (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
