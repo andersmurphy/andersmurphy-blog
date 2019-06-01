@@ -22,7 +22,7 @@
        &#40;map &#40;partial str &quot;xid&quot;&#41;&#41;
        shuffle
        vec&#41;&#41;
-</code></pre><p>We can then define our various specs with <code>s/def</code>. We provide custom generator for our item-order and our item ids with <code>s/with-gen</code>. We do this to ensure that both the manifest and the items have the same set of ids. A single item set means our generator will always return the same result.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.alpha :as s&#93;&#41;
+</code></pre><p>We can then define our various specs with <code>s/def</code>. We provide a custom generator for our item-order and our item ids with <code>s/with-gen</code>. We do this to ensure that both the manifest and the items have the same set of ids. A single item set means our generator will always return the same result.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.alpha :as s&#93;&#41;
 &#40;require '&#91;clojure.spec.gen.alpha :as gen&#93;&#41;
 
 &#40;s/def ::id string?&#41;
@@ -40,7 +40,7 @@
                 &#40;map &#40;fn &#91;item id&#93; &#40;merge item {:id id}&#41;&#41;
                      &#40;apply concat &#40;s/exercise ::item &#40;count ids&#41;&#41;&#41;
                      ids&#41;&#41;}&#41;&#41;&#41;
-</code></pre><p>We add <code>consistent-ids?</code> to our spec with <code>s/and</code> to ensure that our items and manifest share the same set of ids. This isn't strictly necessary as our <code>large-shuffled-vec-of-ids</code> function should ensure this, but it's always good to capture our intent in a spec as they also serve as valuable documentation.</p><pre><code class="clojure">&#40;defn consistent-ids? &#91;{:keys &#91;manifest items&#93;}&#93;
+</code></pre><p>We add <code>consistent-ids?</code> to our spec with <code>s/and</code> to ensure that our items and manifest share the same set of ids. This isn't strictly necessary as our <code>large-shuffled-vec-of-ids</code> function should guarantee this, but it's always good to capture our intent in a spec as they also serve as valuable documentation.</p><pre><code class="clojure">&#40;defn consistent-ids? &#91;{:keys &#91;manifest items&#93;}&#93;
   &#40;= &#40;set &#40;manifest :item-order&#41;&#41;
      &#40;set &#40;map :id items&#41;&#41;&#41;&#41;
 
@@ -48,7 +48,7 @@
   &#40;s/and
    &#40;s/keys :req-un &#91;::manifest ::items&#93;&#41;
    consistent-ids?&#41;&#41;
-</code></pre><p>With the <code>::items-with-manifest</code> spec we can generate a large amount of test data for our performance test.</p><pre><code class="clojure">=&gt; &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;
+</code></pre><p>With the <code>::items-with-manifest</code> spec finished we can now generate a large amount of test data for our performance test.</p><pre><code class="clojure">=&gt; &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;
 
 {:manifest
  {:item-order
@@ -59,7 +59,7 @@
    &quot;xid67&quot;
    ...
    }}
-</code></pre><p>Warning! The output is quite large and will flood your repl.</p><h3>Performance test</h3><p>Now that we can generate loads of test data we test our initial implementation with the <code>time</code> function. It's worth noting the use of <code>do</code> to avoid flooding the repl with output results.</p><pre><code class="clojure">&#40;def large-manifest &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;&#41;
+</code></pre><p>Warning! The output is quite large and will flood your repl.</p><h3>Performance test</h3><p>Now that we can generate test data we test the performance of our initial implementation with the <code>time</code> function. It's worth noting the use of <code>do</code> to avoid flooding the repl with output results.</p><pre><code class="clojure">&#40;def large-manifest &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;&#41;
 
 &#40;defn index-of-sort &#91;{:keys &#91;items manifest&#93;}&#93;
   &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
@@ -69,7 +69,7 @@
 =&gt; &#40;time &#40;do &#40;index-of-sort large-manifest&#41; nil&#41;&#41;
 
 &quot;Elapsed time: 561.437815 msecs&quot;
-</code></pre><p>As suspected our function is very slow for our large input. This is because each call of <code>.indexOf</code> has <code>O&#40;n&#41;</code> complexity. We can avoid this cost by building a map of values to index. This can be done with <code>&#40;iterate inc 0&#41;</code> which generates a sequence of numbers starting from 0 and then we <code>zipmap</code> the numbers to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
+</code></pre><p>As suspected our function is very slow for large input. This is because each call of <code>.indexOf</code> has <code>O&#40;n&#41;</code> complexity. We can avoid this cost by building a map of values to index. This can be done with <code>&#40;iterate inc 0&#41;</code> which generates a sequence of numbers starting from 0 which we then <code>zipmap</code> to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
   &#40;let &#91;value-&gt;index &#40;-&gt; &#40;manifest :item-order&#41;
                          &#40;zipmap &#40;iterate inc 0&#41;&#41;&#41;&#93;
     &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
