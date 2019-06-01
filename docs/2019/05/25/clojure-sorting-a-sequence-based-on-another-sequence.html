@@ -17,12 +17,12 @@
  {:id &quot;g090&quot; :type &quot;drink&quot;}
  {:id &quot;z001&quot; :type &quot;food&quot;}
  {:id &quot;a362&quot; :type &quot;food&quot;}&#41;
-</code></pre><p>This seems to work. However, <code>.indexOf</code> gets called for every item in our list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.</p><h3>Generating data</h3><p>First we need to write a function that generates a large number of unique string ids. This is so that we can use it later to generate the same set of ids for our manifest and our items. We use the <code>shuffle</code> function to make sure every call to this function returns the result in a random order.</p><pre><code class="clojure">&#40;defn large-shuffled-vec-of-ids &#91;&#93;
+</code></pre><p>This seems to work. However, <code>.indexOf</code> gets called for every item in our list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.</p><h3>Generating data</h3><p>First we need to write a function that generates a large number of unique string ids. This is so that we can generate the same set of ids for our manifest and our items. The <code>shuffle</code> function makes sure every call to this function returns the result in a random order.</p><pre><code class="clojure">&#40;defn large-shuffled-vec-of-ids &#91;&#93;
   &#40;-&gt;&gt; &#40;range 1000&#41;
        &#40;map &#40;partial str &quot;xid&quot;&#41;&#41;
        shuffle
        vec&#41;&#41;
-</code></pre><p>We can then define our various specs with <code>s/def</code>. We provide custom generator for our item-order and our item ids with <code>s/with-gen</code>. We do this to ensure that both the manifest and the items have the same set of ids. A single item set ensure our generator always returns the same result.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.alpha :as s&#93;&#41;
+</code></pre><p>We can then define our various specs with <code>s/def</code>. We provide custom generator for our item-order and our item ids with <code>s/with-gen</code>. We do this to ensure that both the manifest and the items have the same set of ids. A single item set means our generator will always return the same result.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.alpha :as s&#93;&#41;
 &#40;require '&#91;clojure.spec.gen.alpha :as gen&#93;&#41;
 
 &#40;s/def ::id string?&#41;
