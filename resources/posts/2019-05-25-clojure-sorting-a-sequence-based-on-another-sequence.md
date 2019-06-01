@@ -46,7 +46,7 @@ First we need to write a function that generates a large number of unique string
        vec))
 ```
 
-We can then define our various specs using `s/def`. We use `s/with-gen` to provide a custom generator for our item-order and our item ids. We do this to ensure that both the manifest and the items have the same set of ids. We use a single item set as our spec because we always want the generator to return the same result.
+We can then define our various specs with `s/def`. We provide custom generator for our item-order and our item ids with `s/with-gen`. We do this to ensure that both the manifest and the items have the same set of ids. A single item set ensure our generator always returns the same result.
 
 ```clojure
 (require '[clojure.spec.alpha :as s])
@@ -62,7 +62,7 @@ We can then define our various specs using `s/def`. We use `s/with-gen` to provi
 (s/def ::item (s/keys :req-un [::id ::type]))
 ```
 
-For our `::items` spec we use `s/exercise` to generate as many items as we have ids. We `concat` the result because `s/exercise` returns pairs. We then use `map` and  `merge` to overwrite the random ids with the ids from our `large-shuffled-vec-of-ids` function.
+`s/exercise` allows us to generate as many items as we have ids. We `concat` the result because `s/exercise` returns pairs. We then `map` and  `merge` to overwrite the random ids with the ids from our `large-shuffled-vec-of-ids` function.
 
 ```clojure
 (s/def ::items
@@ -74,7 +74,7 @@ For our `::items` spec we use `s/exercise` to generate as many items as we have 
                      ids))})))
 ```
 
-We use `s/and` to add a `consistent-ids?` spec to ensure that our items and manifest share the same set of ids. This isn't strictly necessary as our `large-shuffled-vec-of-ids` function should ensure this, but it's always good to capture our intent in a spec as they also serve as valuable documentation.
+We add `consistent-ids?` to our spec with `s/and` to ensure that our items and manifest share the same set of ids. This isn't strictly necessary as our `large-shuffled-vec-of-ids` function should ensure this, but it's always good to capture our intent in a spec as they also serve as valuable documentation.
 
 ```clojure
 (defn consistent-ids? [{:keys [manifest items]}]
@@ -87,7 +87,7 @@ We use `s/and` to add a `consistent-ids?` spec to ensure that our items and mani
    consistent-ids?))
 ```
 
-Now we can use the `::items-with-manifest` spec to generate a large amount of test data for our performance test.
+With the `::items-with-manifest` spec we can generate a large amount of test data for our performance test.
 
 ```clojure
 => (gen/generate (s/gen ::items-with-manifest))
@@ -107,7 +107,7 @@ Warning! The output is quite large and will flood your repl.
 
 ### Performance test
 
-Now that we can generate loads of test data we can use it to test our initial implementation using the `time` function. It's worth noting we use `do` to avoid flooding the repl with output results.
+Now that we can generate loads of test data we test our initial implementation with the `time` function. It's worth noting the use of `do` to avoid flooding the repl with output results.
 
 ```clojure
 (def large-manifest (gen/generate (s/gen ::items-with-manifest)))
@@ -122,7 +122,7 @@ Now that we can generate loads of test data we can use it to test our initial im
 "Elapsed time: 561.437815 msecs"
 ```
 
-As suspected our function is very slow for our large input. This is because each call of `.indexOf` has `O(n)` complexity. We can avoid this cost by building a map of values to index. This can be done using `(iterate inc 0)` to generate a sequence of numbers starting from 0 and then using `zipmap` to map the numbers to the id values.
+As suspected our function is very slow for our large input. This is because each call of `.indexOf` has `O(n)` complexity. We can avoid this cost by building a map of values to index. This can be done with `(iterate inc 0)` which generates a sequence of numbers starting from 0 and then we `zipmap` the numbers to the id values.
 
 ```clojure
 (defn hash-map-index-sort [{:keys [items manifest]}]
@@ -141,7 +141,7 @@ The results from `time` show this implementation is much faster than our initial
 
 ### Validation and generative testing
 
-We can also spec our function using `s/fdef` and use the spec to create a generative test for our function. The `:args` key defines the input to our function (also used for generating the input test data). The `:ret` key defines the output data. Finally, the `:fn` key defines the relation between input and output that we want to validate; in this case we want to check that the order of the output items is the same as the order of ids in the input manifest.
+We can also spec our function with `s/fdef` and use the spec to create a generative test for our function. The `:args` key defines the input to our function. The `:ret` key defines the output data. Finally, the `:fn` key defines the relation between input and output that we want to validate; in this case we want to check that the order of the output items is the same as the order of ids in the input manifest.
 
 ```clojure
 (require '[clojure.spec.test.alpha :as stest])
