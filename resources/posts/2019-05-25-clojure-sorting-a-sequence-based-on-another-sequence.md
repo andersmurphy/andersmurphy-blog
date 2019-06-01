@@ -36,7 +36,7 @@ This seems to work. However, `.indexOf` gets called for every item in our list o
 
 ### Generating data
 
-First we need to write a function that generates a large number of unique string ids. This is so that we can use it later to generate the same set of ids for our manifest and our items. We use the `shuffle` function to make sure every call to this function returns the result in a random order.
+First we need to write a function that generates a large number of unique string ids. This is so that we can generate the same set of ids for our manifest and our items. The `shuffle` function makes sure every call to this function returns the result in a random order.
 
 ```clojure
 (defn large-shuffled-vec-of-ids []
@@ -46,7 +46,7 @@ First we need to write a function that generates a large number of unique string
        vec))
 ```
 
-We can then define our various specs with `s/def`. We provide custom generator for our item-order and our item ids with `s/with-gen`. We do this to ensure that both the manifest and the items have the same set of ids. A single item set ensure our generator always returns the same result.
+We can then define our various specs with `s/def`. We provide custom generator for our item-order and our item ids with `s/with-gen`. We do this to ensure that both the manifest and the items have the same set of ids. A single item set means our generator will always return the same result.
 
 ```clojure
 (require '[clojure.spec.alpha :as s])
