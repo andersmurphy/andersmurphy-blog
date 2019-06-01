@@ -122,7 +122,7 @@ Now that we can generate test data we test the performance of our initial implem
 "Elapsed time: 561.437815 msecs"
 ```
 
-As suspected our function is very slow for large input. This is because each call of `.indexOf` has *O(n)* complexity. We can avoid this cost by building a map of values to index. This can be done with `(iterate inc 0)` which generates a sequence of numbers starting from 0 which we then `zipmap` to the id values.
+As suspected our function is very slow for large input. This is because each call of `.indexOf` has **O(n)** complexity. We can avoid this cost by building a map of values to index. This can be done with `(iterate inc 0)` which generates a sequence of numbers starting from 0 which we then `zipmap` to the id values.
 
 ```clojure
 (defn hash-map-index-sort [{:keys [items manifest]}]
