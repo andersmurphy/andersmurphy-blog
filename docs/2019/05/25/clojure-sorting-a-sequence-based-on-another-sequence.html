@@ -69,7 +69,7 @@
 =&gt; &#40;time &#40;do &#40;index-of-sort large-manifest&#41; nil&#41;&#41;
 
 &quot;Elapsed time: 561.437815 msecs&quot;
-</code></pre><p>As suspected our function is very slow for large input. This is because each call of <code>.indexOf</code> has <em>O(n)</em> complexity. We can avoid this cost by building a map of values to index. This can be done with <code>&#40;iterate inc 0&#41;</code> which generates a sequence of numbers starting from 0 which we then <code>zipmap</code> to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
+</code></pre><p>As suspected our function is very slow for large input. This is because each call of <code>.indexOf</code> has <strong>O(n)</strong> complexity. We can avoid this cost by building a map of values to index. This can be done with <code>&#40;iterate inc 0&#41;</code> which generates a sequence of numbers starting from 0 which we then <code>zipmap</code> to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
   &#40;let &#91;value-&gt;index &#40;-&gt; &#40;manifest :item-order&#41;
                          &#40;zipmap &#40;iterate inc 0&#41;&#41;&#41;&#93;
     &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
