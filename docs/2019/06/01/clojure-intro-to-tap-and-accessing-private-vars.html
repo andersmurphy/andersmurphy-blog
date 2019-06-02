@@ -43,12 +43,12 @@ var: clojure.core/tapset is not public
 =&gt; user/private-var
 
 Syntax error compiling at &#40;form-init1817879857542651664.clj:1:1&#41;.
-var: user/some-var is not public
+var: user/private-var is not public
 </code></pre><p>Even though these private vars are not intended to be accessed we can still work around this by using <code>#'</code> to refer directly to the var. We can then dereference it to access its value.</p><pre><code class="clojure">=&gt; #'user/private-var
 
-#'user/some-var
+#'user/private-var
 
-=&gt; @#'user/some-var
+=&gt; @#'user/private-var
 
 &quot;foo&quot;
 </code></pre><p>There are rarely any reasons to ever have to do this in production code, and even then it would not be advisable. However, it can be very useful when exploring a new api in the repl.</p><h3>Back to tapset</h3><p>Armed with our new knowledge of how to access private vars we can find out what's in <code>tapset</code>. Notice the <code>@@</code> we need to derefence <code>tapset</code> twice: once to get the value of the var, and once to get the value of the atom.</p><pre><code class="clojure">=&gt; @@#'clojure.core/tapset
