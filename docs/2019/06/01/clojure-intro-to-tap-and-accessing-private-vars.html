@@ -64,7 +64,7 @@ var: user/some-var is not public
 
 &#91;&#93;
 </code></pre><p>Back to normal. So if we want to be able to prevent the same function from getting added multiple times, we need to give it a name.</p><pre><code class="clojure">&#40;defn conj-to-bar &#91;x&#93;
-  &#40;swap! jar conj x&#41;&#41;
+  &#40;swap! bar conj x&#41;&#41;
 
 &#40;add-tap conj-to-bar&#41;
 &#40;add-tap conj-to-bar&#41;
