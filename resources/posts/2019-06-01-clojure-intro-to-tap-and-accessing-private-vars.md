@@ -4,9 +4,9 @@ Clojure 1.10 introduced a new system called tap. From the release notes: *tap is
 
 Tap has a nice simple api. We can send a value to the set of registered handler functions with `tap>`. We can register a handlers function with `add-tap`. Finally we can unregister a handler function with `remove-tap`.
 
-### Adding a tap and sending values
+### Adding a tap handler and sending values
 
-We create an atom `bar` and register an anonymous handler function to the tap system with `add-tap`. This will `conj` any values we pass to tap to the `bar` atom.
+We create an atom `bar` and register an anonymous handler function to the tap system with `add-tap`. This will `conj` any values we pass to `tap>` to the `bar` atom.
 
 ```clojure
 (def bar (atom []))
@@ -80,7 +80,7 @@ Syntax error compiling at (form-init1817879857542651664.clj:1:1).
 var: user/some-var is not public
 ```
 
-Even those these private vars are not intended to be accessible we can still work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
+Even though these private vars are not intended to be accessed we can still work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
 
 ```clojure
 => #'user/private-var
@@ -92,9 +92,9 @@ Even those these private vars are not intended to be accessible we can still wor
 "foo"
 ```
 
-There are rarely any reasons to ever have to do this in production code, and even then it would not be advised. However, it can be very useful for exploring a new api in the repl.
+There are rarely any reasons to ever have to do this in production code, and even then it would not be advisable. However, it can be very useful when exploring a new api in the repl.
 
-### Back to tap
+### Back to tapset
 
 Armed with our new knowledge of how to access private vars we can find out what's in `tapset`. Notice the `@@` we need to derefence `tapset` twice: once to get the value of the var, and once to get the value of the atom.
 
@@ -134,9 +134,9 @@ Back to normal. So if we want to be able to prevent the same function from getti
 
 Even though we called the `add-tap` function twice with the same function, it only got added once.
 
-### Removing taps
+### Removing tap handlers
 
-The other advantage of using named functions is that you can use `remove-tap` to remove tap functions from the `tapset`. With an anonymous function you would have to hand on to the a reference to be able to remove it from the `tapset`.
+The other advantage of using named functions is that you can use `remove-tap` to remove tap functions from the `tapset`. With an anonymous function you would have to hang on to the a reference to be able to remove it from the `tapset`.
 
 ```clojure
 (remove-tap conj-to-bar)
