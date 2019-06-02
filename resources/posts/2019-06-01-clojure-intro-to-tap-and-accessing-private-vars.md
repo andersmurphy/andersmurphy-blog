@@ -122,7 +122,7 @@ Back to normal. So if we want to be able to prevent the same function from getti
 
 ```clojure
 (defn conj-to-bar [x]
-  (swap! jar conj x))
+  (swap! bar conj x))
 
 (add-tap conj-to-bar)
 (add-tap conj-to-bar)
