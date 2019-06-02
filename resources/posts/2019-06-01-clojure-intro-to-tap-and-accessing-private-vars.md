@@ -1,6 +1,6 @@
 Title: Clojure: intro to tap> and accessing private vars
 
-Clojure 1.10 introduced a new system called `tap`. From the release notes: *tap is a shared, globally accessible system for distributing a series of informational or diagnostic values to a set of (presumably effectful) handler functions. It can be used as a better debug prn, or for facilities like logging etc.* Sounds useful.
+Clojure 1.10 introduced a new system called tap. From the release notes: *tap is a shared, globally accessible system for distributing a series of informational or diagnostic values to a set of (presumably effectful) handler functions. It can be used as a better debug prn, or for facilities like logging etc.*
 
 Tap has a nice simple api. We can send a value to the set of taps with `tap>`. We can add taps with `add-tap`. Finally we can remove taps with `remove-tap`.
 
@@ -26,7 +26,7 @@ We create an atom `bar` and register an anonymous tap function (think event hand
 [2 "foo"]
 ```
 
-When we dereference `bar` we get the values that have been passed to `tap>` `[2 "foo"]`. What happens if we add the same anonymous tap function to the tap system again.
+When we dereference `bar` we get the values `[2 "foo"]` that have been passed to `tap>`. What happens if we add the same anonymous tap function to the tap system again.
 
 ```clojure
 (reset! bar [])
