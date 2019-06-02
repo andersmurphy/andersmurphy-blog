@@ -77,7 +77,7 @@ In Clojure you can create private vars by adding the key `:private` to a var's m
 => user/private-var
 
 Syntax error compiling at (form-init1817879857542651664.clj:1:1).
-var: user/some-var is not public
+var: user/private-var is not public
 ```
 
 Even though these private vars are not intended to be accessed we can still work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
@@ -85,9 +85,9 @@ Even though these private vars are not intended to be accessed we can still work
 ```clojure
 => #'user/private-var
 
-#'user/some-var
+#'user/private-var
 
-=> @#'user/some-var
+=> @#'user/private-var
 
 "foo"
 ```
