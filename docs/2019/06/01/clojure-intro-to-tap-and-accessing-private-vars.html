@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: intro to tap> and accessing private vars</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: intro to tap> and accessing private vars</h1><time class="post-date" datetime="2019-06-01T00:00:00+00:00">01 Jun 2019</time><p>Clojure 1.10 introduced a new system called <code>tap</code>. From the release notes: <em>tap is a shared, globally accessible system for distributing a series of informational or diagnostic values to a set of (presumably effectful) handler functions. It can be used as a better debug prn, or for facilities like logging etc.</em> Sounds useful.</p><p>Tap has a nice simple api. We can send a value to the set of taps with <code>tap&gt;</code>. We can add taps with <code>add-tap</code>. Finally we can remove taps with <code>remove-tap</code>.</p><h3>Adding a tap and sending values</h3><p>We create an atom <code>bar</code> and register an anonymous tap function (think event handler) to the tap system with <code>add-tap</code>. This will <code>conj</code> any values we pass to tap to the <code>bar</code> atom.</p><pre><code class="clojure">&#40;def bar &#40;atom &#91;&#93;&#41;&#41;
+
+&#40;add-tap &#40;partial swap! bar conj&#41;&#41;
+
+&#40;tap&gt; &#40;inc 1&#41;&#41;
+
+=&gt; @bar
+
+&#91;2&#93;
+
+&#40;tap&gt; &quot;foo&quot;&#41;
+
+=&gt; @bar
+
+&#91;2 &quot;foo&quot;&#93;
+</code></pre><p>When we dereference <code>bar</code> we get the values that have been passed to <code>tap&gt;</code> <code>&#91;2 &quot;foo&quot;&#93;</code>. What happens if we add the same anonymous tap function to the tap system again.</p><pre><code class="clojure">&#40;reset! bar &#91;&#93;&#41;
+
+&#40;add-tap &#40;partial swap! bar conj&#41;&#41;
+
+&#40;tap&gt; &quot;foo&quot;&#41;
+
+=&gt; @bar
+
+&#91;&quot;foo&quot; &quot;foo&quot;&#93;
+</code></pre><p>Surprising, even though we called tap once two <code>&quot;foo&quot;</code>s got written to our atom. Let's investigate the <code>add-tap</code> source to see if we can work out what's going on.</p><pre><code class="clojure">=&gt; &#40;source add-tap&#41;
+
+&#40;defn add-tap
+  &#91;f&#93;
+  &#40;force tap-loop&#41;
+  &#40;swap! tapset conj f&#41;
+  nil&#41;
+</code></pre><p>So <code>add-tap</code> adds the tap handlers to an atom called <code>tapset</code>. From the name, we can guess that it might be a set which means we shouldn't be able to register the same tap function twice. Let's try and access <code>tapset</code>.</p><pre><code class="clojure">=&gt; clojure.core/tapset
+
+Syntax error compiling at &#40;form-init1817879857542651664.clj:1:1&#41;.
+var: clojure.core/tapset is not public
+</code></pre><p>No luck, <code>tapset</code> is not public.</p><h3>Creating and accessing private vars</h3><p>In Clojure you can create private vars by adding the key <code>:private</code> to a var's metadata.</p><pre><code class="clojure">=&gt; &#40;def &#94;:private private-var &quot;foo&quot;&#41;
+
+#'user/private-var
+
+&#40;ns baz&#41;
+
+=&gt; user/private-var
+
+Syntax error compiling at &#40;form-init1817879857542651664.clj:1:1&#41;.
+var: user/some-var is not public
+</code></pre><p>Even those these private vars are not intended to be accessible we can still work around this by using <code>#'</code> to refer directly to the var. We can then dereference it to access its value.</p><pre><code class="clojure">=&gt; #'user/private-var
+
+#'user/some-var
+
+=&gt; @#'user/some-var
+
+&quot;foo&quot;
+</code></pre><p>There are rarely any reasons to ever have to do this in production code, and even then it would not be advised. However, it can be very useful for exploring a new api in the repl.</p><h3>Back to tap</h3><p>Armed with our new knowledge of how to access private vars we can find out what's in <code>tapset</code>. Notice the <code>@@</code> we need to derefence <code>tapset</code> twice: once to get the value of the var, and once to get the value of the atom.</p><pre><code class="clojure">=&gt; @@#'clojure.core/tapset
+
+#{#object&#91;clojure.core$partial$fn&#95;&#95;5831 0x18852ca3 &quot;clojure.core$partial$fn&#95;&#95;5831@18852ca3&quot;&#93;
+  #object&#91;clojure.core$partial$fn&#95;&#95;5831 0xb50d66f &quot;clojure.core$partial$fn&#95;&#95;5831@b50d66f&quot;&#93;}
+</code></pre><p>It looks like our anonymous functions are not unique and therefore count as different functions as far as tap is concerned. Let's <code>reset!</code> the <code>tapset</code>.</p><pre><code class="clojure">&#40;reset! bar &#91;&#93;&#41;
+&#40;reset! @#'clojure.core/tapset #{}&#41;
+
+&#40;tap&gt; &quot;foo&quot;&#41;
+
+=&gt; @bar
+
+&#91;&#93;
+</code></pre><p>Back to normal. So if we want to be able to prevent the same function from getting added multiple times, we need to give it a name.</p><pre><code class="clojure">&#40;defn conj-to-bar &#91;x&#93;
+  &#40;swap! jar conj x&#41;&#41;
+
+&#40;add-tap conj-to-bar&#41;
+&#40;add-tap conj-to-bar&#41;
+
+=&gt; @@#'clojure.core/tapset
+
+#{#object&#91;user$conj&#95;to&#95;bar 0x4f1e0067 &quot;user$conj&#95;to&#95;bar@4f1e0067&quot;&#93;}
+</code></pre><p>Even though we called the <code>add-tap</code> function twice with the same function, it only got added once.</p><h3>Removing taps</h3><p>The other advantage of using named functions is that you can use <code>remove-tap</code> to remove tap functions from the <code>tapset</code>. With an anonymous function you would have to hand on to the a reference to be able to remove it from the <code>tapset</code>.</p><pre><code class="clojure">&#40;remove-tap conj-to-bar&#41;
+
+=&gt; @@#'clojure.core/tapset
+
+#{}
+</code></pre><p>This concludes our initial intro to Clojure 1.10's tap system and some useful tricks for accessing private vars.</p></article></div></body></html>
