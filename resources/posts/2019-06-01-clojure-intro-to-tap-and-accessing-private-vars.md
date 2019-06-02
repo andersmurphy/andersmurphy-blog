@@ -2,7 +2,7 @@ Title: Clojure: intro to tap> and accessing private vars
 
 Clojure 1.10 introduced a new system called tap. From the release notes: *tap is a shared, globally accessible system for distributing a series of informational or diagnostic values to a set of (presumably effectful) handler functions. It can be used as a better debug prn, or for facilities like logging etc.*
 
-Tap has a nice simple api. We can send a value to the set of taps with `tap>`. We can add taps with `add-tap`. Finally we can remove taps with `remove-tap`.
+Tap has a nice simple api. We can send a value to the set of registered tap functions with `tap>`. We can add a tap function with `add-tap`. Finally we can remove a tap function with `remove-tap`.
 
 ### Adding a tap and sending values
 
