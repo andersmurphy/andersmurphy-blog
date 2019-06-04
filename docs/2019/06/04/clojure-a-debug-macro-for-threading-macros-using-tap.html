@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: a debug macro for threading macros using tap></title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: a debug macro for threading macros using tap></h1><time class="post-date" datetime="2019-06-04T00:00:00+00:00">04 Jun 2019</time><p>In this article we will cover how to make a debug macro using tap. See <a href='https://andersmurphy.com/2019/06/01/clojure-intro-to-tap-and-accessing-private-vars.html'>this article</a> for an introduction to Clojure 1.10's tap system.</p><h3>Setting up tap></h3><p>We register a handler function with <code>add-tap</code> that writes whatever we pass into <code>tap&gt;</code> to the <code>debug</code> atom.</p><pre><code class="clojure">&#40;def debug &#40;atom &#91;&#93;&#41;&#41;
+
+&#40;defn add-to-debug &#91;x&#93;
+  &#40;swap! debug conj x&#41;&#41;
+
+&#40;add-tap add-to-debug&#41;
+
+=&gt; &#40;tap&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;
+
+true
+
+=&gt; @debug
+
+&#91;&#40;2 3 4 5 6&#41;&#93;
+</code></pre><p>When we dereference <code>debug</code> we get the result of evaluating <code>&#40;map inc &#91;1 2 3 4 5&#93;&#41;</code>. This seems to works at the top level of our code, but what happens when we call tap in the middle of a nested expression.</p><pre><code class="clojure">=&gt; &#40;take 1 &#40;tap&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+
+Error printing return value &#40;IllegalArgumentException&#41; at clojure.lang.RT/seqFrom &#40;RT.java:552&#41;.
+Don't know how to create ISeq from: java.lang.Boolean
+</code></pre><p>We get an error as <code>tap&gt;</code> doesn't return the result of the value we pass into it but the value of <code>true</code> instead.</p><h3>Writing debug* as a function</h3><p>Let's write a simple function that logs our result to tap and returns the result of the function to the expression that is calling tap.</p><pre><code class="clojure">&#40;reset! debug &#91;&#93;&#41;
+
+&#40;defn debug&#42; &#91;args&#93;
+  &#40;do &#40;tap&gt; args&#41;
+      args&#41;&#41;
+
+=&gt; &#40;take 1 &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+
+&#40;2&#41;
+
+=&gt; @debug
+
+&#91;&#40;2 3 4 5 6&#41;&#93;
+</code></pre><p>That works. But it would be more helpful we knew what code lead to that result.</p><pre><code class="clojure">&#40;reset! debug &#91;&#93;&#41;
+
+&#40;defn debug&#42; &#91;args&#93;
+  &#40;do &#40;tap&gt; &#40;sorted-map :fn args :ret args&#41;&#41;
+      args&#41;&#41;
+
+=&gt; &#40;take 1 &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+
+&#40;2&#41;
+
+=&gt; @debug
+
+&#91;{:fn &#40;2 3 4 5 6&#41;, :ret &#40;2 3 4 5 6&#41;}&#93;
+</code></pre><p>Not quite. We want the value of <code>:fn</code> to be our code before it gets evaluated not after. Whenever you want to do something with the value of code as data rather than the result of it's evaluation you need to use macro.</p><h3>Rewriting debug* as a macro</h3><p>Rewriting our debug function as a macro is relatively straight forwards we change <code>defn</code> to <code>defmacro</code>, syntax quote the <code>do</code> form with `````, and unquote the <code>args</code> with <code>&#126;</code>. Finally, we use <code>quote</code> to prevent the <code>args</code> from evaluating.</p><pre><code class="clojure">&#40;reset! debug &#91;&#93;&#41;
+
+&#40;defmacro debug&#42; &#91;args&#93;
+  `&#40;do
+     &#40;tap&gt; &#40;sorted-map :fn &#40;quote &#126;args&#41; :ret &#126;args&#41;&#41;
+     &#126;args&#41;&#41;
+
+=&gt; &#40;take 1 &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+
+&#40;2&#41;
+
+=&gt; @debug
+
+&#91;{:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}&#93;
+</code></pre><p>Much better.</p><h3>Writing the debug->> macro</h3><p>Next let's write a <code>debug-&gt;&gt;</code> macro that will write each step to the <code>debug</code> atom. The <code>repeat</code> function generates a sequence of <code>'debug&#42;</code> symbols which we <code>interleave</code> them with the functions <code>fns</code> that have been passed into our macro. Finally we <code>&#126;@</code> to splice (think apply) the resulting list into the regular <code>-&gt;&gt;</code> macro.</p><pre><code class="clojure">&#40;defmacro debug-&gt;&gt; &#91;&amp; fns&#93;
+  &#40;reset! debug &#91;&#93;&#41;
+  `&#40;-&gt;&gt; &#126;@&#40;interleave fns &#40;repeat 'debug&#42;&#41;&#41;&#41;&#41;
+
+=&gt; &#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
+             &#40;filter odd?&#41;&#41;
+
+&#40;3 5&#41;
+
+=&gt; @debug
+
+&#91;{:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}
+ {:fn &#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;, :ret &#40;3 5&#41;}
+ {:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}&#93;
+</code></pre><p>There are two issues with the output of our macro. The first is that it wrote three steps to the <code>debug</code> atom and there should only be two. The second is that we are only interested in the function for that step <code>&#40;filter odd?&#41;</code>, not the whole chain of functions up to that point <code>&#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;</code>.</p><h3>Multiple evaluation and variable capture</h3><p>Let's see try and fix the first issue. The <code>clojure.walk/macroexpand-all</code>function recursively performs all possible macroexpansions in form. This can be really useful for working out what's going wrong with a macro.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
+     '&#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
+             &#40;filter odd?&#41;&#41;&#41;
+
+&#40;do
+ &#40;clojure.core/tap&gt;
+  &#40;clojure.core/sorted-map
+   :fn
+   '&#40;filter
+     odd?
+     &#40;do
+      &#40;clojure.core/tap&gt;
+       &#40;clojure.core/sorted-map
+        :fn
+        '&#40;map inc &#91;1 2 3 4 5&#93;&#41;
+        :ret
+        &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+      &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+   :ret
+   &#40;filter
+    odd?
+    &#40;do
+     &#40;clojure.core/tap&gt;
+      &#40;clojure.core/sorted-map
+       :fn
+       '&#40;map inc &#91;1 2 3 4 5&#93;&#41;
+       :ret
+       &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+     &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;&#41;&#41;
+ &#40;filter
+  odd?
+  &#40;do
+   &#40;clojure.core/tap&gt;
+    &#40;clojure.core/sorted-map
+     :fn
+     '&#40;map inc &#91;1 2 3 4 5&#93;&#41;
+     :ret
+     &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
+   &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;&#41;
+</code></pre><p>Looking at the output code we can see that <code>tap&gt;</code> appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with out output, which wrote to our <code>debug</code> atom three times and one of the results contained the <code>tap&gt;</code> function that had not been evaluated and stored in <code>:fn</code>. Multiple evaluation is one of the pitfalls of macros writing to watch out for.</p><p>The reason the tap function is getting evaluated so many times is because our code calls <code>&#126;args</code> several times. Once to be passed into our <code>:ret</code> value to get the result, once as a return value of the macro, to be passed onto the next function and once to be passed into <code>quote</code>. We don't have to worry about this last value as <code>quote</code> will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a <code>let</code> binding and assigning <code>&#126;args</code> to an auto-gensym value <code>args#</code> and then using that value in the rest of the macro.  Clojure automatically ensures that each instance of <code>args#</code> resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture.</p><pre><code class="clojure">&#40;defmacro debug&#42; &#91;args&#93;
+  `&#40;let &#91;args# &#126;args&#93;
+    &#40;tap&gt; &#40;sorted-map :fn
+                       &#40;quote &#126;args&#41;
+                       :ret
+                       args#&#41;&#41;
+     args#&#41;&#41;
+</code></pre><p>We can see what this expands to with <code>clojure.walk/macroexpand-all</code>.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
+     '&#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
+             &#40;filter odd?&#41;&#41;&#41;
+
+&#40;let&#42;
+ &#91;args&#95;&#95;1780&#95;&#95;auto&#95;&#95;
+  &#40;filter
+   odd?
+   &#40;let&#42;
+    &#91;args&#95;&#95;1780&#95;&#95;auto&#95;&#95; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#93;
+    &#40;clojure.core/tap&gt;
+     &#40;clojure.core/sorted-map
+      :fn
+      '&#40;map inc &#91;1 2 3 4 5&#93;&#41;
+      :ret
+      args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;
+    args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;&#93;
+ &#40;clojure.core/tap&gt;
+  &#40;clojure.core/sorted-map
+   :fn
+   '&#40;filter
+     odd?
+     &#40;let&#42;
+      &#91;args&#95;&#95;1780&#95;&#95;auto&#95;&#95; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#93;
+      &#40;clojure.core/tap&gt;
+       &#40;clojure.core/sorted-map
+        :fn
+        '&#40;map inc &#91;1 2 3 4 5&#93;&#41;
+        :ret
+        args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;
+      args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;
+   :ret
+   args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;
+ args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;
+
+</code></pre><p>Everything looks right. There are only two calls to tap that will get evaluated.</p><pre><code class="clojure">&#40;defmacro debug-&gt;&gt; &#91;&amp; fns&#93;
+  &#40;reset! debug &#91;&#93;&#41;
+  `&#40;-&gt;&gt; &#126;@&#40;interleave fns &#40;repeat 'debug&#42;&#41;&#41;&#41;&#41;
+
+=&gt; &#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
+             &#40;filter odd?&#41;&#41;
+
+&#40;3 5&#41;
+
+=&gt; @debug
+
+&#91;{:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}
+ {:fn &#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;, :ret &#40;3 5&#41;}&#93;
+</code></pre><p>Excellent.</p><h3>Removing debug* from the output</h3><p>Now let's see if we can fix the second issue and only show the function for that step <code>&#40;filter odd?&#41;</code>, not the whole chain of functions up to that point <code>&#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;</code>. To do this we create a function <code>drop-debug</code> that removes any nested lists that start with <code>'debug&#42;'</code>.</p><pre><code class="clojure">&#40;reset! debug &#91;&#93;&#41;
+
+&#40;defn drop-debug &#91;sexp&#93;
+  &#40;if &#40;list? sexp&#41;
+    &#40;remove #&#40;and &#40;list? %&#41; &#40;-&gt; % first &#40;= 'debug&#42;&#41;&#41;&#41; sexp&#41;
+    sexp&#41;&#41;
+
+&#40;defmacro debug&#42; &#91;args&#93;
+  `&#40;let &#91;args# &#126;args&#93;
+     &#40;tap&gt; &#40;sorted-map :fn
+                       &#40;-&gt; &#40;quote &#126;args&#41; drop-debug&#41;
+                       :ret
+                       args#&#41;&#41;
+     args#&#41;&#41;
+
+&#40;defmacro debug-&gt;&gt; &#91;&amp; fns&#93;
+  &#40;reset! debug &#91;&#93;&#41;
+  `&#40;-&gt;&gt; &#126;@&#40;interleave fns &#40;repeat 'debug&#42;&#41;&#41;&#41;&#41;
+
+=&gt; &#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
+             &#40;filter odd?&#41;&#41;
+
+&#40;3 5&#41;
+
+=&gt; @debug
+
+&#91;{:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}
+ {:fn &#40;filter odd?&#41;, :ret &#40;3 5&#41;}&#93;
+</code></pre><p>Perfect.</p><h3>Writing the debug-> macro</h3><p>Finally lets implement <code>debug-&gt;</code> for good measure.</p><pre><code class="clojure">&#40;defmacro debug-&gt; &#91;&amp; fns&#93;
+  &#40;reset! debug &#91;&#93;&#41;
+  `&#40;-&gt; &#126;@&#40;interleave fns &#40;repeat 'debug&#42;&#41;&#41;&#41;&#41;
+
+=&gt; &#40;debug-&gt; &#40;assoc {} :a 1&#41;
+            &#40;update :a inc&#41;&#41;
+
+{:a 2}
+
+=&gt; @debug
+
+&#91;{:fn &#40;assoc {} :a 1&#41;, :ret {:a 1}}
+ {:fn &#40;update :a inc&#41;, :ret {:a 2}}&#93;
+</code></pre><p>This concludes our tutorial on how to make a debug macro with Clojure 1.10's tap system.</p></article></div></body></html>
