@@ -76,7 +76,7 @@ Not quite. We want the value of `:fn` to be our code before it gets evaluated no
 
 ### Rewriting debug* as a macro
 
-Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with `\`` , and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
+Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with `` ` `` , and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
 
 
 ```clojure
