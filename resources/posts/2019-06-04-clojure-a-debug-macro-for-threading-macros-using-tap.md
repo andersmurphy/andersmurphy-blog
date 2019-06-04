@@ -119,7 +119,7 @@ Next let's write a `debug->>` macro that will write each step to the `debug` ato
  {:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}]
 ```
 
-There are two issues with the output of our macro. The first is that it wrote three steps to the `debug` atom and there should only be two. The second is that we are only interested in the function for the second step `(filter odd?)`, not the whole chain of functions up to that point `(filter odd? (debug* (map inc [1 2 3 4 5])))`.
+There are two issues with the output of our macro. The first is that it wrote three steps to the `debug` atom and there should only be two. The second is that we only want to show `(filter odd?)` for the second step, not the whole chain of functions up to that point `(filter odd? (debug* (map inc [1 2 3 4 5])))`.
 
 ### Multiple evaluation and variable capture
 
@@ -167,10 +167,9 @@ Let's try and fix the first issue. The `clojure.walk/macroexpand-all` function r
    (map inc [1 2 3 4 5]))))
 ```
 
-Looking at the output code we can see that `tap>` appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our `debug` atom three times and one of the results contained the `tap>` function that had not been evaluated and stored in `:fn`. Multiple evaluation is one of the pitfalls of macros writing to watch out for.
+Looking at the output code we can see that `tap>` appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our `debug` atom three times and one `:fn` value contained the `tap>` function that had not been evaluated. This is called multiple evaluation and is a common pitfalls of macros writing to watch out for.
 
-The reason the tap function is getting evaluated so many times is because our code calls `~args` several times. Once to be passed into our `:ret` value to get the result, once as a return value of the macro to be passed onto the next function and once to be passed into `quote`. We don't have to worry about this last value as `quote` will prevent it from being evaluated. However, the other two we only
-want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture. Variable capture is when a macro introduces a binding that shadows another binding unexpectedly leading to unexpected results.
+The reason the tap function is getting evaluated so many times is because our code calls `~args` several times. Once to be passed into our `:ret` value to get the result, once as a return value of the macro and once to be passed into `quote`. We don't have to worry about this last value as `quote` will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro instead of `~args`.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture; when a macro introduces a binding that shadows another binding leading to unexpected results.
 
 ```clojure
 (defmacro debug* [args]
@@ -182,7 +181,7 @@ want to evaluate once. We can do this by using a `let` binding and assigning `~a
      args#))
 ```
 
-We can see what this expands to with `clojure.walk/macroexpand-all`.
+We can see what this new version of our macro expands to with `clojure.walk/macroexpand-all`.
 
 ```clojure
 => (clojure.walk/macroexpand-all
@@ -222,7 +221,7 @@ We can see what this expands to with `clojure.walk/macroexpand-all`.
 
 ```
 
-Everything looks right. There are only two calls to tap that will get evaluated.
+Everything looks right. There are only two calls to `tap>` that will get evaluated.
 
 ```clojure
 (defmacro debug->> [& fns]
