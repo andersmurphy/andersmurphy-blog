@@ -76,7 +76,7 @@ Not quite. We want the value of `:fn` to be our code before it gets evaluated no
 
 ### Rewriting debug* as a macro
 
-Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with `` ` ``, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
+Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with ` ` ` , and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
 
 
 ```clojure
@@ -170,7 +170,7 @@ Let's try and fix the first issue. The `clojure.walk/macroexpand-all` function r
 Looking at the output code we can see that `tap>` appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our `debug` atom three times and one of the results contained the `tap>` function that had not been evaluated and stored in `:fn`. Multiple evaluation is one of the pitfalls of macros writing to watch out for.
 
 The reason the tap function is getting evaluated so many times is because our code calls `~args` several times. Once to be passed into our `:ret` value to get the result, once as a return value of the macro to be passed onto the next function and once to be passed into `quote`. We don't have to worry about this last value as `quote` will prevent it from being evaluated. However, the other two we only
-want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture.
+want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture. Variable capture is when a macro introduces a binding that shadows another binding unexpectedly leading to surprising results.
 
 ```clojure
 (defmacro debug* [args]
