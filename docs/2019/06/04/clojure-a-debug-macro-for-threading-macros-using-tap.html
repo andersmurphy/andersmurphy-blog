@@ -71,7 +71,7 @@ Don't know how to create ISeq from: java.lang.Boolean
 &#91;{:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}
  {:fn &#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;, :ret &#40;3 5&#41;}
  {:fn &#40;map inc &#91;1 2 3 4 5&#93;&#41;, :ret &#40;2 3 4 5 6&#41;}&#93;
-</code></pre><p>There are two issues with the output of our macro. The first is that it wrote three steps to the <code>debug</code> atom and there should only be two. The second is that we are only interested in the function for the second step <code>&#40;filter odd?&#41;</code>, not the whole chain of functions up to that point <code>&#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;</code>.</p><h3>Multiple evaluation and variable capture</h3><p>Let's try and fix the first issue. The <code>clojure.walk/macroexpand-all</code> function recursively performs all possible macroexpansions in the form we give it. This can be really useful for working out what's going wrong with a macro.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
+</code></pre><p>There are two issues with the output of our macro. The first is that it wrote three steps to the <code>debug</code> atom and there should only be two. The second is that we only want to show <code>&#40;filter odd?&#41;</code> for the second step, not the whole chain of functions up to that point <code>&#40;filter odd? &#40;debug&#42; &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;</code>.</p><h3>Multiple evaluation and variable capture</h3><p>Let's try and fix the first issue. The <code>clojure.walk/macroexpand-all</code> function recursively performs all possible macroexpansions in the form we give it. This can be really useful for working out what's going wrong with a macro.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
      '&#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
              &#40;filter odd?&#41;&#41;&#41;
 
@@ -110,14 +110,14 @@ Don't know how to create ISeq from: java.lang.Boolean
      :ret
      &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;
    &#40;map inc &#91;1 2 3 4 5&#93;&#41;&#41;&#41;&#41;
-</code></pre><p>Looking at the output code we can see that <code>tap&gt;</code> appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our <code>debug</code> atom three times and one of the results contained the <code>tap&gt;</code> function that had not been evaluated and stored in <code>:fn</code>. Multiple evaluation is one of the pitfalls of macros writing to watch out for.</p><p>The reason the tap function is getting evaluated so many times is because our code calls <code>&#126;args</code> several times. Once to be passed into our <code>:ret</code> value to get the result, once as a return value of the macro to be passed onto the next function and once to be passed into <code>quote</code>. We don't have to worry about this last value as <code>quote</code> will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a <code>let</code> binding and assigning <code>&#126;args</code> to an auto-gensym value <code>args#</code> and then using that value in the rest of the macro.  Clojure automatically ensures that each instance of <code>args#</code> resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture. Variable capture is when a macro introduces a binding that shadows another binding unexpectedly leading to unexpected results.</p><pre><code class="clojure">&#40;defmacro debug&#42; &#91;args&#93;
+</code></pre><p>Looking at the output code we can see that <code>tap&gt;</code> appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our <code>debug</code> atom three times and one <code>:fn</code> value contained the <code>tap&gt;</code> function that had not been evaluated. This is called multiple evaluation and is a common pitfalls of macros writing to watch out for.</p><p>The reason the tap function is getting evaluated so many times is because our code calls <code>&#126;args</code> several times. Once to be passed into our <code>:ret</code> value to get the result, once as a return value of the macro and once to be passed into <code>quote</code>. We don't have to worry about this last value as <code>quote</code> will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a <code>let</code> binding and assigning <code>&#126;args</code> to an auto-gensym value <code>args#</code> and then using that value in the rest of the macro instead of <code>&#126;args</code>.  Clojure automatically ensures that each instance of <code>args#</code> resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture; when a macro introduces a binding that shadows another binding leading to unexpected results.</p><pre><code class="clojure">&#40;defmacro debug&#42; &#91;args&#93;
   `&#40;let &#91;args# &#126;args&#93;
     &#40;tap&gt; &#40;sorted-map :fn
                        &#40;quote &#126;args&#41;
                        :ret
                        args#&#41;&#41;
      args#&#41;&#41;
-</code></pre><p>We can see what this expands to with <code>clojure.walk/macroexpand-all</code>.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
+</code></pre><p>We can see what this new version of our macro expands to with <code>clojure.walk/macroexpand-all</code>.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/macroexpand-all
      '&#40;debug-&gt;&gt; &#40;map inc &#91;1 2 3 4 5&#93;&#41;
              &#40;filter odd?&#41;&#41;&#41;
 
@@ -152,7 +152,7 @@ Don't know how to create ISeq from: java.lang.Boolean
    args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;&#41;
  args&#95;&#95;1780&#95;&#95;auto&#95;&#95;&#41;
 
-</code></pre><p>Everything looks right. There are only two calls to tap that will get evaluated.</p><pre><code class="clojure">&#40;defmacro debug-&gt;&gt; &#91;&amp; fns&#93;
+</code></pre><p>Everything looks right. There are only two calls to <code>tap&gt;</code> that will get evaluated.</p><pre><code class="clojure">&#40;defmacro debug-&gt;&gt; &#91;&amp; fns&#93;
   &#40;reset! debug &#91;&#93;&#41;
   `&#40;-&gt;&gt; &#126;@&#40;interleave fns &#40;repeat 'debug&#42;&#41;&#41;&#41;&#41;
 
