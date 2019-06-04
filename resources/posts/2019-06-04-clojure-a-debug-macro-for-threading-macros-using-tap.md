@@ -36,7 +36,7 @@ We get an error as `tap>` doesn't return the result of the value we pass into it
 
 ### Writing debug* as a function
 
-Let's write a simple function that logs our result to tap and returns the result of the function to the expression that is calling tap.
+Let's write a simple function that writes our result to tap and then returns the result of the function to the expression that is calling tap.
 
 ```clojure
 (reset! debug [])
@@ -72,11 +72,11 @@ This works. But it would be more helpful if we knew what code lead to that resul
 [{:fn (2 3 4 5 6), :ret (2 3 4 5 6)}]
 ```
 
-Not quite. We want the value of `:fn` to be our code before it gets evaluated not after. Whenever you want to do something with the value of code as data rather than the result of it's evaluation you need to use macro.
+Not quite. We want the value of `:fn` to be our code before it gets evaluated not the result after. Whenever you want to do something with code as data rather than the result of it's evaluation you need to use macro.
 
 ### Rewriting debug* as a macro
 
-Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with ```, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from evaluating.
+Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form with `` ` ``, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
 
 
 ```clojure
