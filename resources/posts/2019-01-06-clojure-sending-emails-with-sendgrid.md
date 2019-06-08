@@ -161,4 +161,4 @@ That's all there is to it. Here's all the code.
        (send-email-with-csv "john@example.com")))
 ```
 
-The full example project is [here](https://github.com/andersmurphy/clj-cookbook/tree/master/clj-sendgrid-example).
+The full example project is [here](https://github.com/andersmurphy/clj-cookbook/tree/master/sending-email/sendgrid-example).
