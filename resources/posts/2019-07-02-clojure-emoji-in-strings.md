@@ -1,6 +1,6 @@
 Title: Clojure: emoji in strings
 
-Sometimes, for better or worse your problem domain requires the use of emoji. This article will cover how emoji are represented in Clojure strings.
+Sometimes your problem domain requires the use of emoji. This article will cover how emoji are represented in Clojure strings.
 
 ### Emoji literal
 
@@ -21,7 +21,7 @@ Another option is to use unicode. Clojure uses Java's string class which unfortu
   (-> (Character/toChars code)
       String.))
 
-(unicode->string 0x1F641)
+(unicode->string 0x1F52E)
 
 => "🔮"
 ```
@@ -31,9 +31,7 @@ Another option is to use unicode. Clojure uses Java's string class which unfortu
 It's worth bearing in mind that Java uses UTF-16 encoding. This means that unicode characters will use one 16-bit word or two 16-bits words, depending on the character. We can see this by using `count`.
 
 ```clojure
-(def emoji "🔮")
-
-(count emoji)
+(count "🔮")
 
 => 2
 ```
@@ -43,11 +41,11 @@ The string is 2 characters long, even though it consists of only a single emoji.
 If we get the first or second character of this string we get a `?`.
 
 ```clojure
-(subs (str emoji " Estimating!") 0 1)
+(subs "🔮 Estimating!" 0 1)
 
 => "?"
 
-(subs (str emoji " Estimating!") 1 2)
+(subs "🔮 Estimating!" 1 2)
 
 => "?"
 ```
@@ -55,7 +53,7 @@ If we get the first or second character of this string we get a `?`.
 If we get the first two characters of the string we get the emoji.
 
 ```clojure
-(subs (str emoji " Estimating!") 0 2)
+(subs "🔮 Estimating!" 0 2)
 
 => "🔮"
 ```
