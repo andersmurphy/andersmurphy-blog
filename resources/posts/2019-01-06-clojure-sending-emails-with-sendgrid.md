@@ -1,4 +1,4 @@
-Title: Clojure: sending emails with SendGrid
+3Title: Clojure: sending emails with SendGrid
 
 Your business needs you to generate an automated email report containing data from your app. In this example we will use the [SendGrid](https://sendgrid.com) web API to email a `.csv` file.
 
@@ -161,4 +161,4 @@ That's all there is to it. Here's all the code.
        (send-email-with-csv "john@example.com")))
 ```
 
-The full example project is [here](https://github.com/andersmurphy/clj-cookbook/tree/master/sending-email/sendgrid-example).
+The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/sending-email/sendgrid-example).
