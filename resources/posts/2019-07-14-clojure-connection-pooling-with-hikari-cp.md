@@ -135,6 +135,4 @@ Create a `logback.xml` in your project `resources` folder (lein will add this to
 
 Now only ERROR level hikari messages will be logged.
 
-This concludes this guide to setting up connection pooling with hikari-cp.
-
-The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/connection-pooling/hikari-cp-example).
+This concludes this guide to setting up connection pooling with hikari-cp. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/connection-pooling/hikari-cp-example).
