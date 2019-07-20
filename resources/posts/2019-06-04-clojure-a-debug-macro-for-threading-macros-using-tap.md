@@ -1,10 +1,10 @@
 Title: Clojure: a debug macro for threading macros using tap>
 
-In this article we will cover how to make a debug macro using tap. See [this article](https://andersmurphy.com/2019/06/01/clojure-intro-to-tap-and-accessing-private-vars.html) for an introduction to Clojure 1.10's tap system.
+This article will cover how to make a debug macro using tap. See [this article](https://andersmurphy.com/2019/06/01/clojure-intro-to-tap-and-accessing-private-vars.html) for an introduction to Clojure 1.10's tap system.
 
 ### Setting up tap>
 
-First we register a handler function with `add-tap` that writes whatever we pass into `tap>` to the `debug` atom.
+First register a handler function with `add-tap` that writes whatever we pass into `tap>` to the `debug` atom.
 
 ```clojure
 (def debug (atom []))
@@ -280,7 +280,7 @@ Perfect.
 
 ### Writing the debug-> macro
 
-Finally lets implement `debug->` for good measure.
+Finally let's implement `debug->` for good measure.
 
 ```clojure
 (defmacro debug-> [& fns]
@@ -298,4 +298,4 @@ Finally lets implement `debug->` for good measure.
  {:fn (update :a inc), :ret {:a 2}}]
 ```
 
-This concludes our tutorial on how to make a debug macro with Clojure 1.10's tap system.
+This concludes this tutorial on how to make a debug macro with Clojure 1.10's tap system.

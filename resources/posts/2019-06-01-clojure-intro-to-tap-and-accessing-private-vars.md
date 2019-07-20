@@ -6,7 +6,7 @@ Tap has a nice simple api. We can send a value to the set of registered handler 
 
 ### Adding a tap handler and sending values
 
-We create an atom `bar` and register an anonymous handler function to the tap system with `add-tap`. This will `conj` any values we pass to `tap>` to the `bar` atom.
+Create an atom `bar` and register an anonymous handler function to the tap system with `add-tap`. This will `conj` any values we pass to `tap>` to the `bar` atom.
 
 ```clojure
 (def bar (atom []))
@@ -26,7 +26,7 @@ We create an atom `bar` and register an anonymous handler function to the tap sy
 [2 "foo"]
 ```
 
-When we dereference `bar` we get the values `[2 "foo"]` that have been passed to `tap>`. What happens if we add the same anonymous handler function to the tap system again.
+When we dereference `bar` we get the values `[2 "foo"]` that have been passed to `tap>`. What happens if we add the same anonymous handler function to the tap system again?
 
 ```clojure
 (reset! bar [])
@@ -40,7 +40,7 @@ When we dereference `bar` we get the values `[2 "foo"]` that have been passed to
 ["foo" "foo"]
 ```
 
-Surprising, even though we called tap once two `"foo"`s got written to our atom. Let's investigate the `add-tap` source to see if we can work out what's going on.
+Surprising, even though we called tap once two `"foo"`s got written to our atom. Let's investigate the `add-tap` source and work out what's going on.
 
 ```clojure
 => (source add-tap)
@@ -80,7 +80,7 @@ Syntax error compiling at (form-init1817879857542651664.clj:1:1).
 var: user/private-var is not public
 ```
 
-Even though these private vars are not intended to be accessed we can still work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
+Even though these private vars are not intended to be accessed we can work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
 
 ```clojure
 => #'user/private-var
@@ -141,9 +141,9 @@ The other advantage of using named functions is that you can use `remove-tap` to
 ```clojure
 (remove-tap conj-to-bar)
 
-=> @@#'clojure.core/tapset
+=> @@#'clojure.core/tapsetg
 
 #{}
 ```
 
-This concludes our initial intro to Clojure 1.10's tap system and some useful tricks for accessing private vars.
+This concludes this initial intro to Clojure 1.10's tap system and some useful tricks for accessing private vars.
