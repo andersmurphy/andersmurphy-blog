@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: using java.time with clojure.java.jdbc</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: using java.time with clojure.java.jdbc</h1><time class="post-date" datetime="2019-08-03T00:00:00+00:00">03 Aug 2019</time><p>Java 8 introduced <code>java.time</code> to replace the existing java representations of time <code>java.util.Date</code>, <code>java.sql.Timestamp</code> etc. There were many problems with this old implementation: it wasn't thread safe, it had a clunky API and no built in representation for timezones. <code>java.time</code> is the successor to the fantastic <code>joda.time</code> project which solves all these problems. So if <code>java.time</code> fixes everything then why this article? Well, <code>java.sql.Timestamp</code> still rears its ugly head at the database layer where it is still the default representation of time in the <code>java.jdbc</code> database drivers. In this article we will cover how to automate the conversion between <code>java.sql.Timestamp</code> and <code>java.time</code> so you never have to deal with <code>java.sql.Timestamp</code> again.</p><h3>Initial set up</h3><p>Start postgres.</p><pre><code class="bash">pg&#95;ctl -D pg start
+</code></pre><p>Create a database called <code>databasename</code>.</p><pre><code class="bash">createdb databasename
+</code></pre><h3>Dependencies</h3><p>Add <code>org.clojure/java.jdbc</code> and <code>org.postgresql/postgresql</code> to your dependencies.</p><pre><code class="clojure">&#40;defproject jdbc-java-time-example &quot;0.1.0-SNAPSHOT&quot;
+  :dependencies &#91;&#91;org.clojure/clojure &quot;1.10.1&quot;&#93;
+                 &#91;org.clojure/java.jdbc &quot;0.7.7&quot;&#93;
+                 &#91;org.postgresql/postgresql &quot;42.2.3&quot;&#93;&#93;&#41;
+</code></pre><h3>Create a table in the database</h3><p>Start with importing all the needed dependencies, creating a database connection and a test table.</p><pre><code class="clojure">&#40;ns jdbc-java-time-example.core
+  &#40;:require &#91;clojure.java.jdbc :as jdbc&#93;&#41;
+  &#40;:import &#91;java.sql Timestamp&#93;
+           &#91;java.sql Date&#93;
+           &#91;java.time.format DateTimeFormatter&#93;
+           &#91;java.time LocalDate&#93;
+           &#91;java.time Instant&#93;
+           &#91;java.io FileWriter&#93;&#41;&#41;
+
+&#40;def database-connection &quot;postgresql://localhost:5432/databasename&quot;&#41;
+
+&#40;jdbc/execute!
+   database-connection
+   &quot;CREATE TABLE event &#40;pid SERIAL PRIMARY KEY, name text,
+   created timestamp with time zone,
+   log&#95;date date &#41;&quot;&#41;
+</code></pre><h3>Adding support for java.time.instant and java.time.Localdate to JDBC</h3><p>Extend <code>jdbc/IResultsetReadColumn</code> to convert <code>java.sql.Timestamp</code> to <code>java.time.Instant</code> and <code>java.sql.Date</code> to <code>java.time.LocalDate</code>.</p><pre><code class="clojure">&#40;extend-protocol jdbc/IResultSetReadColumn
+  java.sql.Timestamp
+  &#40;result-set-read-column &#91;v &#95; &#95;&#93;
+    &#40;.toInstant v&#41;&#41;
+  java.sql.Date
+  &#40;result-set-read-column &#91;v &#95; &#95;&#93;
+    &#40;.toLocalDate v&#41;&#41;&#41;
+</code></pre><p>Extend <code>jdbc/ISQLValue</code> to convert <code>java.time.Instant</code> to <code>java.sql.Timestamp</code> and <code>java.time.LocalDate</code> to <code>java.sql.Date</code>.</p><pre><code class="clojure">&#40;extend-protocol jdbc/ISQLValue
+  java.time.Instant
+  &#40;sql-value &#91;v&#93;
+    &#40;Timestamp/from v&#41;&#41;
+  java.time.LocalDate
+  &#40;sql-value &#91;v&#93;
+    &#40;Date/valueOf v&#41;&#41;&#41;
+</code></pre><h3>Read and write</h3><p>Inserting <code>java.time</code> values works as expected.</p><pre><code class="clojure">&#40;jdbc/insert!
+   database-connection
+   :event
+   {:name     &quot;page&#95;viewed&quot;
+    :created  &#40;Instant/now&#41;
+    :log&#95;date &#40;LocalDate/now&#41;}&#41;
+
+=&gt; &#40;{:pid 1,
+     :name &quot;page&#95;viewed&quot;,
+     :created #object&#91;java.time.Instant 0x1d43ad18 &quot;2019-08-03T16:28:25.935Z&quot;&#93;,
+     :log&#95;date #object&#91;java.time.LocalDate 0x265e4f6d &quot;2019-08-03&quot;&#93;}&#41;
+</code></pre><p>Same for reading <code>java.time</code> values.</p><pre><code class="clojure">&#40;jdbc/query
+   database-connection
+   &#91;&quot;select &#42; from event&quot;&#93;&#41;
+
+=&gt; &#40;{:pid 1,
+     :name &quot;page&#95;viewed&quot;,
+     :created #object&#91;java.time.Instant 0x1d43ad18 &quot;2019-08-03T16:28:25.935Z&quot;&#93;,
+     :log&#95;date #object&#91;java.time.LocalDate 0x265e4f6d &quot;2019-08-03&quot;&#93;}&#41;
+</code></pre><h3>Adding instant and localdate reader literals</h3><p>To make <code>java.time</code> values easier to work with we can add support for reader literals. For the repl to be able to print the literals define the following methods.</p><pre><code class="clojure">&#40;defmethod print-method java.time.Instant
+  &#91;inst out&#93;
+  &#40;.write out &#40;str &quot;#time/inst \&quot;&quot; &#40;.toString inst&#41; &quot;\&quot;&quot;&#41; &#41;&#41;
+
+&#40;defmethod print-dup java.time.Instant
+  &#91;inst out&#93;
+  &#40;.write out &#40;str &quot;#time/inst \&quot;&quot; &#40;.toString inst&#41; &quot;\&quot;&quot;&#41; &#41;&#41;
+
+&#40;defmethod print-method LocalDate
+  &#91;&#94;LocalDate date &#94;FileWriter out&#93;
+  &#40;.write out &#40;str &quot;#time/ld \&quot;&quot; &#40;.toString date&#41; &quot;\&quot;&quot;&#41;&#41;&#41;
+
+&#40;defmethod print-dup LocalDate
+  &#91;&#94;LocalDate date &#94;FileWriter out&#93;
+  &#40;.write out &#40;str &quot;#time/ld \&quot;&quot; &#40;.toString date&#41; &quot;\&quot;&quot;&#41;&#41;&#41;
+</code></pre><p>To allow clojure to read these literals first create two functions for passing date and time.</p><pre><code class="clojure">&#40;defn parse-date &#91;string&#93;
+  &#40;LocalDate/parse string&#41;&#41;
+
+&#40;defn parse-time &#91;string&#93;
+  &#40;and string &#40;-&gt; &#40;.parse &#40;DateTimeFormatter/ISO&#95;INSTANT&#41; string&#41;
+                  Instant/from&#41;&#41;&#41;
+</code></pre><p>Then create a file called <code>data&#95;readers.clj</code> in your project <code>resources</code> folder (this will add it to the class path).</p><pre><code class="clojure">{time/inst jdbc-java-time-example.core/parse-time
+ time/ld   jdbc-java-time-example.core/parse-date}
+</code></pre><p>Writing literals works as expected.</p><pre><code class="clojure">&#40;jdbc/insert!
+   database-connection
+   :event
+   {:name     &quot;page&#95;viewed&quot;
+    :created  #time/inst &quot;2019-08-03T16:28:25.935Z&quot;
+    :log&#95;date #time/ld &quot;2019-08-03&quot;}&#41;
+
+=&gt; &#40;{:pid 1,
+     :name &quot;page&#95;viewed&quot;,
+     :created #object&#91;java.time.Instant 0x1d43ad18 &quot;2019-08-03T16:28:25.935Z&quot;&#93;,
+     :log&#95;date #object&#91;java.time.LocalDate 0x265e4f6d &quot;2019-08-03&quot;&#93;}&#41;
+</code></pre><p>Reading print literals.</p><pre><code class="clojure">&#40;jdbc/query
+   database-connection
+   &#91;&quot;select &#42; from event&quot;&#93;&#41;
+
+=&gt; &#40;{:pid 1,
+     :name &quot;page&#95;viewed&quot;,
+     :created #time/inst &quot;2019-08-03T16:28:25.935Z&quot;,
+     :log&#95;date #time/ld &quot;2019-08-03&quot;}&#41;
+</code></pre><p>This concludes this guide to using <code>java.time</code> with <code>clojure.java.jdbc</code> as well as a brief introduction to reader literals. The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/database-type-conversion/jdbc-java-time-example'>here</a>.</p></article></div></body></html>
