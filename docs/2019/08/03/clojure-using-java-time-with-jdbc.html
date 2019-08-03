@@ -5,7 +5,7 @@
   :dependencies &#91;&#91;org.clojure/clojure &quot;1.10.1&quot;&#93;
                  &#91;org.clojure/java.jdbc &quot;0.7.7&quot;&#93;
                  &#91;org.postgresql/postgresql &quot;42.2.3&quot;&#93;&#93;&#41;
-</code></pre><h3>Create a table in the database</h3><p>Start with importing all the needed dependencies, creating a database connection and a test table.</p><pre><code class="clojure">&#40;ns jdbc-java-time-example.core
+</code></pre><h3>Database connection</h3><p>Start with importing all the needed dependencies, creating a database connection and a test table.</p><pre><code class="clojure">&#40;ns jdbc-java-time-example.core
   &#40;:require &#91;clojure.java.jdbc :as jdbc&#93;&#41;
   &#40;:import &#91;java.sql Timestamp&#93;
            &#91;java.sql Date&#93;
@@ -21,7 +21,7 @@
    &quot;CREATE TABLE event &#40;pid SERIAL PRIMARY KEY, name text,
    created timestamp with time zone,
    log&#95;date date &#41;&quot;&#41;
-</code></pre><h3>Adding support for java.time.instant and java.time.Localdate to JDBC</h3><p>Extend <code>jdbc/IResultsetReadColumn</code> to convert <code>java.sql.Timestamp</code> to <code>java.time.Instant</code> and <code>java.sql.Date</code> to <code>java.time.LocalDate</code>.</p><pre><code class="clojure">&#40;extend-protocol jdbc/IResultSetReadColumn
+</code></pre><h3>Extending JDBC with java.time</h3><p>Extend <code>jdbc/IResultsetReadColumn</code> to convert <code>java.sql.Timestamp</code> to <code>java.time.Instant</code> and <code>java.sql.Date</code> to <code>java.time.LocalDate</code>.</p><pre><code class="clojure">&#40;extend-protocol jdbc/IResultSetReadColumn
   java.sql.Timestamp
   &#40;result-set-read-column &#91;v &#95; &#95;&#93;
     &#40;.toInstant v&#41;&#41;
@@ -35,7 +35,7 @@
   java.time.LocalDate
   &#40;sql-value &#91;v&#93;
     &#40;Date/valueOf v&#41;&#41;&#41;
-</code></pre><h3>Read and write</h3><p>Inserting <code>java.time</code> values works as expected.</p><pre><code class="clojure">&#40;jdbc/insert!
+</code></pre><h3>Read and write time</h3><p>Inserting <code>java.time</code> values works as expected.</p><pre><code class="clojure">&#40;jdbc/insert!
    database-connection
    :event
    {:name     &quot;page&#95;viewed&quot;
@@ -54,7 +54,7 @@
      :name &quot;page&#95;viewed&quot;,
      :created #object&#91;java.time.Instant 0x1d43ad18 &quot;2019-08-03T16:28:25.935Z&quot;&#93;,
      :log&#95;date #object&#91;java.time.LocalDate 0x265e4f6d &quot;2019-08-03&quot;&#93;}&#41;
-</code></pre><h3>Adding instant and localdate reader literals</h3><p>To make <code>java.time</code> values easier to work with we can add support for reader literals. For the repl to be able to print the literals define the following methods.</p><pre><code class="clojure">&#40;defmethod print-method java.time.Instant
+</code></pre><h3>Reader literals</h3><p>To make <code>java.time</code> values easier to work with we can add support for reader literals. For Clojure to be able to print the literals define the following methods.</p><pre><code class="clojure">&#40;defmethod print-method java.time.Instant
   &#91;inst out&#93;
   &#40;.write out &#40;str &quot;#time/inst \&quot;&quot; &#40;.toString inst&#41; &quot;\&quot;&quot;&#41; &#41;&#41;
 
@@ -69,7 +69,7 @@
 &#40;defmethod print-dup LocalDate
   &#91;&#94;LocalDate date &#94;FileWriter out&#93;
   &#40;.write out &#40;str &quot;#time/ld \&quot;&quot; &#40;.toString date&#41; &quot;\&quot;&quot;&#41;&#41;&#41;
-</code></pre><p>To allow clojure to read these literals first create two functions for passing date and time.</p><pre><code class="clojure">&#40;defn parse-date &#91;string&#93;
+</code></pre><p>To allow Clojure to read these literals first create two functions for passing date and time.</p><pre><code class="clojure">&#40;defn parse-date &#91;string&#93;
   &#40;LocalDate/parse string&#41;&#41;
 
 &#40;defn parse-time &#91;string&#93;
@@ -86,9 +86,9 @@
 
 =&gt; &#40;{:pid 1,
      :name &quot;page&#95;viewed&quot;,
-     :created #object&#91;java.time.Instant 0x1d43ad18 &quot;2019-08-03T16:28:25.935Z&quot;&#93;,
-     :log&#95;date #object&#91;java.time.LocalDate 0x265e4f6d &quot;2019-08-03&quot;&#93;}&#41;
-</code></pre><p>Reading print literals.</p><pre><code class="clojure">&#40;jdbc/query
+     :created #time/inst &quot;2019-08-03T16:28:25.935Z&quot;,
+     :log&#95;date #time/ld &quot;2019-08-03&quot;}&#41;
+</code></pre><p>Reading prints literals.</p><pre><code class="clojure">&#40;jdbc/query
    database-connection
    &#91;&quot;select &#42; from event&quot;&#93;&#41;
 
