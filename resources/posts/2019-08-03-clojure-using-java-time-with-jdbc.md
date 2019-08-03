@@ -27,7 +27,7 @@ Add `org.clojure/java.jdbc` and `org.postgresql/postgresql` to your dependencies
                  [org.postgresql/postgresql "42.2.3"]])
 ```
 
-### Create a table in the database
+### Database connection
 
 Start with importing all the needed dependencies, creating a database connection and a test table.
 
@@ -50,7 +50,7 @@ Start with importing all the needed dependencies, creating a database connection
    log_date date )")
 ```
 
-### Adding support for java.time.instant and java.time.Localdate to JDBC
+### Extending JDBC with java.time
 
 Extend `jdbc/IResultsetReadColumn` to convert `java.sql.Timestamp` to `java.time.Instant` and `java.sql.Date` to `java.time.LocalDate`.
 
@@ -76,7 +76,7 @@ Extend `jdbc/ISQLValue` to convert `java.time.Instant` to `java.sql.Timestamp` a
     (Date/valueOf v)))
 ```
 
-### Read and write
+### Read and write time
 
 Inserting `java.time` values works as expected.
 
@@ -107,9 +107,9 @@ Same for reading `java.time` values.
      :log_date #object[java.time.LocalDate 0x265e4f6d "2019-08-03"]})
 ```
 
-### Adding instant and localdate reader literals
+### Reader literals
 
-To make `java.time` values easier to work with we can add support for reader literals. For the repl to be able to print the literals define the following methods.
+To make `java.time` values easier to work with we can add support for reader literals. For Clojure to be able to print the literals define the following methods.
 
 ```clojure
 (defmethod print-method java.time.Instant
@@ -129,7 +129,7 @@ To make `java.time` values easier to work with we can add support for reader lit
   (.write out (str "#time/ld \"" (.toString date) "\"")))
 ```
 
-To allow clojure to read these literals first create two functions for passing date and time.
+To allow Clojure to read these literals first create two functions for passing date and time.
 
 ```clojure
 (defn parse-date [string]
@@ -159,11 +159,11 @@ Writing literals works as expected.
 
 => ({:pid 1,
      :name "page_viewed",
-     :created #object[java.time.Instant 0x1d43ad18 "2019-08-03T16:28:25.935Z"],
-     :log_date #object[java.time.LocalDate 0x265e4f6d "2019-08-03"]})
+     :created #time/inst "2019-08-03T16:28:25.935Z",
+     :log_date #time/ld "2019-08-03"})
 ```
 
-Reading print literals.
+Reading prints literals.
 
 ```clojure
 (jdbc/query
