@@ -1,4 +1,4 @@
-3Title: Clojure: sending emails with SendGrid
+Title: Clojure: sending emails with SendGrid
 
 Your business needs you to generate an automated email report containing data from your app. In this example we will use the [SendGrid](https://sendgrid.com) web API to email a `.csv` file.
 
