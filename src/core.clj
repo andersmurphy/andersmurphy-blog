@@ -231,7 +231,8 @@
     (xml/emit tags out-file)))
 
 (defn date->rfc822 [date]
-  (let [local-date (-> (LocalDate/parse date)
+  (let [local-date (-> (apply str (interpose "-" date))
+                       (LocalDate/parse)
                        (.atStartOfDay)
                        (.atZone (ZoneId/of "UTC")))]
     (.format local-date DateTimeFormatter/RFC_1123_DATE_TIME)))
