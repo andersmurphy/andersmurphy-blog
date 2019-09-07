@@ -4,7 +4,10 @@
             [clojure.string :as str]
             [clojure.java.io :as io]
             [clojure.data.xml :as xml])
-  (:import [java.time LocalDateTime]))
+  (:import [java.time LocalDateTime]
+           [java.time LocalDate]
+           [java.time ZoneId]
+           [java.time.format DateTimeFormatter]))
 
 (def site-url "https://andersmurphy.com")
 (def site-title "Anders Murphy")
@@ -227,6 +230,12 @@
   (with-open [out-file (java.io.FileWriter. "docs/feed.xml")]
     (xml/emit tags out-file)))
 
+(defn date->rfc822 [date]
+  (let [local-date (-> (LocalDate/parse date)
+                       (.atStartOfDay)
+                       (.atZone (ZoneId/of "UTC")))]
+    (.format local-date DateTimeFormatter/RFC_1123_DATE_TIME)))
+
 (defn generate-rss-feed [posts]
   (xml/sexp-as-element
    [:rss
@@ -243,7 +252,7 @@
             (let [post-url (str site-url "/" post-path-name)]
               [:item
                [:title post-name]
-               [:pubDate (date->datetime date)]
+               [:pubDate (date->rfc822 date)]
                [:link post-url]
                [:guid {:isPermaLink "true"} post-url]]))
           posts)]]))
