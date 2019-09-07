@@ -2,7 +2,8 @@
   (:require [hiccup.core :refer [html]]
             [markdown.core :refer [md-to-html-string-with-meta]]
             [clojure.string :as str]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [clojure.data.xml :as xml])
   (:import [java.time LocalDateTime]))
 
 (def site-url "https://andersmurphy.com")
@@ -10,6 +11,7 @@
 (def site-tagline "A blog mostly about functional programming")
 (def site-github "https://github.com/andersmurphy")
 (def site-twitter "https://twitter.com/anders_murphy")
+(def site-rss (str site-url "/feed.xml"))
 (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
 (def highlight-url "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0")
 (def directory (io/file "resources/posts"))
@@ -102,7 +104,8 @@
     [:nav {:class "sidebar-nav"}
      [:a {:class "sidebar-nav-item" :href site-github} "Github"]
      [:a {:class "sidebar-nav-item" :href site-twitter} "Twitter"]
-     [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]]
+     [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]
+     [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]
     [:p (str "@ " (current-year) ". All rights reserved")]]])
 
 (defn add-post-content [{:keys [file] :as m}]
@@ -220,6 +223,31 @@
          (map add-post-page))
    files))
 
+(defn write-rss! [tags]
+  (with-open [out-file (java.io.FileWriter. "docs/feed.xml")]
+    (xml/emit tags out-file)))
+
+(defn generate-rss-feed [posts]
+  (xml/sexp-as-element
+   [:rss
+    {:version    "2.0"
+     :xmlns:atom "https://www.w3.org/2005/Atom"
+     :xmlns:dc   "https://purl.org/dc/elements/1.1/"}
+    [:channel
+     [:title site-title
+      [:description site-tagline]
+      [:link site-url]
+      [:atom:link
+       {:href site-rss :rel "self" :type "application/rss+xml"}
+       (map (fn [{:keys [post-name date post-path-name]}]
+              (let [post-url (str site-url "/" post-path-name)]
+                [:item
+                 [:title post-name]
+                 [:pubDate (date->datetime date)]
+                 [:link post-url]
+                 [:guid {:isPermaLink "true"} post-url]]))
+            posts)]]]]))
+
 (defn generate-site []
   (let [posts (get-posts files)]
     (->> (partition-all 10 posts)
@@ -228,4 +256,6 @@
          (run! write-page!))
     (-> html-404
         write-404!)
-    (run! write-post! posts)))
+    (run! write-post! posts)
+    (-> (generate-rss-feed posts)
+        write-rss!)))
