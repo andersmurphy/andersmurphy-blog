@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: generating html and xml</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: generating html and xml</h1><time class="post-date" datetime="2019-09-08T00:00:00+00:00">08 Sep 2019</time><p>HTML and XML are ubiquitous, whether it's the pages of a static site or configuration for a logger, being able to programmatically generate these files can be really powerful. This article will cover how to generate html and xml files in Clojure.</p><h3>HTML</h3><p>In some languages you use template (<a href='https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html'>ERB</a>) to generate html/xml or a language syntax extension (<a href='https://reactjs.org/docs/introducing-jsx.html'>JSX</a>). Inevitably, as you need to solve more and more interesting problems the limitations of these template/extension languages becomes a problem, eventually you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively implementing the underlying language twice, often with some awkward syntactic differences.</p><p>Clojure takes a different approach, rather than implementing a new embedded syntax it represents HTML and XML with Clojure data structures (vectors and maps). This gives you all the power of Clojure for manipulating and building HTML and XML files. This is possible as Lisp and HTML/XML are both trees that represent data. For a more in depth discussion on the similarities between Lisp and XML check out <a href='https://www.defmacro.org/ramblings/lisp.html'>this</a> article.</p><p>For generating HTML we are going to use <code>hiccup</code>. Hiccup is a library for representing HTML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes.</p><p>Add <code>hiccup</code> as a dependency in the project <code>deps.edn</code> file.</p><pre><code class="clojure">{:deps {hiccup {:mvn/version &quot;1.0.5&quot;}}}
+</code></pre><p>Require <code>hiccup</code>.</p><pre><code class="clojure">&#40;ns html-and-xml-example.core
+  &#40;:require &#91;hiccup.core :as html&#93;&#41;&#41;
+</code></pre><p>The <code>html</code> function to create a HTML string representation of a 404 error page which we then <code>spit</code> into a file. Vectors are used to represent elements, keywords represent tags, and maps represent attributes. Interestingly this data representation is less verbose that HTML as closing tags are omitted. This example also illustrates the use of a variable <code>site-url</code> in the HTML data.</p><pre><code class="clojure">&#40;def site-url &quot;https://andersmurphy.com&quot;&#41;
+
+&#40;defn generate-404-html &#91;&#93;
+  &#40;html/html &#91;:html
+              &#91;:body
+               &#91;:h1 {:class &quot;post-title&quot;} &quot;404: Page not found&quot;&#93;
+               &#91;:p &quot;Sorry, we've misplaced that URL or it's
+                 pointing to something that doesn't exist.&quot;
+                &#91;:a {:href site-url} &quot;Head back home&quot;&#93;
+                &quot; to try finding it again.&quot;&#93;&#93;&#93;&#41;&#41;
+
+&#40;defn write-404! &#91;html&#93;
+  &#40;let &#91;path-name &quot;404.html&quot;&#93;
+    &#40;spit path-name html&#41;&#41;&#41;
+
+&#40;comment &#40;-&gt; &#40;generate-404-html&#41;
+             write-404!&#41;&#41;
+</code></pre><p>The generated output file <code>404.html</code> has the following content. Note that I have formatted the output for this blog post to make it human readable, the actual output is a single line without any white space.</p><pre><code class="html">&lt;html&gt;
+ &lt;body&gt;
+  &lt;h1 class=&quot;post-title&quot;&gt;404: Page not found&lt;/h1&gt;
+   &lt;p&gt;Sorry, we've misplaced that URL or it's
+pointing to something that doesn't exist.&lt;a href=&quot;https://andersmurphy.com&quot;&gt;Head back home&lt;/a&gt; to try finding it again.
+  &lt;/p&gt;
+ &lt;/body&gt;
+&lt;/html&gt;
+</code></pre><h3>XML</h3><p>For generating XML we are going to use <code>clojure.data.xml</code>. Clojure.data.xml is a library for representing XML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes, identical to <code>hiccup</code>.</p><p>Add <code>clojure.data.xml</code> as a dependency in the project <code>deps.edn</code> file.</p><pre><code class="clojure">{:deps {hiccup               {:mvn/version &quot;1.0.5&quot;}
+        org.clojure/data.xml {:mvn/version &quot;0.0.8&quot;}}}
+</code></pre><p>Require <code>clojure.data.xml</code>.</p><pre><code class="clojure">&#40;ns html-and-xml-example.core
+  &#40;:require &#91;hiccup.core :as html&#93;
+            &#91;clojure.data.xml :as xml&#93;&#41;&#41;
+</code></pre><p>The <code>sexp-as-element</code> function is used to generate an XML RSS feed. <code>map</code> iterates over a sequence of posts and generate the corresponding RSS items. There's nothing special about the syntax in this example its just regular Clojure. <code>emit</code> writes the XML to file.</p><pre><code class="clojure">&#40;def site-title &quot;Site Title&quot;&#41;
+&#40;def site-rss &#40;str site-url &quot;/feed.xml&quot;&#41;&#41;
+&#40;def site-description &quot;Site Description&quot;&#41;
+
+&#40;defn generate-rss-xml &#91;posts&#93;
+  &#40;xml/sexp-as-element
+   &#91;:rss
+    {:version    &quot;2.0&quot;
+     :xmlns:atom &quot;https://www.w3.org/2005/Atom&quot;
+     :xmlns:dc   &quot;https://purl.org/dc/elements/1.1/&quot;}
+    &#91;:channel
+     &#91;:title site-title&#93;
+     &#91;:description site-description&#93;
+     &#91;:link site-url&#93;
+     &#91;:atom:link
+      {:href site-rss :rel &quot;self&quot; :type &quot;application/rss+xml&quot;}&#93;
+     &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+            &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+              &#91;:item
+               &#91;:title post-name&#93;
+               &#91;:pubDate date&#93;
+               &#91;:link post-url&#93;
+               &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+          posts&#41;&#93;&#93;&#41;&#41;
+
+&#40;def posts &#91;{:post-name      &quot;Foo&quot;
+             :post-path-name &quot;foo&quot;
+             :date           &quot;Fri, 6 Sep 2019 00:00:00 GMT&quot;}
+            {:post-name      &quot;Bar&quot;
+             :post-path-name &quot;bar&quot;
+             :date           &quot;Sat, 7 Sep 2019 00:00:00 GMT&quot;}
+            {:post-name      &quot;Baz&quot;
+             :post-path-name &quot;baz&quot;
+             :date           &quot;Sun, 8 Sep 2019 00:00:00 GMT&quot;}&#93;&#41;
+
+&#40;defn write-rss! &#91;xml&#93;
+  &#40;with-open &#91;out-file &#40;java.io.FileWriter. &quot;feed.xml&quot;&#41;&#93;
+    &#40;xml/emit xml out-file&#41;&#41;&#41;
+
+&#40;comment &#40;-&gt; &#40;generate-rss-xml posts&#41;
+             write-rss!&#41;&#41;
+</code></pre><p>The generated output file <code>feed.xml</code> has the following content. Note that I have formatted the output for this blog post to make it human readable, the actual output is a single line without any white space.</p><pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;rss xmlns:atom=&quot;https://www.w3.org/2005/Atom&quot; xmlns:dc=&quot;https://purl.org/dc/elements/1.1/&quot; version=&quot;2.0&quot;&gt;
+   &lt;channel&gt;
+      &lt;title&gt;Site Title&lt;/title&gt;
+      &lt;description&gt;Site Description&lt;/description&gt;
+      &lt;link&gt;https://andersmurphy.com&lt;/link&gt;
+      &lt;atom:link href=&quot;https://andersmurphy.com/feed.xml&quot; rel=&quot;self&quot; type=&quot;application/rss+xml&quot; /&gt;
+      &lt;item&gt;
+         &lt;title&gt;Foo&lt;/title&gt;
+         &lt;pubDate&gt;Fri, 6 Sep 2019 00:00:00 GMT&lt;/pubDate&gt;
+         &lt;link&gt;https://andersmurphy.com/foo&lt;/link&gt;
+         &lt;guid isPermaLink=&quot;true&quot;&gt;https://andersmurphy.com/foo&lt;/guid&gt;
+      &lt;/item&gt;
+      &lt;item&gt;
+         &lt;title&gt;Bar&lt;/title&gt;
+         &lt;pubDate&gt;Sat, 7 Sep 2019 00:00:00 GMT&lt;/pubDate&gt;
+         &lt;link&gt;https://andersmurphy.com/bar&lt;/link&gt;
+         &lt;guid isPermaLink=&quot;true&quot;&gt;https://andersmurphy.com/bar&lt;/guid&gt;
+      &lt;/item&gt;
+      &lt;item&gt;
+         &lt;title&gt;Baz&lt;/title&gt;
+         &lt;pubDate&gt;Sun, 8 Sep 2019 00:00:00 GMT&lt;/pubDate&gt;
+         &lt;link&gt;https://andersmurphy.com/baz&lt;/link&gt;
+         &lt;guid isPermaLink=&quot;true&quot;&gt;https://andersmurphy.com/baz&lt;/guid&gt;
+      &lt;/item&gt;
+   &lt;/channel&gt;
+&lt;/rss&gt;
+</code></pre><p>This concludes this guide to generating html and xml in Clojure. The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example'>here</a>.</p></article></div></body></html>
