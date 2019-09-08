@@ -1,14 +1,14 @@
 Title: Clojure: generating html and xml
 
-HTML and XML are ubiquitous, whether it's the pages of a static site or configuration for a logger, being able to programmatically generate these files can be really powerful. This article will cover how to generate html and xml files in Clojure.
+HTML and XML are ubiquitous, whether it's the pages of a static site or configuration for a logger, being able to programmatically generate these files can be really powerful. This article will cover how to generate HTML and XML files in Clojure.
 
 ### HTML
 
-In some languages you use template ([ERB](https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html)) to generate html/xml or a language syntax extension ([JSX](https://reactjs.org/docs/introducing-jsx.html)). Inevitably, as you need to solve more and more interesting problems the limitations of these template/extension languages becomes a problem, eventually you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively implementing the underlying language twice, often with some awkward syntactic differences.
+In some languages you use template ([ERB](https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html)) to generate html/xml or a language syntax extension ([JSX](https://reactjs.org/docs/introducing-jsx.html)). Inevitably, as you need to solve more and more interesting problems the limitations of these template/extension languages becomes an issue, eventually you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively implementing the underlying language in addition to it's own syntax, often with some awkward differences.
 
 Clojure takes a different approach, rather than implementing a new embedded syntax it represents HTML and XML with Clojure data structures (vectors and maps). This gives you all the power of Clojure for manipulating and building HTML and XML files. This is possible as Lisp and HTML/XML are both trees that represent data. For a more in depth discussion on the similarities between Lisp and XML check out [this](https://www.defmacro.org/ramblings/lisp.html) article.
 
-For generating HTML we are going to use `hiccup`. Hiccup is a library for representing HTML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes.
+For generating HTML we are going to use Hiccup. Hiccup is a library for representing HTML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes.
 
 Add `hiccup` as a dependency in the project `deps.edn` file.
 
@@ -23,7 +23,7 @@ Require `hiccup`.
   (:require [hiccup.core :as html]))
 ```
 
-The `html` function to create a HTML string representation of a 404 error page which we then `spit` into a file. Vectors are used to represent elements, keywords represent tags, and maps represent attributes. Interestingly this data representation is less verbose that HTML as closing tags are omitted. This example also illustrates the use of a variable `site-url` in the HTML data.
+The `html` function creates an HTML string representation of a 404 error page which we then `spit` into a file. Vectors are used to represent elements, keywords represent tags, and maps represent attributes. Interestingly this data representation is less verbose that HTML as closing tags are omitted. This example also illustrates the use of a variable `site-url` in the HTML data.
 
 ```clojure
 (def site-url "https://andersmurphy.com")
@@ -60,7 +60,7 @@ pointing to something that doesn't exist.<a href="https://andersmurphy.com">Head
 
 ### XML
 
-For generating XML we are going to use `clojure.data.xml`. Clojure.data.xml is a library for representing XML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes, identical to `hiccup`.
+For generating XML we are going to use Clojure.data.xml. Clojure.data.xml is a library for representing XML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes (identical to Hiccup).
 
 Add `clojure.data.xml` as a dependency in the project `deps.edn` file.
 
@@ -77,7 +77,7 @@ Require `clojure.data.xml`.
             [clojure.data.xml :as xml]))
 ```
 
-The `sexp-as-element` function is used to generate an XML RSS feed. `map` iterates over a sequence of posts and generate the corresponding RSS items. There's nothing special about the syntax in this example its just regular Clojure. `emit` writes the XML to file.
+The `sexp-as-element` function is used to generate an XML RSS feed. `map` iterates over a sequence of posts and generate the corresponding RSS items. There's nothing special about the syntax in this example its just regular Clojure. Finally, `emit` writes the XML to file.
 
 ```clojure
 (def site-title "Site Title")
@@ -155,4 +155,4 @@ The generated output file `feed.xml` has the following content. Note that I have
 </rss>
 ```
 
-This concludes this guide to generating html and xml in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example).
+This concludes this guide to generating HTML and XML in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example).
