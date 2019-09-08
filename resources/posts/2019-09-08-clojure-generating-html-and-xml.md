@@ -1,4 +1,4 @@
-Title: Clojure: generating html and xml
+Title: Clojure: generating HTML and XML
 
 HTML and XML are ubiquitous, whether it's the pages of a static site or configuration for a logger, being able to programmatically generate these files can be really powerful. This article will cover how to generate HTML and XML files in Clojure.
 
