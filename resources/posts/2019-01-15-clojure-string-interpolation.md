@@ -16,9 +16,9 @@ One way of doing this is to use `str` function.
        "/items/"               item-code
        "/prices/"              currency))
 
-=> (shop-url "bob" "A567" "EUR")
+(shop-url "bob" "A567" "EUR")
 
-"https://www.shop.com/bob/items/A567/prices/EUR"
+=> "https://www.shop.com/bob/items/A567/prices/EUR"
 ```
 
 There's nothing wrong with this solution. However, it does encapsulate/hide information that might be useful at the call site: order of arguments and what URL it is operating on.
@@ -28,12 +28,12 @@ There's nothing wrong with this solution. However, it does encapsulate/hide info
 Another approach would be to use the `format` function, which gives us string interpolation.
 
 ```clojure
-=> (format "https://www.shop.com/%s/items/%s/prices/%s"
-           "bob"
-           "A567"
-           "EUR")
+(format "https://www.shop.com/%s/items/%s/prices/%s"
+        "bob"
+        "A567"
+        "EUR")
 
-"https://www.shop.com/bob/items/A567/prices/EUR"
+=> "https://www.shop.com/bob/items/A567/prices/EUR"
 ```
 
 The downside of this is that the placeholders in the URL are not self-documenting.
@@ -48,12 +48,12 @@ What about using a string replace function? Clojure core does have functions for
             (clojure.string/replace s match replacement))
           s replacements))
 
-=> (replace-several "https://www.shop.com/$seller/items/$item-code/prices/$currency"
-                    "$seller" "bob"
-                    "$item-code" "A567"
-                    "$currency" "EUR")
+(replace-several "https://www.shop.com/$seller/items/$item-code/prices/$currency"
+                 "$seller" "bob"
+                 "$item-code" "A567"
+                 "$currency" "EUR")
 
-"https://www.shop.com/bob/items/A567/prices/EUR"
+=> "https://www.shop.com/bob/items/A567/prices/EUR"
 ```
 
 The above works and reads better than our previous solutions as the value substitutions are clear. If you find the destructuring in the `reduce` a bit cumbersome you can use `reduce-kv` which returns the accumulator, key and values for us.

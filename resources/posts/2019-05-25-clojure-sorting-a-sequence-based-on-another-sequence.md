@@ -21,15 +21,15 @@ Let's start by writing some test data.
 Now that we have some data we can use the `sort-by` function and the `.indexOf` method to make the order of the items match the order in the manifest.
 
 ```clojure
-=> (sort-by (fn [{:keys [id]}]
-              (.indexOf (manifest :item-order) id))
-     items)
+(sort-by (fn [{:keys [id]}]
+           (.indexOf (manifest :item-order) id))
+         items)
 
-({:id "x234" :type "drink"}
- {:id "d543" :type "food"}
- {:id "g090" :type "drink"}
- {:id "z001" :type "food"}
- {:id "a362" :type "food"})
+=> ({:id "x234" :type "drink"}
+    {:id "d543" :type "food"}
+    {:id "g090" :type "drink"}
+    {:id "z001" :type "food"}
+    {:id "a362" :type "food"})
 ```
 
 This seems to work. However, `.indexOf` gets called for every item in the list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.
@@ -90,17 +90,17 @@ We add `consistent-ids?` to the spec with `s/and` to ensure that the items and m
 With the `::items-with-manifest` spec finished we can now generate a large amount of test data for our performance test.
 
 ```clojure
-=> (gen/generate (s/gen ::items-with-manifest))
+(gen/generate (s/gen ::items-with-manifest))
 
-{:manifest
- {:item-order
-  ["xid313"
-   "xid544"
-   "xid846"
-   "xid351"
-   "xid67"
-   ...
-   }}
+=> {:manifest
+    {:item-order
+     ["xid313"
+      "xid544"
+      "xid846"
+      "xid351"
+      "xid67"
+      ...
+    }}
 ```
 
 Warning! The output is quite large and will flood your repl.
@@ -117,9 +117,9 @@ Now that we can generate test data, we test the performance of the initial imple
              (.indexOf (manifest :item-order) id))
            items))
 
-=> (time (do (index-of-sort large-manifest) nil))
+(time (do (index-of-sort large-manifest) nil))
 
-"Elapsed time: 561.437815 msecs"
+=> "Elapsed time: 561.437815 msecs"
 ```
 
 As suspected, the function is very slow for large input. This is because each call of `.indexOf` has **O(n)** complexity. We can avoid this cost by building a map of values to index. This can be done with `(iterate inc 0)` this generates a sequence of numbers starting from 0 which we then `zipmap` to the id values.
@@ -132,9 +132,9 @@ As suspected, the function is very slow for large input. This is because each ca
                (value->index id))
              items)))
 
-=> (time (do (hash-map-index-sort large-manifest) nil))
+(time (do (hash-map-index-sort large-manifest) nil))
 
-"Elapsed time: 2.564776 msecs"
+=> "Elapsed time: 2.564776 msecs"
 ```
 
 The results from `time` show this implementation is much faster than the initial implementation.
@@ -152,15 +152,15 @@ We can also spec the `hash-map-index-sort` function with `s/fdef` and use the sp
   :fn #(= (-> % :args :m :manifest :item-order)
           (->> % :ret (map :id))))
 
-=> (-> (stest/check `hash-map-index-sort)
-       first
-       :clojure.spec.test.check/ret)
+(-> (stest/check `hash-map-index-sort)
+    first
+    :clojure.spec.test.check/ret)
 
-{:result true,
- :pass? true,
- :num-tests 1000,
- :time-elapsed-ms 14614,
- :seed 1558893244714}
+=> {:result true,
+    :pass? true,
+    :num-tests 1000,
+    :time-elapsed-ms 14614,
+    :seed 1558893244714}
 ```
 
 This concludes this exploration of how to order items by a manifest as well as some use cases for Clojure Spec.

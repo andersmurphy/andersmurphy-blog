@@ -7,47 +7,49 @@ Checking for containment, whether a collection contains an item, is a common tas
 The `contains?` function springs to mind, lets try it out in the repl.
 
 ```clojure
-=> (contains? {:a 1 :b 2 :c 3} :a)
+(contains? {:a 1 :b 2 :c 3} :a)
 
-true
+=> true
 
-=> (contains? {:a 1 :b 2 :c 3} :d)
+(contains? {:a 1 :b 2 :c 3} :d)
 
-false
+=> false
 ```
 
 So far so good, `contains?` works as expected with maps.
 
 ```clojure
-=> (contains? #{:a :b :c} :a)
+(contains? #{:a :b :c} :a)
 
-true
+=> true
 
-=> (contains? #{:a :b :c} :d)
+(contains? #{:a :b :c} :d)
 
-false
+=> false
 ```
 
 Looks like it also works with sets.
 
 ```clojure
-=> (contains? [1 :b  3 :a] :a)
+(contains? [1 :b  3 :a] :a)
 
-false
+=> false
 
-=> (contains? [2 3 4] 1)
+(contains? [2 3 4] 1)
 
-true
+=> true
 
-=> (contains? [1 3 4] 4)
+(contains? [1 3 4] 4)
 
-false
+=> false
 ```
 
 What's going on here? We are not getting "expected" behaviour with vectors. Let's look at the docs.
 
 ```clojure
-=> (doc contains?)
+(doc contains?)
+
+=>
 -------------------------
 clojure.core/contains?
 ([coll key])
@@ -65,7 +67,9 @@ So for vectors, `contains?` is only useful for checking if an array contains an 
 The documentation for `contains?` mentions the `some` function. Let's investigate the docs for `some`.
 
 ```clojure
-=> (doc some)
+(doc some)
+
+=>
 -------------------------
 clojure.core/some
 ([pred coll])
@@ -78,33 +82,41 @@ clojure.core/some
 So we can use `some` to check if a collection contains an item that satisfies the supplied predicate.
 
 ```clojure
-=> (some even? [1 2 3])
+(some even? [1 2 3])
 
-true
+=> true
 
-=> (some even? [1 3 5])
+(some even? [1 3 5])
 
-nil
+=> nil
 
-=> (some identity [nil false nil 4 nil])
+(some identity [nil false nil 4 nil])
 
-4
+=> 4
 ```
 
 You can also use `some` to check for containment by passing in a set containing the value you want to check for, eg: `#{:a}`. This works because sets are functions in Clojure that return the value you pass into them if it is contained in the set and nil otherwise. Finally `some` can also be used for checking if a collection contains at least one of the values in the set, returning the first true value it encounters.
 
 ```clojure
-=> (some #{:a} [1 :b :a 2])
+(some #{:a} [1 :b :a 2])
 
-:a
+=> :a
 
-=> (some #{:d} [1 :b :a 2])
+(some #{:d} [1 :b :a 2])
 
-nil
+=> nil
 
-=> (some #{:a :b} [1 :b :a 2])
+(some #{:a :b} [1 :b :a 2])
 
-:b
+=> :b
+```
+
+One thing to bare in mind when using `some` with sets is that it won't work with `nil` or `false` values.
+
+```clojure
+(some #{false nil} [false true false nil])
+
+=> nil
 ```
 
 Hopefully this covers most of your day to day containment needs.

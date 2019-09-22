@@ -14,20 +14,21 @@ First register a handler function with `add-tap` that writes whatever we pass in
 
 (add-tap add-to-debug)
 
-=> (tap> (map inc [1 2 3 4 5]))
+(tap> (map inc [1 2 3 4 5]))
 
-true
+=> true
 
-=> @debug
+@debug
 
-[(2 3 4 5 6)]
+=> [(2 3 4 5 6)]
 ```
 
 When we dereference `debug` we get the result of evaluating `(map inc [1 2 3 4 5])`. This seems to works at the top level of our code, but what happens when we call tap in the middle of a nested expression?
 
 ```clojure
-=> (take 1 (tap> (map inc [1 2 3 4 5])))
+(take 1 (tap> (map inc [1 2 3 4 5])))
 
+=>
 Error printing return value (IllegalArgumentException) at clojure.lang.RT/seqFrom (RT.java:552).
 Don't know how to create ISeq from: java.lang.Boolean
 ```
@@ -45,13 +46,13 @@ Let's write a simple function that writes our result to tap and then returns the
   (do (tap> args)
       args))
 
-=> (take 1 (debug* (map inc [1 2 3 4 5])))
+(take 1 (debug* (map inc [1 2 3 4 5])))
 
-(2)
+=> (2)
 
-=> @debug
+@debug
 
-[(2 3 4 5 6)]
+=> [(2 3 4 5 6)]
 ```
 
 This works. But it would be more helpful if we knew what code lead to that result.
@@ -63,13 +64,13 @@ This works. But it would be more helpful if we knew what code lead to that resul
   (do (tap> (sorted-map :fn args :ret args))
       args))
 
-=> (take 1 (debug* (map inc [1 2 3 4 5])))
+(take 1 (debug* (map inc [1 2 3 4 5])))
 
-(2)
+=> (2)
 
-=> @debug
+@debug
 
-[{:fn (2 3 4 5 6), :ret (2 3 4 5 6)}]
+=> [{:fn (2 3 4 5 6), :ret (2 3 4 5 6)}]
 ```
 
 Not quite. We want the value of `:fn` to be our code before it gets evaluated not the result after. Whenever you want to do something with code as data rather than the result of it's evaluation you need to use macro.
@@ -87,13 +88,13 @@ Rewriting our debug function as a macro is relatively straight forwards we chang
      (tap> (sorted-map :fn (quote ~args) :ret ~args))
      ~args))
 
-=> (take 1 (debug* (map inc [1 2 3 4 5])))
+(take 1 (debug* (map inc [1 2 3 4 5])))
 
-(2)
+=> (2)
 
-=> @debug
+@debug
 
-[{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}]
+=> [{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}]
 ```
 
 Much better.
@@ -107,16 +108,16 @@ Next let's write a `debug->>` macro that will write each step to the `debug` ato
   (reset! debug [])
   `(->> ~@(interleave fns (repeat 'debug*))))
 
-=> (debug->> (map inc [1 2 3 4 5])
-             (filter odd?))
+(debug->> (map inc [1 2 3 4 5])
+          (filter odd?))
 
-(3 5)
+=> (3 5)
 
-=> @debug
+@debug
 
-[{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
- {:fn (filter odd? (debug* (map inc [1 2 3 4 5]))), :ret (3 5)}
- {:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}]
+=> [{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
+    {:fn (filter odd? (debug* (map inc [1 2 3 4 5]))), :ret (3 5)}
+    {:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}]
 ```
 
 There are two issues with the output of our macro. The first is that it wrote three steps to the `debug` atom and there should only be two. The second is that we only want to show `(filter odd?)` for the second step, not the whole chain of functions up to that point `(filter odd? (debug* (map inc [1 2 3 4 5])))`.
@@ -126,10 +127,11 @@ There are two issues with the output of our macro. The first is that it wrote th
 Let's try and fix the first issue. The `clojure.walk/macroexpand-all` function recursively performs all possible macroexpansions in the form we give it. This can be really useful for working out what's going wrong with a macro.
 
 ```clojure
-=> (clojure.walk/macroexpand-all
-     '(debug->> (map inc [1 2 3 4 5])
-             (filter odd?)))
+(clojure.walk/macroexpand-all
+ '(debug->> (map inc [1 2 3 4 5])
+ (filter odd?)))
 
+=>
 (do
  (clojure.core/tap>
   (clojure.core/sorted-map
@@ -184,10 +186,11 @@ The reason the tap function is getting evaluated so many times is because our co
 We can see what this new version of our macro expands to with `clojure.walk/macroexpand-all`.
 
 ```clojure
-=> (clojure.walk/macroexpand-all
-     '(debug->> (map inc [1 2 3 4 5])
-             (filter odd?)))
+(clojure.walk/macroexpand-all
+ '(debug->> (map inc [1 2 3 4 5])
+ (filter odd?)))
 
+=>
 (let*
  [args__1780__auto__
   (filter
@@ -228,15 +231,15 @@ Everything looks right. There are only two calls to `tap>` that will get evaluat
   (reset! debug [])
   `(->> ~@(interleave fns (repeat 'debug*))))
 
-=> (debug->> (map inc [1 2 3 4 5])
+(debug->> (map inc [1 2 3 4 5])
              (filter odd?))
 
-(3 5)
+=> (3 5)
 
-=> @debug
+@debug
 
-[{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
- {:fn (filter odd? (debug* (map inc [1 2 3 4 5]))), :ret (3 5)}]
+=> [{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
+    {:fn (filter odd? (debug* (map inc [1 2 3 4 5]))), :ret (3 5)}]
 ```
 
 Excellent.
@@ -265,15 +268,15 @@ Now let's see if we can fix the second issue and only show `(filter odd?)` for t
   (reset! debug [])
   `(->> ~@(interleave fns (repeat 'debug*))))
 
-=> (debug->> (map inc [1 2 3 4 5])
-             (filter odd?))
+(debug->> (map inc [1 2 3 4 5])
+          (filter odd?))
 
-(3 5)
+=> (3 5)
 
-=> @debug
+@debug
 
-[{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
- {:fn (filter odd?), :ret (3 5)}]
+=> [{:fn (map inc [1 2 3 4 5]), :ret (2 3 4 5 6)}
+    {:fn (filter odd?), :ret (3 5)}]
 ```
 
 Perfect.
@@ -287,15 +290,15 @@ Finally let's implement `debug->` for good measure.
   (reset! debug [])
   `(-> ~@(interleave fns (repeat 'debug*))))
 
-=> (debug-> (assoc {} :a 1)
-            (update :a inc))
+(debug-> (assoc {} :a 1)
+         (update :a inc))
 
-{:a 2}
+=> {:a 2}
 
-=> @debug
+@debug
 
-[{:fn (assoc {} :a 1), :ret {:a 1}}
- {:fn (update :a inc), :ret {:a 2}}]
+=> [{:fn (assoc {} :a 1), :ret {:a 1}}
+    {:fn (update :a inc), :ret {:a 2}}]
 ```
 
 This concludes this tutorial on how to make a debug macro with Clojure 1.10's tap system.

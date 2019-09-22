@@ -15,9 +15,9 @@ Let's start by writing a simple case conversion function for converting `kebab-c
          (apply str (first words))
          keyword)))
 
-=> (kebab-case->camelCase :foo-bar-baz)
+(kebab-case->camelCase :foo-bar-baz)
 
-:fooBarBaz
+=> :fooBarBaz
 ```
 
 ### Converting the case of keys in a map
@@ -29,10 +29,10 @@ Now that we have a function for converting case let's convert all the keys of a 
   (->> (map (fn [[k v]] [(f k) v]) m)
        (into {})))
 
-=> (map-keys kebab-case->camelCase
-             {:character-id 1 :first-name "John" :second-name "Snow"})
+(map-keys kebab-case->camelCase
+          {:character-id 1 :first-name "John" :second-name "Snow"})
 
-{:characterId 1, :firstName "John", :secondName "Snow"}
+=> {:characterId 1, :firstName "John", :secondName "Snow"}
 ```
 
 ### Converting case of keys in a nested data structure
@@ -40,8 +40,9 @@ Now that we have a function for converting case let's convert all the keys of a 
 For converting the keys of arbitrarily nested data structures we can use the `clojure.walk/postwalk` function. Let's check out the docs.
 
 ```clojure
-=> (doc clojure.walk/postwalk)
+(doc clojure.walk/postwalk)
 
+=>
 -------------------------
 clojure.walk/postwalk
 ([f form])
@@ -56,24 +57,24 @@ Combining `clojure.walk/postwalk` with our `map-keys` function we can create a `
 (defn transform-keys [t form]
   (clojure.walk/postwalk (fn [x] (if (map? x) (map-keys t x) x)) form))
 
-=> (transform-keys kebab-case->camelCase
-    [{:character-id 1
-      :first-name "Olaf"
-      :second-name "Iondrake"
-      :items {:bag-of-holding ["sword" "axe" "money"]}}
-     {:character-Id 2
-      :first-name "Sigurd"
-      :second-name "Rockfist"
-      :items {:bag-of-holding ["scroll" "potion of healing"]}}])
+(transform-keys kebab-case->camelCase
+ [{:character-id 1
+   :first-name "Olaf"
+   :second-name "Iondrake"
+   :items {:bag-of-holding ["sword" "axe" "money"]}}
+  {:character-Id 2
+   :first-name "Sigurd"
+   :second-name "Rockfist"
+   :items {:bag-of-holding ["scroll" "potion of healing"]}}])
 
-[{:characterId 1,
-  :firstName "Olaf",
-  :secondName "Irondrake",
-  :items {:bagOfHolding ["sword" "axe" "money"]}}
- {:characterId 2,
-  :firstName "Sigurd",
-  :secondName "Rockfist",
-  :items {:bagOfHolding ["scroll" "potion of healing"]}}]
+=> [{:characterId 1,
+     :firstName "Olaf",
+     :secondName "Irondrake",
+     :items {:bagOfHolding ["sword" "axe" "money"]}}
+    {:characterId 2,
+     :firstName "Sigurd",
+     :secondName "Rockfist",
+     :items {:bagOfHolding ["scroll" "potion of healing"]}}]
 ```
 
 There you have it, a function for converting the case of keys in an arbitrarily nested data structure. You can use this function at the boundaries of your software stack to keep you and your team sane.

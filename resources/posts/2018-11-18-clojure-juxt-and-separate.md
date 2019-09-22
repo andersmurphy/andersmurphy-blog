@@ -3,7 +3,9 @@ Title: Clojure: juxt and separate
 Juxt is one of those higher-order functions that you never knew you needed. Despite not using it that often I find it can still be surprisingly useful. Let's check out the docs.
 
 ```clojure
-=> (doc juxt)
+(doc juxt)
+
+=>
 -------------------------
 clojure.core/juxt
 ([f] [f g] [f g h] [f g h & fs])
@@ -21,10 +23,10 @@ So `juxt` takes a number of functions and returns a function that applies each o
 Sort-by returns a sorted sequence of the items in a collection where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use `juxt` to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, and so on.
 
 ```clojure
-=> (sort-by (juxt :a :b)
-     [{:a 3 :b 4} {:a 2 :b 2} {:a 2 :b 1}])
+(sort-by (juxt :a :b)
+ [{:a 3 :b 4} {:a 2 :b 2} {:a 2 :b 1}])
 
-({:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4})
+=> ({:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4})
 ```
 
 When you need to sort items by criteria of decreasing importance this comes in handy.
@@ -39,40 +41,40 @@ Group-by returns a map of elements grouped by key, where the supplied function d
     :below-half-health
     :above-half-health))
 
-=> (group-by
-     (juxt :faction health-status)
-           [{:name "Grug" :faction :orcs :health 49}
-            {:name "Elendil" :faction :elves :health 98}
-            {:name "Gazkral" :faction :orcs :health 65}
-            {:name "Varok" :faction :orcs :health 31}
-            {:name "Gork" :faction :orcs :health 29}])
+(group-by
+ (juxt :faction health-status)
+  [{:name "Grug" :faction :orcs :health 49}
+   {:name "Elendil" :faction :elves :health 98}
+   {:name "Gazkral" :faction :orcs :health 65}
+   {:name "Varok" :faction :orcs :health 31}
+   {:name "Gork" :faction :orcs :health 29}])
 
-{[:orcs :below-half-health]
- [{:name "Grug" :faction :orcs :health 49}
-  {:name "Varok" :faction :orcs :health 31}
-  {:name "Gork" :faction :orcs :health 29}]
- [:elves :above-half-health]
- [{:name "Elendil" :faction :elves :health 98}]
- [:orcs :above-half-health]
- [{:name "Gazkral" :faction :orcs :health 65}]}
+=> {[:orcs :below-half-health]
+    [{:name "Grug" :faction :orcs :health 49}
+     {:name "Varok" :faction :orcs :health 31}
+     {:name "Gork" :faction :orcs :health 29}]
+    [:elves :above-half-health]
+    [{:name "Elendil" :faction :elves :health 98}]
+    [:orcs :above-half-health]
+    [{:name "Gazkral" :faction :orcs :health 65}]}
 
 (defn cleave-attack [actors]
   (dissoc actors [:orcs :below-half-health]))
 
-=> (cleave-attack
-    {[:orcs :below-half-health]
-     [{:name "Grug" :faction :orcs :health 49}
-      {:name "Varok" :faction :orcs :health 31}
-      {:name "Gork" :faction :orcs :health 29}]
-     [:elves :above-half-health]
-     [{:name "Elendil" :faction :elves :health 98}]
-     [:orcs :above-half-health]
-     [{:name "Gazkral" :faction :orcs :health 65}]})
+(cleave-attack
+ {[:orcs :below-half-health]
+  [{:name "Grug" :faction :orcs :health 49}
+   {:name "Varok" :faction :orcs :health 31}
+   {:name "Gork" :faction :orcs :health 29}]
+  [:elves :above-half-health]
+  [{:name "Elendil" :faction :elves :health 98}]
+  [:orcs :above-half-health]
+  [{:name "Gazkral" :faction :orcs :health 65}]})
 
-{[:elves :above-half-health]
- [{:name "Elendil", :faction :elves, :health 98}]
- [:orcs :above-half-health]
- [{:name "Gazkral", :faction :orcs, :health 65}]}
+=> {[:elves :above-half-health]
+    [{:name "Elendil", :faction :elves, :health 98}]
+    [:orcs :above-half-health]
+    [{:name "Gazkral", :faction :orcs, :health 65}]}
 ```
 
 Now we know how many orcs get cut down by Elendil's cleave attack.
@@ -85,9 +87,9 @@ There was once a function, in the now deprecated `clojure.contrib.seq-utils` lib
 (defn separate [pred s]
   [(filter pred s) (remove pred s)])
 
-=> (separate odd? [1 2 3 2 1])
+(separate odd? [1 2 3 2 1])
 
-[(1 3 1) (2 2)]
+=> [(1 3 1) (2 2)]
 ```
 
 However, we can make this function more succinct with `juxt` removing the need to pass the same arguments into two different functions.
@@ -96,8 +98,8 @@ However, we can make this function more succinct with `juxt` removing the need t
 (defn separate [pred s]
   ((juxt filter remove) pred s))
 
-=> (separate odd? [1 2 3 2 1])
+(separate odd? [1 2 3 2 1])
 
-[(1 3 1) (2 2)]
+=> [(1 3 1) (2 2)]
 ```
 Hopefully, these examples give you a taste of what `juxt` can do.

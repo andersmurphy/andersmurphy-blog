@@ -21,20 +21,21 @@ Then we import the `PhoneNumberUtil` class and use the `.parse` method which tak
   (->> (.parse (PhoneNumberUtil/getInstance) number "")
        (.isValidNumber (PhoneNumberUtil/getInstance))))
 
-=> (valid-number? "+41446681800")
+(valid-number? "+41446681800")
 
-true
+=> true
 
-=> (valid-number? "+41543")
+(valid-number? "+41543")
 
-false
+=> false
 ```
 
 The above works well enough so far. But, what if we try something more "obviously wrong"?
 
 ```clojure
-=> (valid-number? "+41")
+(valid-number? "+41")
 
+=>
 Execution error (NumberParseException) at com.google.i18n.phonenumbers.PhoneNumberUtil/parseHelper (PhoneNumberUtil.java:3151).
 The string supplied did not seem to be a phone number.
 ```
@@ -52,21 +53,21 @@ We get an exception. If we look at the `.parse` method's source code this is exp
          (.isValidNumber (PhoneNumberUtil/getInstance)))
     (catch NumberParseException e false)))
 
-=> (valid-number? "+41446681800")
+(valid-number? "+41446681800")
 
-true
+=> true
 
-=> (valid-number? "+41543")
+(valid-number? "+41543")
 
-false
+=> false
 
-=> (valid-number? "+41")
+(valid-number? "+41")
 
-false
+=> false
 
-=> (valid-number? "rubbish")
+(valid-number? "rubbish")
 
-false
+=> false
 ```
 
 Great our function now handles any string we throw at it! That wraps up our short introduction to [googlei18n/libphonenumber](https://github.com/googlei18n/libphonenumber/tree/master/java/libphonenumber/src/com/google/i18n/phonenumbers).
