@@ -111,7 +111,7 @@ You can also use `some` to check for containment by passing in a set containing 
 => :b
 ```
 
-One thing to bare in mind when using `some` with sets is that it won't work with `nil` or `false` values.
+One thing to bear in mind when using `some` with sets is that it won't work with `nil` or `false` values.
 
 ```clojure
 (some #{false nil} [false true false nil])
