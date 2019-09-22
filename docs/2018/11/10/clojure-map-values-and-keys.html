@@ -3,35 +3,36 @@
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;k &#40;f v&#41;&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-=&gt; &#40;map-values inc {:a 1 :b 2 :c 3}&#41;
+&#40;map-values inc {:a 1 :b 2 :c 3}&#41;
 
-{:a 2 :b 3 :c 4}
+=&gt; {:a 2 :b 3 :c 4}
 
-=&gt; &#40;map-values #&#40;str &quot;beta-&quot; %&#41;
-    {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
+&#40;map-values #&#40;str &quot;beta-&quot; %&#41;
+ {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
 
-{:sign-up &quot;beta-event&quot; :log-out &quot;beta-event&quot;}
+=&gt; {:sign-up &quot;beta-event&quot; :log-out &quot;beta-event&quot;}
 </code></pre><p>This function is specifically for map collection types, but there is a more generic version called <a href='https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19'>fmap</a> available in the <code>clojure/algo.generic</code> library.</p><h3>map-keys</h3><p>Another common task I run into is transforming the keys of a map. Useful when you are at the edge of your codebase and want to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to entirely different words or domain language.</p><pre><code class="clojure">&#40;defn map-keys &#91;f m&#93;
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-=&gt; &#40;map-keys #&#40;str &quot;beta-&quot; &#40;name %&#41;&#41;
-    {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
+&#40;map-keys #&#40;str &quot;beta-&quot; &#40;name %&#41;&#41;
+ {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
 
-{&quot;beta-sign-up&quot; &quot;event&quot; &quot;beta-log-out&quot; &quot;event&quot;}
+=&gt; {&quot;beta-sign-up&quot; &quot;event&quot; &quot;beta-log-out&quot; &quot;event&quot;}
 
 &#40;def keys-&gt;analytics-event-names
   {:message-sent         &quot;Primary announcement sent&quot;
    :transaction-complete &quot;Item purchased&quot;}&#41;
 
-=&gt; &#40;map-keys keys-&gt;analytics-event-names
-    {:message-sent         &quot;event&quot;
-     :transaction-complete &quot;event&quot;}&#41;
+&#40;map-keys keys-&gt;analytics-event-names
+ {:message-sent         &quot;event&quot;
+  :transaction-complete &quot;event&quot;}&#41;
 
-{&quot;Primary anouncement sent&quot; &quot;event&quot;,
- &quot;Item purchased&quot;           &quot;event&quot;}
-</code></pre><p>There's also a core function called <code>clojure.set/rename-keys</code> which does a similar thing to our <code>map-keys</code> function.</p><pre><code class="clojure">=&gt; &#40;doc clojure.set/rename-keys&#41;
+=&gt; {&quot;Primary anouncement sent&quot; &quot;event&quot;,
+    &quot;Item purchased&quot;           &quot;event&quot;}
+</code></pre><p>There's also a core function called <code>clojure.set/rename-keys</code> which does a similar thing to our <code>map-keys</code> function.</p><pre><code class="clojure">&#40;doc clojure.set/rename-keys&#41;
 
+=&gt;
 -------------------------
 clojure.set/rename-keys
 &#40;&#91;map kmap&#93;&#41;
@@ -40,22 +41,22 @@ clojure.set/rename-keys
   {:message-sent         &quot;Primary announcement sent&quot;
    :transaction-complete &quot;Item purchased&quot;}&#41;
 
-=&gt; &#40;map-keys keys-&gt;analytics-event-names
-    {:message-sent         &quot;event&quot;
-     :transaction-complete &quot;event&quot;
-     :missing-key          &quot;event&quot;}&#41;
+&#40;map-keys keys-&gt;analytics-event-names
+ {:message-sent         &quot;event&quot;
+  :transaction-complete &quot;event&quot;
+  :missing-key          &quot;event&quot;}&#41;
 
-{&quot;Primary anouncement sent&quot; &quot;event&quot;,
- &quot;Item purchased&quot;           &quot;event&quot;
- nil                        &quot;event&quot;}
+=&gt; {&quot;Primary anouncement sent&quot; &quot;event&quot;,
+    &quot;Item purchased&quot;           &quot;event&quot;
+    nil                        &quot;event&quot;}
 
-=&gt; &#40;clojure.set/rename-keys
-    {:message-sent         &quot;event&quot;
-     :transaction-complete &quot;event&quot;
-     :missing-key          &quot;event&quot;}
-    keys-&gt;analytics-event-names&#41;
+&#40;clojure.set/rename-keys
+ {:message-sent         &quot;event&quot;
+  :transaction-complete &quot;event&quot;
+  :missing-key          &quot;event&quot;}
+  keys-&gt;analytics-event-names&#41;
 
-{:missing-key                &quot;event&quot;
- &quot;Primary announcement sent&quot; &quot;event&quot;
- &quot;Item purchased&quot;            &quot;event&quot;}
+=&gt; {:missing-key                &quot;event&quot;
+    &quot;Primary announcement sent&quot; &quot;event&quot;
+    &quot;Item purchased&quot;            &quot;event&quot;}
 </code></pre><p>I hope these functions come in handy.</p></article></div></body></html>

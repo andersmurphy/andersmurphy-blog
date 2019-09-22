@@ -15,13 +15,13 @@
        &#40;map &#40;fn &#91;&#91;row1 row2&#93;&#93;
               &#40;merge row1 row2&#41;&#41;&#41;&#41;&#41;
 
-=&gt; &#40;merge-on-key :userid
-                 name-table
-                 email-table&#41;
+&#40;merge-on-key :userid
+              name-table
+              email-table&#41;
 
-&#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
- {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
- {:userid 3, :name &quot;Sarah&quot;, :email &quot;sarah@email.com&quot;}&#41;
+=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+    {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
+    {:userid 3, :name &quot;Sarah&quot;, :email &quot;sarah@email.com&quot;}&#41;
  </code></pre><p>This works for sequences of the same length, but what do we get if the sequences are different lengths (one of the tables has missing rows)?</p><pre><code class="clojure">&#40;def name-table &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
                  {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
@@ -29,13 +29,13 @@
 &#40;def email-table &#91;{:userid 1 :email &quot;bob@email.com&quot;}
                   {:userid 2 :email &quot;jo@email.com&quot;}&#93;&#41;
 
-=&gt; &#40;merge-on-key :userid
-                 name-table
-                 email-table&#41;
+&#40;merge-on-key :userid
+              name-table
+              email-table&#41;
 
-&#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
- {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
- {:userid 3, :name &quot;Sarah&quot;}&#41;
+=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+    {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
+    {:userid 3, :name &quot;Sarah&quot;}&#41;
  </code></pre><p>This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.</p><h3>Using clojure.set/join</h3><p>If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the <code>join</code> function from the <code>clojure.set</code> namespace.</p><pre><code class="clojure">&#40;def name-table &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
                  {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
@@ -43,8 +43,8 @@
 &#40;def email-table &#91;{:userid 1 :email &quot;bob@email.com&quot;}
                   {:userid 2 :email &quot;jo@email.com&quot;}&#93;&#41;
 
-=&gt; &#40;clojure.set/join &#40;set name-table&#41; &#40;set email-table&#41;&#41;
+&#40;clojure.set/join &#40;set name-table&#41; &#40;set email-table&#41;&#41;
 
-&#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
- {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}&#41;
+=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+    {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}&#41;
 </code></pre><p>This just scratches the surface of the relational algebra you can do with Clojure data structures. For more check out the <a href='https://clojuredocs.org/clojure.set'>clojure.set</a> namespace.</p></article></div></body></html>

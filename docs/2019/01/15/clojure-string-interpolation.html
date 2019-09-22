@@ -5,26 +5,26 @@
        &quot;/items/&quot;               item-code
        &quot;/prices/&quot;              currency&#41;&#41;
 
-=&gt; &#40;shop-url &quot;bob&quot; &quot;A567&quot; &quot;EUR&quot;&#41;
+&#40;shop-url &quot;bob&quot; &quot;A567&quot; &quot;EUR&quot;&#41;
 
-&quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
-</code></pre><p>There's nothing wrong with this solution. However, it does encapsulate/hide information that might be useful at the call site: order of arguments and what URL it is operating on.</p><h3>format</h3><p>Another approach would be to use the <code>format</code> function, which gives us string interpolation.</p><pre><code class="clojure">=&gt; &#40;format &quot;https://www.shop.com/%s/items/%s/prices/%s&quot;
-           &quot;bob&quot;
-           &quot;A567&quot;
-           &quot;EUR&quot;&#41;
+=&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
+</code></pre><p>There's nothing wrong with this solution. However, it does encapsulate/hide information that might be useful at the call site: order of arguments and what URL it is operating on.</p><h3>format</h3><p>Another approach would be to use the <code>format</code> function, which gives us string interpolation.</p><pre><code class="clojure">&#40;format &quot;https://www.shop.com/%s/items/%s/prices/%s&quot;
+        &quot;bob&quot;
+        &quot;A567&quot;
+        &quot;EUR&quot;&#41;
 
-&quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
+=&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
 </code></pre><p>The downside of this is that the placeholders in the URL are not self-documenting.</p><h3>replace-several</h3><p>What about using a string replace function? Clojure core does have functions for replacing matches in strings, but it doesn't have a built-in function for replacing multiple different matches. Let's see how we could implement our own <code>replace-several</code> function.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
   &#40;reduce &#40;fn &#91;s &#91;match replacement&#93;&#93;
             &#40;clojure.string/replace s match replacement&#41;&#41;
           s replacements&#41;&#41;
 
-=&gt; &#40;replace-several &quot;https://www.shop.com/$seller/items/$item-code/prices/$currency&quot;
-                    &quot;$seller&quot; &quot;bob&quot;
-                    &quot;$item-code&quot; &quot;A567&quot;
-                    &quot;$currency&quot; &quot;EUR&quot;&#41;
+&#40;replace-several &quot;https://www.shop.com/$seller/items/$item-code/prices/$currency&quot;
+                 &quot;$seller&quot; &quot;bob&quot;
+                 &quot;$item-code&quot; &quot;A567&quot;
+                 &quot;$currency&quot; &quot;EUR&quot;&#41;
 
-&quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
+=&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
 </code></pre><p>The above works and reads better than our previous solutions as the value substitutions are clear. If you find the destructuring in the <code>reduce</code> a bit cumbersome you can use <code>reduce-kv</code> which returns the accumulator, key and values for us.</p><pre><code class="clojure">&#40;defn replace-several &#91;s &amp; {:as replacements}&#93;
   &#40;reduce-kv clojure.string/replace s replacements&#41;&#41;
 </code></pre><p>Hopefully, these examples come in handy the next time you need some pseudo-string interpolation.</p></article></div></body></html>

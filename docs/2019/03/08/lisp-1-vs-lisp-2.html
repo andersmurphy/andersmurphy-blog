@@ -4,7 +4,7 @@
 
 &#40;my-apply + 2 2&#41;
 
- =&gt; 4
+=&gt; 4
 </code></pre><p>The downside of this is that local functions and values can "shadow" existing functions.</p><pre><code class="clojure">&#40;def f -&#41;
 
 &#40;defn my-apply &#91;f arg1 arg2&#93;
@@ -34,5 +34,5 @@
 
 &#40;my-apply '+ 2 2&#41;
 
- =&gt; 4
+=&gt; 4
 </code></pre><p>This prevents functions shadowing values but at the cost of making the mechanism of passing functions as arguments more complex.</p><p>Hopefully this post helps shed some light on the differences between <strong>lisp-1</strong> and <strong>lisp-2</strong>. For a more thorough discussion checkout <a href='http://www.nhplace.com/kent/Papers/Technical-Issues.html'>this paper</a>.</p></article></div></body></html>

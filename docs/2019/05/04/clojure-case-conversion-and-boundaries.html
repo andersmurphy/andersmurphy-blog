@@ -5,19 +5,20 @@
          &#40;apply str &#40;first words&#41;&#41;
          keyword&#41;&#41;&#41;
 
-=&gt; &#40;kebab-case-&gt;camelCase :foo-bar-baz&#41;
+&#40;kebab-case-&gt;camelCase :foo-bar-baz&#41;
 
-:fooBarBaz
+=&gt; :fooBarBaz
 </code></pre><h3>Converting the case of keys in a map</h3><p>Now that we have a function for converting case let's convert all the keys of a map using the <code>map-keys</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure">&#40;defn map-keys &#91;f m&#93;
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-=&gt; &#40;map-keys kebab-case-&gt;camelCase
-             {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
+&#40;map-keys kebab-case-&gt;camelCase
+          {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
 
-{:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
-</code></pre><h3>Converting case of keys in a nested data structure</h3><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">=&gt; &#40;doc clojure.walk/postwalk&#41;
+=&gt; {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
+</code></pre><h3>Converting case of keys in a nested data structure</h3><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">&#40;doc clojure.walk/postwalk&#41;
 
+=&gt;
 -------------------------
 clojure.walk/postwalk
 &#40;&#91;f form&#93;&#41;
@@ -27,22 +28,22 @@ clojure.walk/postwalk
 </code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>map-keys</code> function we can create a <code>transform-keys</code> function that will take a transformation function and apply it to all keys in a data structure.</p><pre><code class="clojure">&#40;defn transform-keys &#91;t form&#93;
   &#40;clojure.walk/postwalk &#40;fn &#91;x&#93; &#40;if &#40;map? x&#41; &#40;map-keys t x&#41; x&#41;&#41; form&#41;&#41;
 
-=&gt; &#40;transform-keys kebab-case-&gt;camelCase
-    &#91;{:character-id 1
-      :first-name &quot;Olaf&quot;
-      :second-name &quot;Iondrake&quot;
-      :items {:bag-of-holding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
-     {:character-Id 2
-      :first-name &quot;Sigurd&quot;
-      :second-name &quot;Rockfist&quot;
-      :items {:bag-of-holding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;&#41;
+&#40;transform-keys kebab-case-&gt;camelCase
+ &#91;{:character-id 1
+   :first-name &quot;Olaf&quot;
+   :second-name &quot;Iondrake&quot;
+   :items {:bag-of-holding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
+  {:character-Id 2
+   :first-name &quot;Sigurd&quot;
+   :second-name &quot;Rockfist&quot;
+   :items {:bag-of-holding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;&#41;
 
-&#91;{:characterId 1,
-  :firstName &quot;Olaf&quot;,
-  :secondName &quot;Irondrake&quot;,
-  :items {:bagOfHolding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
- {:characterId 2,
-  :firstName &quot;Sigurd&quot;,
-  :secondName &quot;Rockfist&quot;,
-  :items {:bagOfHolding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;
+=&gt; &#91;{:characterId 1,
+     :firstName &quot;Olaf&quot;,
+     :secondName &quot;Irondrake&quot;,
+     :items {:bagOfHolding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}
+    {:characterId 2,
+     :firstName &quot;Sigurd&quot;,
+     :secondName &quot;Rockfist&quot;,
+     :items {:bagOfHolding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;
 </code></pre><p>There you have it, a function for converting the case of keys in an arbitrarily nested data structure. You can use this function at the boundaries of your software stack to keep you and your team sane.</p><p>For more robust case conversion checkout the awesome <a href='https://github.com/clj-commons/camel-snake-kebab'>camel-snake-kebab</a> library.</p></article></div></body></html>

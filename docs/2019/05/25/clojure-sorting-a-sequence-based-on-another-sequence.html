@@ -8,15 +8,15 @@
    {:id &quot;a362&quot; :type &quot;food&quot;}
    {:id &quot;x234&quot; :type &quot;drink&quot;}
    {:id &quot;d543&quot; :type &quot;food&quot;}&#93;&#41;
-</code></pre><p>Now that we have some data we can use the <code>sort-by</code> function and the <code>.indexOf</code> method to make the order of the items match the order in the manifest.</p><pre><code class="clojure">=&gt; &#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
-              &#40;.indexOf &#40;manifest :item-order&#41; id&#41;&#41;
-     items&#41;
+</code></pre><p>Now that we have some data we can use the <code>sort-by</code> function and the <code>.indexOf</code> method to make the order of the items match the order in the manifest.</p><pre><code class="clojure">&#40;sort-by &#40;fn &#91;{:keys &#91;id&#93;}&#93;
+           &#40;.indexOf &#40;manifest :item-order&#41; id&#41;&#41;
+         items&#41;
 
-&#40;{:id &quot;x234&quot; :type &quot;drink&quot;}
- {:id &quot;d543&quot; :type &quot;food&quot;}
- {:id &quot;g090&quot; :type &quot;drink&quot;}
- {:id &quot;z001&quot; :type &quot;food&quot;}
- {:id &quot;a362&quot; :type &quot;food&quot;}&#41;
+=&gt; &#40;{:id &quot;x234&quot; :type &quot;drink&quot;}
+    {:id &quot;d543&quot; :type &quot;food&quot;}
+    {:id &quot;g090&quot; :type &quot;drink&quot;}
+    {:id &quot;z001&quot; :type &quot;food&quot;}
+    {:id &quot;a362&quot; :type &quot;food&quot;}&#41;
 </code></pre><p>This seems to work. However, <code>.indexOf</code> gets called for every item in the list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.</p><h3>Generating data</h3><p>First we need to write a function that generates a large number of unique string ids. This is so that we can generate the same set of ids for our manifest and items. The <code>shuffle</code> function makes sure every call to this function returns the result in a random order.</p><pre><code class="clojure">&#40;defn large-shuffled-vec-of-ids &#91;&#93;
   &#40;-&gt;&gt; &#40;range 1000&#41;
        &#40;map &#40;partial str &quot;xid&quot;&#41;&#41;
@@ -48,17 +48,17 @@
   &#40;s/and
    &#40;s/keys :req-un &#91;::manifest ::items&#93;&#41;
    consistent-ids?&#41;&#41;
-</code></pre><p>With the <code>::items-with-manifest</code> spec finished we can now generate a large amount of test data for our performance test.</p><pre><code class="clojure">=&gt; &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;
+</code></pre><p>With the <code>::items-with-manifest</code> spec finished we can now generate a large amount of test data for our performance test.</p><pre><code class="clojure">&#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;
 
-{:manifest
- {:item-order
-  &#91;&quot;xid313&quot;
-   &quot;xid544&quot;
-   &quot;xid846&quot;
-   &quot;xid351&quot;
-   &quot;xid67&quot;
-   ...
-   }}
+=&gt; {:manifest
+    {:item-order
+     &#91;&quot;xid313&quot;
+      &quot;xid544&quot;
+      &quot;xid846&quot;
+      &quot;xid351&quot;
+      &quot;xid67&quot;
+      ...
+    }}
 </code></pre><p>Warning! The output is quite large and will flood your repl.</p><h3>Performance test</h3><p>Now that we can generate test data, we test the performance of the initial implementation with the <code>time</code> function. It's worth noting the use of <code>do</code> to avoid flooding the repl with output results.</p><pre><code class="clojure">&#40;def large-manifest &#40;gen/generate &#40;s/gen ::items-with-manifest&#41;&#41;&#41;
 
 &#40;defn index-of-sort &#91;{:keys &#91;items manifest&#93;}&#93;
@@ -66,9 +66,9 @@
              &#40;.indexOf &#40;manifest :item-order&#41; id&#41;&#41;
            items&#41;&#41;
 
-=&gt; &#40;time &#40;do &#40;index-of-sort large-manifest&#41; nil&#41;&#41;
+&#40;time &#40;do &#40;index-of-sort large-manifest&#41; nil&#41;&#41;
 
-&quot;Elapsed time: 561.437815 msecs&quot;
+=&gt; &quot;Elapsed time: 561.437815 msecs&quot;
 </code></pre><p>As suspected, the function is very slow for large input. This is because each call of <code>.indexOf</code> has <strong>O(n)</strong> complexity. We can avoid this cost by building a map of values to index. This can be done with <code>&#40;iterate inc 0&#41;</code> this generates a sequence of numbers starting from 0 which we then <code>zipmap</code> to the id values.</p><pre><code class="clojure">&#40;defn hash-map-index-sort &#91;{:keys &#91;items manifest&#93;}&#93;
   &#40;let &#91;value-&gt;index &#40;-&gt; &#40;manifest :item-order&#41;
                          &#40;zipmap &#40;iterate inc 0&#41;&#41;&#41;&#93;
@@ -76,9 +76,9 @@
                &#40;value-&gt;index id&#41;&#41;
              items&#41;&#41;&#41;
 
-=&gt; &#40;time &#40;do &#40;hash-map-index-sort large-manifest&#41; nil&#41;&#41;
+&#40;time &#40;do &#40;hash-map-index-sort large-manifest&#41; nil&#41;&#41;
 
-&quot;Elapsed time: 2.564776 msecs&quot;
+=&gt; &quot;Elapsed time: 2.564776 msecs&quot;
 </code></pre><p>The results from <code>time</code> show this implementation is much faster than the initial implementation.</p><h3>Validation and generative testing</h3><p>We can also spec the <code>hash-map-index-sort</code> function with <code>s/fdef</code> and use the spec to create a generative test. The <code>:args</code> key defines the input to the function. The <code>:ret</code> key defines the output data. Finally, the <code>:fn</code> key defines the relation between input and output that we want to validate; in this case we want to check that the order of the output items is the same as the order of ids in the input manifest.</p><pre><code class="clojure">&#40;require '&#91;clojure.spec.test.alpha :as stest&#93;&#41;
 
 &#40;s/fdef hash-map-index-sort
@@ -87,13 +87,13 @@
   :fn #&#40;= &#40;-&gt; % :args :m :manifest :item-order&#41;
           &#40;-&gt;&gt; % :ret &#40;map :id&#41;&#41;&#41;&#41;
 
-=&gt; &#40;-&gt; &#40;stest/check `hash-map-index-sort&#41;
-       first
-       :clojure.spec.test.check/ret&#41;
+&#40;-&gt; &#40;stest/check `hash-map-index-sort&#41;
+    first
+    :clojure.spec.test.check/ret&#41;
 
-{:result true,
- :pass? true,
- :num-tests 1000,
- :time-elapsed-ms 14614,
- :seed 1558893244714}
+=&gt; {:result true,
+    :pass? true,
+    :num-tests 1000,
+    :time-elapsed-ms 14614,
+    :seed 1558893244714}
 </code></pre><p>This concludes this exploration of how to order items by a manifest as well as some use cases for Clojure Spec.</p></article></div></body></html>

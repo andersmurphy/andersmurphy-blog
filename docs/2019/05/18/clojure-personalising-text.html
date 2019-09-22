@@ -5,33 +5,33 @@
           initial-string
           personalisations&#41;&#41;
 
-=&gt; &#40;personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}
-                &quot;The :class called :name entered the dungeon.&quot;&#41;
+&#40;personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}
+             &quot;The :class called :name entered the dungeon.&quot;&#41;
 
-&quot;The warrior called Ivan entered the dungeon.&quot;
+=&gt; &quot;The warrior called Ivan entered the dungeon.&quot;
 </code></pre><h3>Personalising the string values of a map</h3><p>Now that we have a function for personalising strings let's convert all the string values of a map using the <code>map-values</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure">&#40;defn map-values &#91;f m&#93;
     &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;k &#40;f v&#41;&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-=&gt; &#40;map-values &#40;partial personalise
-                        {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
-               {:journal &quot;:name's journal&quot;
-                :weapon  &quot;The :class's sword&quot;}&#41;
+&#40;map-values &#40;partial personalise
+                     {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+            {:journal &quot;:name's journal&quot;
+            :weapon  &quot;The :class's sword&quot;}&#41;
 
-{:journal &quot;Ivan's journal&quot;
- :weapon  &quot;The warrior's sword&quot;}
+=&gt; {:journal &quot;Ivan's journal&quot;
+    :weapon  &quot;The warrior's sword&quot;}
 </code></pre><p>This works for strings but what about none homogeneous maps?</p><pre><code class="clojure">&#40;defn map-values &#91;f m&#93;
     &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;k &#40;f v&#41;&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
-=&gt; &#40;map-values &#40;partial personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
-               {:journal &quot;:name's journal&quot;
-                :weapon  &quot;The :class's sword&quot;
-                :treasures-found 1}&#41;
+&#40;map-values &#40;partial personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+            {:journal &quot;:name's journal&quot;
+             :weapon  &quot;The :class's sword&quot;
+             :treasures-found 1}&#41;
 
-{:journal         &quot;Ivan's journal&quot;
- :weapon          &quot;The warrior's sword&quot;
- :treasures-found &quot;1&quot;}
+=&gt; {:journal         &quot;Ivan's journal&quot;
+    :weapon          &quot;The warrior's sword&quot;
+    :treasures-found &quot;1&quot;}
 </code></pre><p>Although this doesn't throw any exceptions, if we look closely it has caused unexpected behaviour. The number of treasures found has been converted to a string. Let's change the personalise function to prevent this unexpected behaviour from happening.</p><pre><code class="clojure">&#40;defn safe-personalise &#91;personalisations initial-string&#93;
   &#40;if &#40;string? initial-string&#41;
     &#40;reduce &#40;fn &#91;s &#91;k v&#93;&#93;
@@ -40,34 +40,35 @@
             personalisations&#41;
     initial-string&#41;&#41;
 
-=&gt; &#40;map-values &#40;partial safe-personalise
-                        {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
-               {:journal         &quot;:name's journal&quot;
-                :weapon          &quot;The :class's sword&quot;
-                :treasures-found 1}&#41;
+&#40;map-values &#40;partial safe-personalise
+                     {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+            {:journal         &quot;:name's journal&quot;
+             :weapon          &quot;The :class's sword&quot;
+             :treasures-found 1}&#41;
 
-{:journal         &quot;Ivan's journal&quot;
- :weapon          &quot;The warrior's sword&quot;
- :treasures-found 1}
-</code></pre><h3>Personalising strings in a nested data structure</h3><p>To apply a function to all the nodes of an arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Here are the docs.</p><pre><code class="clojure">=&gt; &#40;doc clojure.walk/postwalk&#41;
+=&gt; {:journal         &quot;Ivan's journal&quot;
+    :weapon          &quot;The warrior's sword&quot;
+    :treasures-found 1}
+</code></pre><h3>Personalising strings in a nested data structure</h3><p>To apply a function to all the nodes of an arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Here are the docs.</p><pre><code class="clojure">&#40;doc clojure.walk/postwalk&#41;
 
+=&gt;
 -------------------------
 clojure.walk/postwalk
 &#40;&#91;f form&#93;&#41;
   Performs a depth-first, post-order traversal of form.  Calls f on
   each sub-form, uses f's return value in place of the original.
   Recognizes all Clojure data structures. Consumes seqs as with doall.
-</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>safe-personalise</code> function we can personalise all the strings in a nested data structure.</p><pre><code class="clojure">=&gt; &#40;clojure.walk/postwalk
-    &#40;partial safe-personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
-    &#91;{:item    &quot;:name's bag of holding&quot;
-      :contain {:items &#91;&quot;The :class's sword&quot;
-                        &quot;The :class's shield&quot;&#93;}
-      :id      1}
-     {:item &quot;:name elven cloack&quot;
-      :id   2}&#93;&#41;
+</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>safe-personalise</code> function we can personalise all the strings in a nested data structure.</p><pre><code class="clojure">&#40;clojure.walk/postwalk
+ &#40;partial safe-personalise {:class &quot;warrior&quot; :name &quot;Ivan&quot;}&#41;
+  &#91;{:item    &quot;:name's bag of holding&quot;
+    :contain {:items &#91;&quot;The :class's sword&quot;
+                      &quot;The :class's shield&quot;&#93;}
+    :id      1}
+   {:item &quot;:name elven cloack&quot;
+    :id   2}&#93;&#41;
 
-&#91;{:item &quot;Ivan's bag of holding&quot;
-  :contain {:items &#91;&quot;The warrior's sword&quot; &quot;The warrior's shield&quot;&#93;}
-  :id 1}
- {:item &quot;Ivan elven cloack&quot; :id 2}&#93;
+=&gt; &#91;{:item &quot;Ivan's bag of holding&quot;
+     :contain {:items &#91;&quot;The warrior's sword&quot; &quot;The warrior's shield&quot;&#93;}
+     :id 1}
+    {:item &quot;Ivan elven cloack&quot; :id 2}&#93;
 </code></pre><p>There we have it personalised text for our text based adventure.</p></article></div></body></html>
