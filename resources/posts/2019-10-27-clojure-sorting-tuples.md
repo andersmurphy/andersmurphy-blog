@@ -51,6 +51,6 @@ If we want different length tuples to be sorted by a lexical sort of their conte
 => ([0 1 2] [1 1] [2] [2] [3 1])
 ```
 
-This comparator recursively compares each item in the tuple using the `compare` function. Terminating when the value returned by the `compare` is 1, -1 or their are no more items left to compare.
+This comparator recursively compares each item in the tuple using the `compare` function.
 
 This concludes this guide to sorting tuples in Clojure. For more articles on sorting in Clojure check out: [Clojure: sorting](https://andersmurphy.com/2019/03/09/clojure-sorting.html) and [Clojure: sorting a sequence based on another sequence](https://andersmurphy.com/2019/05/25/clojure-sorting-a-sequence-based-on-another-sequence.html).
