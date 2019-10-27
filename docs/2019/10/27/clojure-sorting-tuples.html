@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: sorting tuples</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: sorting tuples</h1><time class="post-date" datetime="2019-10-27T00:00:00+00:00">27 Oct 2019</time><p>A tuple is a finite ordered sequence of elements. A common use of tuples in Clojure is for representing pairs of data that are related. For example a key and a value when mapping over a map (hashmap/dictionary). That being said tuples can be of any length, and are a common way of representing larger sets of related data in languages that don't use maps as prolifically as Clojure. This articles explores sorting tuples in Clojure.</p><h3>Sorting same length tuples</h3><p>If tuples are the same length the tuples are sorted by a lexical sort. With the first item used for the primary sort, the second item for the secondary sort etc.</p><pre><code class="clojure">&#40;sort &#91;&#91;2 3&#93; &#91;1 2&#93; &#91;1 1&#93;&#93;&#41;
+
+=&gt; &#40;&#91;1 1&#93; &#91;1 2&#93; &#91;2 3&#93;&#41;
+</code></pre><p>The default comparator will throw an error if elements of different types need to be compared.</p><pre><code class="clojure">&#40;sort &#91;&#91;2 3&#93; &#91;1 &quot;w&quot;&#93; &#91;1 1&#93;&#93;&#41;
+
+=&gt;
+Execution error &#40;ClassCastException&#41; at java.util.TimSort/countRunAndMakeAscending &#40;TimSort.java:356&#41;.
+class java.lang.String cannot be cast to class java.lang.Number
+</code></pre><h3>Sorting different length tuples</h3><p>If the tuples are of different lengths the default sort will be based on the length of the tuples rather than a lexical sort of their contents. Falling back on the lexical sort for tuples of the same length.</p><pre><code class="clojure">&#40;sort &#91;&#91;2 3&#93; &#91;1 2 1&#93; &#91;1 1&#93; &#91;1 0&#93;&#93;&#41;
+
+=&gt; &#40;&#91;1 0&#93; &#91;1 1&#93; &#91;2 3&#93; &#91;1 2 1&#93;&#41;
+</code></pre><h3>Sorting different length tuples by their contents</h3><p>If we want different length tuples to be sorted by a lexical sort of their contents we need to write our own comparator.</p><pre><code class="clojure">&#40;defn tuple-compare &#91;a b&#93;
+  &#40;let &#91;&#91;x &amp; xs&#93; &#40;seq a&#41;
+        &#91;y &amp; ys&#93; &#40;seq b&#41;&#93;
+    &#40;let &#91;c &#40;compare x y&#41;&#93;
+      &#40;cond
+        &#40;nil? x&#41; c
+        &#40;#{1 -1} c&#41; c
+        :else       &#40;recur xs ys&#41;&#41;&#41;&#41;&#41;
+
+&#40;sort tuple-compare &#91;&#91;1 1&#93; &#91;2&#93; &#91;3 1&#93; &#91;0 1 2&#93; &#91;2&#93;&#93;&#41;
+
+=&gt; &#40;&#91;0 1 2&#93; &#91;1 1&#93; &#91;2&#93; &#91;2&#93; &#91;3 1&#93;&#41;
+</code></pre><p>This comparator recursively compares each item in the tuple using the <code>compare</code> function. Terminating when the value returned by the <code>compare</code> is 1, -1 or their are no more items left to compare.</p><p>This concludes this guide to sorting tuples in Clojure. For more articles on sorting in Clojure check out: <a href='https://andersmurphy.com/2019/03/09/clojure-sorting.html'>Clojure: sorting</a> and <a href='https://andersmurphy.com/2019/05/25/clojure-sorting-a-sequence-based-on-another-sequence.html'>Clojure: sorting a sequence based on another sequence</a>.</p></article></div></body></html>
