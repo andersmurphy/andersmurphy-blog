@@ -4,7 +4,7 @@ A tuple is a finite ordered sequence of elements. A common use of tuples in Cloj
 
 ### Sorting same length tuples
 
-If tuples are the same length the tuples are sorted by a lexical sort. With the first item used for the primary sort, the second item for the secondary sort etc.
+If the tuples are the same length they are sorted by a lexical sort. With the first item used for the primary sort, the second item for the secondary sort etc.
 
 ```clojure
 (sort [[2 3] [1 2] [1 1]])
