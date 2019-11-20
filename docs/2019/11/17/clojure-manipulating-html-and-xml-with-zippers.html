@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8" /><title>Clojure: manipulating HTML and XML with zippers</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: manipulating HTML and XML with zippers</h1><time class="post-date" datetime="2019-11-17T00:00:00+00:00">17 Nov 2019</time><p>Clojure provides a powerful mechanism for manipulating HTML/XML called <code>clojure.zip</code>. <code>clojure.zip</code> uses the concept of functional zipper (see <a href='http://gallium.inria.fr/~huet/PUBLIC/zip.pdf'>Functional Pearls The zipper</a>) to make manipulating hierarchical data structures simple and efficient. This article will cover how to use zippers to manipulate HTML/XML in Clojure.</p><h3>A quick overview of zippers</h3><p>This articles isn't intended as an in depth guide to zippers but more to illustrate how useful they can be. In this example we will scrape an RSS feed, generate some HTML and then inject it into an existing HTML page replacing part of the original content. But first lets go over some zipper fundamentals.</p><p>Lets start by requiring the <code>clojure.xml</code> for parsing XML and <code>clojure.zip</code> for zipper functions.</p><pre><code class="clojure">&#40;ns manipulating-html-and-xml-example.core
+<html><head><meta charset="UTF-8" /><title>Clojure: manipulating HTML and XML with zippers</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: manipulating HTML and XML with zippers</h1><time class="post-date" datetime="2019-11-17T00:00:00+00:00">17 Nov 2019</time><p>Clojure provides a powerful namespace for manipulating HTML/XML called <code>clojure.zip</code>. It uses the concept of functional zipper (see <a href='http://gallium.inria.fr/~huet/PUBLIC/zip.pdf'>Functional Pearls The zipper</a>) to make manipulating hierarchical data structures simple and efficient. This article will cover how to use zippers to manipulate HTML/XML in Clojure.</p><h3>A quick overview of zippers</h3><p>This articles isn't intended as an thorough guide to zippers but rather to illustrate how useful they can be.</p><p>In this example we will scrape an RSS feed, generate some HTML and then inject it into an existing HTML page replacing part of the original content. But first lets go over some zipper fundamentals.</p><p>Lets start by requiring the <code>clojure.xml</code> for parsing XML and <code>clojure.zip</code> for zipper functions.</p><pre><code class="clojure">&#40;ns manipulating-html-and-xml-example.core
   &#40;:require &#91;clojure.xml :as xml&#93;
             &#91;clojure.zip :as zip&#93;&#41;&#41;
-</code></pre><p>Say we have an XML string.</p><pre><code class="clojure">&#40;def xml-string
+</code></pre><p>We have an XML string.</p><pre><code class="clojure">&#40;def xml-string
   &quot;&lt;item&gt;
     &lt;title&gt;Foo&lt;/title&gt;
    &lt;/item&gt;&quot;&#41;
@@ -15,7 +15,7 @@
 {:tag :item,
  :attrs nil,
  :content &#91;{:tag :title, :attrs nil, :content &#91;&quot;Foo&quot;&#93;}&#93;}
-</code></pre><p>If we convert it to a zipper we get.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
+</code></pre><p>If we convert the nested map representation into a zipper we get a two element vector with the first element being our original data and the second element being <code>nil</code>.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
     &#40;zip/xml-zip&#41;&#41;
 
 =&gt;
@@ -23,7 +23,7 @@
   :attrs nil,
   :content &#91;{:tag :title, :attrs nil, :content &#91;&quot;Foo&quot;&#93;}&#93;}
  nil&#93;
-</code></pre><p>A two element vector with one element being <code>nil</code>.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
+</code></pre><p>Calling <code>zip/next</code> takes us to the next location in the zipper. The first element in the vector is the current node. The second element in the vector contains a map that represents a path with the following keys:</p><ul><li><code>:l</code> a list of sibling nodes to the left of the current node.</li><li><code>:pnodes</code> a list of parent nodes.</li><li><code>:ppath</code> path to the parent node.</li><li><code>:r</code> a list of sibling nodes to the right of the current node.</li></ul><p><code>:ppath</code> is <code>nil</code> for now because the parent node is the root of the tree.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
     zip/xml-zip
     zip/next&#41;
 
@@ -36,7 +36,7 @@
     :content &#91;{:tag :title, :attrs nil, :content &#91;&quot;Foo&quot;&#93;}&#93;}&#93;,
   :ppath nil,
   :r nil}&#93;
-</code></pre><p><code>zip/next</code> takes us to the next location in the zipper. The first element in the vector is the current node. The second element in the vector contains a map that represents a path with the following keys:</p><ul><li><code>:l</code> a vector of sibling nodes to the left of the current node.</li><li><code>:pnodes</code> list of parent nodes.</li><li><code>:ppath</code> path to the parent node.</li><li><code>:r</code> list of sibling nodes to the right of the current node.</li></ul><p><code>:ppath</code> is <code>nil</code> for now because the parent node is the root of the tree. But if we call <code>zip/next</code> again that will change.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
+</code></pre><p>After calling <code>zip/next</code> again <code>:ppath</code> now contains a path.</p><pre><code class="clojure">&#40;-&gt; &#40;parse-xml-string xml-string&#41;
     zip/xml-zip
     zip/next
     zip/next&#41;
@@ -58,7 +58,7 @@
    :ppath nil,
    :r nil},
   :r nil}&#93;
-</code></pre><p><code>:ppath</code> now contains a path. Zippers are a location which is a two element vector that consists of a node and a path.</p><p><code>clojure.zip</code> comes with a collection of very useful functions that operate on zippers, you've already seen <code>zip/xml-zip</code> and <code>zip/next</code>. Hopefully, that's enough of an overview.</p><h3>Putting zippers to work</h3><p>Back to our example of scraping an RSS feed. We will use <code>xml/parse</code> to parse the RSS feed of this blog.</p><pre><code class="clojure">&#40;def xml-feed &#40;xml/parse &quot;https://andersmurphy.com/feed.xml&quot;&#41;&#41;
+</code></pre><p>In summary, zippers are a location which is a two element vector that consists of a node and a path. What makes zipper so compelling is that <code>clojure.zip</code>comes with a collection of functions for performing common operations on them like navigation and editing (we've already seen <code>zip/xml-zip</code> and <code>zip/next</code>). Zippers also let us iterate rather than recur over a tree which has practical applications (like avoiding stack overflow errors for deeply nested trees).</p><h3>Putting zippers to work</h3><p>Back to our example of scraping an RSS feed. We will use <code>xml/parse</code> to parse the RSS feed of this blog.</p><pre><code class="clojure">&#40;def xml-feed &#40;xml/parse &quot;https://andersmurphy.com/feed.xml&quot;&#41;&#41;
 </code></pre><p>We are interested in the <code>item</code> tag but can't quite remember the structure of <code>feed.xml</code>. We could look at the <code>feed.xml</code> file to work out how deep in the hierarchical data the items are but destructuring extremely nested data can be quite cumbersome. Instead we can use a zipper to perform a depth first traversal of the entire document visiting every node and then filter the tags we care about.</p><pre><code class="clojure">&#40;-&gt;&gt; &#40;zip/xml-zip xml-feed&#41;
      &#40;iterate zip/next&#41;
      &#40;take-while &#40;complement zip/end?&#41;&#41;
@@ -103,7 +103,7 @@
     &quot;https://andersmurphy.com/2015/08/27/advantages-of-an-android-free-zone.html&quot;}
    &quot;https://andersmurphy.com/2015/08/27/advantages-of-an-android-free-zone.html&quot;&#93;&#93;
    ...&#41;
-</code></pre><p>We want to inject this HTML list into an existing HTML page. So we need to get and existing HTML page and then write a function to select the node we want.</p><pre><code class="clojure">&#40;def html-page &#40;slurp &quot;https://andersmurphy.com/&quot;&#41;&#41;
+</code></pre><p>We want to inject this HTML list into an existing HTML page. So we need to get an existing HTML page and then write a function to select the node we want.</p><pre><code class="clojure">&#40;def html-page &#40;slurp &quot;https://andersmurphy.com/&quot;&#41;&#41;
 
 &#40;defn zip-select-first &#91;loc tag pred&#93;
   &#40;when-not &#40;zip/end? loc&#41;
@@ -119,7 +119,7 @@
             &#91;clojure.xml :as xml&#93;
             &#91;hickory.zip :as hick-zip&#93;
             &#91;clojure.zip :as zip&#93;&#41;&#41;
-</code></pre><p>Putting it all together we get.</p><pre><code class="clojure">&#40;defn build-page &#91;&#93;
+</code></pre><p>Putting it all together. We read the XML feed, filter the items we care about, convert them to hiccup, find the first <code>:div</code> element with it's <code>:class</code> tag equal to <code>&quot;content container&quot;</code> and replace it with our own <code>:div</code> element. Finally we persist our changes with <code>zip/root</code>, convert the hiccup to HTML and write it to a file.</p><pre><code class="clojure">&#40;defn build-page &#91;&#93;
   &#40;let &#91;content &#40;xml-feed-&gt;hiccup xml-feed&#41;&#93;
     &#40;spit &quot;page.html&quot;
           &#40;-&gt; html-page
@@ -130,4 +130,4 @@
               &#40;zip/replace &#91;:div {:class &quot;content container&quot;} content&#93;&#41;
               zip/root
               hiccup/html&#41;&#41;&#41;&#41;
-</code></pre><p>We read the XML feed, filter the items we care about, convert them to hiccup, find the first <code>:div</code> element with it's <code>:class</code> tag equal to <code>&quot;content container&quot;</code> and replace it with our own <code>:div</code> element. Finally we persist our changes with <code>zip/root</code>, convert the hiccup to HTML and write it to a file.</p><p>This concludes this guide to manipulating HTML/XML in Clojure. The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/zippers/manipulating-html-and-xml-example'>here</a>.</p></article></div></body></html>
+</code></pre><p>This concludes this guide to manipulating HTML/XML in Clojure. The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/zippers/manipulating-html-and-xml-example'>here</a>.</p></article></div></body></html>
