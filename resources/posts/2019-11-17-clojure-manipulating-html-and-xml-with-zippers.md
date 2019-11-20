@@ -5,10 +5,6 @@ Clojure provides a powerful namespace for manipulating HTML/XML called
 
 ### A quick overview of zippers
 
-This articles isn't intended as an thorough guide to zippers but rather to illustrate how useful they can be.
-
-In this example we will scrape an RSS feed, generate some HTML and then inject it into an existing HTML page replacing part of the original content. But first lets go over some zipper fundamentals.
-
 Lets start by requiring the `clojure.xml` for parsing XML and `clojure.zip` for zipper functions.
 
 ```clojure
@@ -109,7 +105,9 @@ In summary, zippers are a location which is a two element vector that consists o
 
 ### Putting zippers to work
 
-Back to our example of scraping an RSS feed. We will use `xml/parse` to parse the RSS feed of this blog.
+In this example we will scrape an RSS feed, generate some HTML and then inject it into an existing HTML page replacing part of the original content.
+
+We will use `xml/parse` to parse the RSS feed of this blog.
 
 ```clojure
 (def xml-feed (xml/parse "https://andersmurphy.com/feed.xml"))
