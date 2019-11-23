@@ -101,7 +101,7 @@ After calling `zip/next` again `:ppath` now contains a path.
   :r nil}]
 ```
 
-In summary, zippers are a location which is a two element vector that consists of a node and a path. What makes zipper so compelling is that `clojure.zip`comes with a collection of functions for performing common operations on them like navigation and editing (we've already seen `zip/xml-zip` and `zip/next`). Zippers also let us iterate rather than recur over a tree which has practical applications (like avoiding stack overflow errors for deeply nested trees).
+In summary, zippers are a location which is a two element vector that consists of a node and a path. What makes zipper so compelling is that `clojure.zip` comes with a collection of functions for performing common operations on them like navigation and editing (we've already seen `zip/xml-zip` and `zip/next`). Zippers also let us iterate rather than recur over a tree which has practical applications (like avoiding stack overflow errors for deeply nested trees).
 
 ### Putting zippers to work
 
@@ -187,7 +187,7 @@ We want to inject this HTML list into an existing HTML page. So we need to get a
       (recur (zip/next loc) tag pred))))
 ```
 
-`zip-select-first` does a depth first traversal of a zipper and finds the first node that is associative and has a tag that satisfies a predicate. `every-pred` is a handy higher order function that returns a function that returns true if a value satisfies all it's predicates. `some->` is like `->` except that is short circuits on if a function returns `nil`.
+`zip-select-first` does a depth first traversal of a zipper and finds the first node that is associative and has a tag that satisfies a predicate. `every-pred` is a handy higher order function that returns a function that returns true if a value satisfies all it's predicates. `some->` is like `->` except that is short circuits if a function returns `nil`.
 
 For the last part of this pipeline we need to add some more dependencies: `hiccup.core` for writing html, `hickory.core` for reading html, and `hickory.zip` for creating zippers for html.
 
