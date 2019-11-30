@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: flattening key paths</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: flattening key paths</h1><time class="post-date" datetime="2019-11-30T00:00:00+00:00">30 Nov 2019</time><p>This article will cover how flatten the nested key paths of a map in Clojure. Turning a nested map like <code>{:a {:b {:c {:d 1} :e 2}}}</code> into a flat map like <code>{:a-b-c-d 1 :a-b-e 2}</code>.</p><h3>Flattening key paths recursively</h3><p>We <code>map</code> over the key values pairs of the top level map. If we encounter a <code>map?</code> that is <code>not-empty</code> we <code>conj</code> the current key onto a vector, thus gradually building a path and then call <code>flatten-paths</code> recursively. If we encounter anything else we take the current path and turn it into a single key.</p><pre><code class="clojure">&#40;defn flatten-paths
+  &#40;&#91;m separator&#93;
+   &#40;flatten-paths m separator &#91;&#93;&#41;&#41;
+  &#40;&#91;m separator path&#93;
+   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93;
+               &#40;if &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                 &#40;flatten-paths v separator &#40;conj path k&#41;&#41;
+                 &#91;&#40;-&gt;&gt; &#40;conj path k&#41;
+                       &#40;map name&#41;
+                       &#40;clojure.string/join separator&#41;
+                       keyword&#41; v&#93;&#41;&#41;
+             m&#41;
+        &#40;into {}&#41;&#41;&#41;&#41;
+</code></pre><p>This works for shallow maps</p><pre><code class="clojure">&#40;flatten-paths {:a {:b {:c {:d 1}
+                        :e 2}}
+                :f 3}
+                &quot;-&quot;&#41;
+
+=&gt; {:a-b-c-d 1, :a-b-e 2, :f 3}
+</code></pre><p>But does it work with deeply nested maps? To check this we first need to write a function <code>create-n-nested-map</code> that will create a deeply nested map.</p><pre><code class="clojure">&#40;defn create-n-nested-map &#91;n&#93;
+  &#40;assoc-in {} &#40;repeat n :a&#41; {}&#41;&#41;
+</code></pre><p>And a harness <code>find-when-overflow-occurs</code> to tell us roughly at what depth we get a <code>StackOverflowError</code>.</p><pre><code class="clojure">&#40;defn find-when-overflow-occurs &#91;f n&#93;
+  &#40;if &#40;try
+        &#40;f n&#41;
+        &#40;catch StackOverflowError e
+          false&#41;&#41;
+    &#40;recur f &#40;inc n&#41;&#41;
+    n&#41;&#41;
+
+&#40;find-when-overflow-occurs
+          &#40;flatten-paths &#40;create-n-nested-map n&#41; &quot;-&quot;&#41;
+          0&#41;
+
+=&gt; 599
+</code></pre><p>On my machine I get a stack overflow at a depth of 600. In practice you are unlikely to encounter a map that is that nested. However, lets see if we can refactor <code>flatten-paths</code> to use the sequence abstraction so that it can handle deeper maps.</p><h3>Flattening key paths with lazy-seq</h3><p>The <code>lazy-seq</code> takes a body of expressions that returns an ISeq or nil, and yields a Seqable object that will invoke the body only the first time seq is called, and will cache the result and return it on all subsequent seq calls. The caching of the body is what allows the <code>lazy-seq</code> macro to call itself recursively without consuming more stackframes the way a normal recursive call would.</p><p>We use the <code>lazy-seq</code> to define a function that recursively builds a list of the flattened key paths. The use of <code>&#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93; ...&#41;</code> is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail. It's also worth noting that to combine the output of the head and the tail operations we use <code>into</code> (strict) rather than <code>concat</code> (lazy). For more details checkout <a href='https://stuartsierra.com/2015/04/26/clojure-donts-concat'>this article</a>.</p><pre><code class="clojure">&#40;defn flatten-paths &#91;m separator&#93;
+  &#40;letfn &#91;&#40;flatten-paths &#91;m separator path&#93;
+            &#40;lazy-seq
+             &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
+               &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                     &#40;into &#40;flatten-paths v separator &#40;conj path k&#41;&#41;
+                           &#40;flatten-paths xs separator path&#41;&#41;
+                     :else
+                     &#40;into &#91;&#40;-&gt;&gt; &#40;conj path k&#41;
+                                 &#40;map name&#41;
+                                 &#40;clojure.string/join separator&#41;
+                                 keyword&#41; v&#93;
+                           &#40;flatten-paths xs separator path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
+    &#40;-&gt;&gt; &#40;flatten-paths m separator &#91;&#93;&#41;
+         &#40;apply hash-map&#41;&#41;&#41;&#41;
+
+&#40;flatten-paths &#40;create-n-nested-map 1000000&#41; &quot;-&quot;&#41;
+
+=&gt;
+Execution error &#40;StackOverflowError&#41; at user/flatten-paths...
+
+</code></pre><p>But for some reason we are still getting a <code>StackOverflowError</code>. Maybe it's our <code>create-n-nested-map</code> function that's the culprit?</p><pre><code class="clojure">&#40;find-when-overflow-occurs
+ create-n-nested-map
+ 0&#41;
+
+=&gt; 5889
+</code></pre><p>Interesting, so <code>assoc-in</code> seems to be the cause. I guess this highlights just how unlikely you are to encounter such ridiculously nested maps. Let's rewrite <code>create-n-nested-map</code> to build the map from the inside out with <code>reduce</code> rather than outside in with <code>assoc-in</code>.</p><pre><code class="clojure">&#40;defn create-n-nested-map &#91;n&#93;
+  &#40;reduce &#40;fn &#91;acc &#95;&#93; {:a acc}&#41; {} &#40;range n&#41;&#41;&#41;
+</code></pre><p>Let's see if that works. Warning! The output is quite large and will flood your repl.</p><pre><code class="clojure">&#40;flatten-paths &#40;create-n-nested-map 1000000&#41; &quot;-&quot;&#41;
+
+=&gt; {:a-a-a-a-a-a... {}}
+</code></pre><p>Rejoice! We can now flatten the key paths of ridiculously deeply nested maps.</p><p>This concludes this guide to flattening key paths in Clojure.</p></article></div></body></html>
