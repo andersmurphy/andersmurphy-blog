@@ -1,6 +1,6 @@
 Title: Ruby: first class functions
 
-In one of my previous jobs I worked as a full stack engineer on a codebase with a Ruby backend and a Javascript/React frontend. Having used Clojure a fair bit in my spare time I was keen to code in a functional style. In Javascript this is relatively easy as it supports first class functions (functions as values). But at first glance this seems trickier in Ruby as it doesn't have first class functions... at least not officially.
+In one of my previous jobs I worked as a full stack engineer on a codebase with a Ruby backend and a Javascript/React frontend. Having used Clojure a fair bit in my spare time I was keen to code in a functional style. In Javascript this is relatively easy as it supports first class functions (functions as values). But at first glance this seems trickier in Ruby as it doesn't have first class functions.
 
 ### Lambda
 
