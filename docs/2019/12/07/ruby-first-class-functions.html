@@ -26,7 +26,7 @@ identity.&#40;add&#41;.&#40;1, 2&#41; # =&gt; 3
 
 &#91;1, 2, 3, 4&#93;.map&#40;&amp;inc&#41; # =&gt; &#91;2, 3, 4, 5&#93;
 </code></pre><p>We can pass methods as functions using <code>&amp;</code> combined with the symbol of the method in this case <code>:even?</code>.</p><pre><code class="ruby">&#91;1, 2, 3, 4&#93;.&#40;&amp;:even?&#41;.reduce&#40;:+&#41; # =&gt; 6
-</code></pre><h3>Currying</h3><p>What if I told you a Ruby <code>lambda</code> even has built in currying?</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+</code></pre><h3>Currying</h3><p> <code>lambda</code> even has built in currying.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
 
 inc = add.curry.&#40;1&#41;
 
