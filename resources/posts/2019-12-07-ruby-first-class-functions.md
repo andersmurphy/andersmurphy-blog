@@ -76,7 +76,7 @@ We can pass methods as functions using `&` combined with the symbol of the metho
 
 ### Currying
 
-What if I told you a Ruby `lambda` even has built in currying?
+ `lambda` even has built in currying.
 
 ```Ruby
 add = -> x,y {x + y}
