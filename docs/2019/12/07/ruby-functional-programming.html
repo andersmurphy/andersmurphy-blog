@@ -37,7 +37,7 @@ identity.&#40;add&#41;.&#40;1, 2&#41;
 
 inc = add.curry.&#40;1&#41;
 
-&#91;1, 2, 3, 4&#93;.map&#40;inc&#41;.reduce&#40;:+&#41;
+&#91;1, 2, 3, 4&#93;.map&#40;&amp;inc&#41;.reduce&#40;:+&#41;
 =&gt; 14
 </code></pre><h3>Compose & Pipe</h3><p>It's really useful to be able to compose functions. We can do this in Ruby by writing our own <code>comp</code> function with reduce. This will compose functions right to left.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
 times = -&gt; x,y {x &#42; y}
