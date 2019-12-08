@@ -90,7 +90,7 @@ add = -> x,y {x + y}
 
 inc = add.curry.(1)
 
-[1, 2, 3, 4].map(inc).reduce(:+)
+[1, 2, 3, 4].map(&inc).reduce(:+)
 => 14
 ```
 
