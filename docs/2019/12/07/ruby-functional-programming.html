@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Ruby: functional programming</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2019. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Ruby: functional programming</h1><time class="post-date" datetime="2019-12-07T00:00:00+00:00">07 Dec 2019</time><p>In one of my previous jobs I worked as a full stack engineer on a codebase with a Ruby backend and a Javascript/React frontend. Having used Clojure a fair bit in my spare time I was keen to code in a functional style. In Javascript this is relatively easy as it supports first class functions (functions as values). But at first glance this seems trickier in Ruby as it doesn't have first class functions.</p><h3>Lambda</h3><p>Ruby might not have first class functions. But it does have <code>lambda</code>.</p><p>We can assign a <code>lanbda</code> to a value.</p><pre><code class="Ruby">add = lambda {|x, y| x + y}
+</code></pre><p>We can return a <code>lambda</code> from a function.</p><pre><code class="Ruby">def identity &#40;x&#41;
+  x
+end
+
+identity&#40;add&#41;
+=&gt; add lambda
+</code></pre><p>We can store a <code>lambda</code> in a data structure.</p><pre><code class="Ruby">a = &#91;add&#93;
+a.first.call&#40;4, 6&#41;
+=&gt; 10
+</code></pre><p>Working with <code>lambda</code> looks something like this.</p><pre><code class="Ruby">add = lambda {|x, y| x + y}
+
+identity = lambda {|x| x}
+
+identity.call&#40;add&#41;.call&#40;1, 2&#41;
+=&gt; 3
+</code></pre><p>We can make those calls to <code>call</code> less verbose by using the <code>.&#40;&#41;</code> shorthand.</p><pre><code class="Ruby">add = lambda {|x, y| x + y}
+
+identity = lambda {|x| x}
+
+identity.&#40;add&#41;.&#40;1, 2&#41;
+=&gt; 3
+</code></pre><p>If writing <code>lambda</code> seems like a lot of work, we can use the <code>-&gt;</code> shorthand.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+
+identity = -&gt; x {x}
+
+identity.&#40;add&#41;.&#40;1, 2&#41;
+=&gt; 3
+</code></pre><p>We can use a <code>lambda</code> as a higher order parameter with <code>&amp;</code> operator.</p><pre><code class="Ruby">inc = -&gt; x {x + 1}
+
+&#91;1, 2, 3, 4&#93;.map&#40;&amp;inc&#41;
+=&gt; &#91;2, 3, 4, 5&#93;
+</code></pre><p>We can pass methods as functions using <code>&amp;</code> combined with the symbol of the method in this case <code>:even?</code>.</p><pre><code class="ruby">&#91;1, 2, 3, 4&#93;.&#40;&amp;:even?&#41;.reduce&#40;:+&#41;
+=&gt; 6
+</code></pre><h3>Currying</h3><p> <code>lambda</code> even has built in currying.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+
+inc = add.curry.&#40;1&#41;
+
+&#91;1, 2, 3, 4&#93;.map&#40;inc&#41;.reduce&#40;:+&#41;
+=&gt; 14
+</code></pre><h3>Compose & Pipe</h3><p>It's really useful to be able to compose functions. We can do this in Ruby by writing our own <code>comp</code> function with reduce. This will compose functions right to left.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+times = -&gt; x,y {x &#42; y}
+
+comp = -&gt; &#42;fns {fns.reduce {|f, g| -&gt; x {f.&#40;g.&#40;x&#41;&#41;}}}
+
+&#91;1,2,3,4&#93;.map&#40;&amp;comp.&#40;add.curry.&#40;1&#41;, times.curry.&#40;2&#41;&#41;&#41;
+=&gt; &#91;3, 5, 7, 9&#93;
+</code></pre><p>If we want to compose left to right we can write our own <code>pipe</code> function.</p><pre><code class="Ruby">pipe = -&gt; &#42;fns {fns.reverse.reduce {|f, g| -&gt; x {f.&#40;g.&#40;x&#41;&#41;}}}
+
+&#91;1,2,3,4&#93;.map&#40;&amp;pipe.&#40;add.curry.&#40;1&#41;, times.curry.&#40;2&#41;&#41;&#41;
+=&gt; &#91;4, 6, 8, 10&#93;
+</code></pre><p>Or since ruby <code>2.6</code> we can use <code>&lt;&lt;</code> or <code>&gt;&gt;</code>.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+times = -&gt; x,y {x &#42; y}
+
+add&#95;one&#95;and&#95;times&#95;by&#95;two = add.curry.&#40;1&#41; &gt;&gt; times.curry.&#40;2&#41;
+
+add&#95;one&#95;and&#95;times&#95;by&#95;two.&#40;1&#41;
+=&gt; 4
+
+times&#95;by&#95;two&#95;and&#95;add&#95;one = add.curry.&#40;1&#41; &lt;&lt; times.curry.&#40;2&#41;
+
+times&#95;by&#95;two&#95;and&#95;add&#95;one.&#40;1&#41;
+=&gt; 3
+</code></pre><p>We can also do inline composition.</p><pre><code class="Ruby">add = -&gt; x,y {x + y}
+times = -&gt; x,y {x &#42; y}
+
+&#91;1,2,3,4&#93;.map&#40;&amp;&#40;add.curry.&#40;1&#41; &gt;&gt; times.curry.&#40;2&#41; &gt;&gt; add.curry.&#40;5&#41;&#41;&#41;
+=&gt; &#91;9, 11, 13, 15&#93;
+</code></pre><p>Most of these features&#42; have been in Ruby since or before <code>1.9</code> which was released in 2007.  It turns out functional programming has been part of Ruby for a long time and might be a lot more idiomatic than you first think.</p><p>&#42; Except for <code>&lt;&lt;</code> and <code>&gt;&gt;</code> which were added in Ruby <code>2.6</code> released in 2018.</p></article></div></body></html>
