@@ -20,7 +20,7 @@ The Scheme implementation:
 => ((1 2 3) (1 3 2) (2 1 3) (2 3 1) (3 1 2) (3 2 1))
 ```
 
-A first pass at the translation sees some minor changes: `length` to `count`, `lambda` to `fn`,`append` to `concat` and finally `remove` in Clojure takes a predicate rather than an element to remove. This gives us:
+A first pass at the translation sees some minor changes: `length` to `count`, `lambda` to `fn`, `append` to `concat` and finally `remove` in Clojure takes a predicate rather than an element to remove. This gives us:
 
 ```Clojure
 (defn permutations [l]
@@ -52,7 +52,7 @@ In Clojure when you have a nested `map` you can replace it with a `for` comprehe
 => ((1 2 3) (1 3 2) (2 1 3) (2 3 1) (3 1 2) (3 2 1))
 ```
 
-We can make out recursive solution use a single stack frame by wrapping it in a lazy-seq:
+We can make out recursive solution use a single stack frame by wrapping it in a `lazy-seq`:
 
 ```Clojure
 (defn permutations [s]
@@ -82,14 +82,14 @@ We can replace `count` with `next` to make the solution more idiomatic:
 => ((1 2 3) (1 3 2) (2 1 3) (2 3 1) (3 1 2) (3 2 1))
 ```
 
-Our permutation function is working fine. However, when we pass in duplicate values we get an unexpected results:
+Our permutation function is working fine. However, when we pass in duplicate values we get unexpected results:
 
 ```Clojure
 (permutations '(2 2))
 => ((2) (2))
 ```
 
-In this case we get `((2) (2))` but we expect to get `((2 2) (2 2))` as each `2` is a separate item despite having the same value. We can fix this by replacing `remove` with `remove-first`. Remove first removes the first item to match the predicate rather than all items:
+In this case we get `((2) (2))` but we expect to get `((2 2) (2 2))` as each `2` is a separate item despite having the same value. We can fix this by replacing `remove` with `remove-first`. Remove first removes the first element to match the predicate rather than all elements that match:
 
 ```Clojure
 (defn remove-first [pred s]
@@ -125,8 +125,8 @@ This works as intended assuming  we want our function to handle duplicate values
 => ((1 2 3) (1 3 2) (2 1 3) (2 3 1) (3 1 2) (3 2 1))
 ```
 
-This implementation has a performance advantage over our version with `remove`. This is because `disj` has `O(log32N)` (almost `O(1)`) performance compared to `reduce` which has `O(N)` performance.
+This implementation also has a performance advantage over our version with `remove`. This is because `disj` has `O(log32N)` (almost `O(1)`) performance compared to `reduce` which has `O(N)` performance.
 
 We now have a lazy recursive implementation of permutations that won't overflow the stack.
 
-For more comprehensive collection of functions for permutations and combinations checkout the [clojure.math.combinatorics](https://github.com/clojure/math.combinatoricsh/) library.
+For more comprehensive collection of functions for generating permutations and combinations checkout the [clojure.math.combinatorics](https://github.com/clojure/math.combinatoricsh/) library.
