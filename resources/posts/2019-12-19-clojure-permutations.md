@@ -4,7 +4,7 @@ I was solving an [Advent of Code](https://adventofcode.com/) problem and part of
 
 The Scheme implementation:
 
-```Scheme
+```Clojure
 (define (permutations l)
   (cond
    ((= (length l) 1) (list l))
