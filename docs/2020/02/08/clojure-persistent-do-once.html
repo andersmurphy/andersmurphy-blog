@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: persistent do once</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2020. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: persistent do once</h1><time class="post-date" datetime="2020-02-08T00:00:00+00:00">08 Feb 2020</time><p>Some business requirements require you to only do something once. An example of this would be sending a daily email to users. You could achieve this by making sure you run the function only once per day. However, if that function were to crash part way through how would you know which users had already been sent their daily email and which hadn't? Resolving this without sending some users multiple messages could be a large time sink. A more robust solution would be to make the email sending function idempotent. In this case meaning the effects of the function are applied only once per user per day and any additional applications do nothing. This article will explore one approach to solving this problem in Clojure.</p><p>As this is a solution that relies on persistence we first need to set up a database:</p><pre><code class="Clojure">&#40;ns do-once.core
+  &#40;:require &#91;next.jdbc :as jdbc&#93;&#41;&#41;
+
+&#40;def db {:dbtype &quot;postgresql&quot; :dbname &quot;databasename&quot;}&#41;
+&#40;def ds &#40;jdbc/get-datasource db&#41;&#41;
+</code></pre><p>We need a function that queries the database to check if a tasks has already been done:</p><pre><code class="Clojure">&#40;defn done? &#91;uuid name&#93;
+  &#40;jdbc/execute-one! ds &#91;&quot;
+select &#42; from do&#95;once where uuid = ? and name = ?&quot;
+                         uuid name&#93;&#41;&#41;
+</code></pre><p>We need a function that records a task that has been done:</p><pre><code class="Clojure">&#40;defn do! &#91;uuid name&#93;
+  &#40;jdbc/execute! ds &#91;&quot;
+insert into do&#95;once &#40;uuid, name&#41; values &#40;? , ?&#41; on conflict &#40;uuid, name&#41; do nothing&quot;
+                     uuid name&#93;&#41;&#41;
+</code></pre><p>We need a table for recording our tasks:</p><pre><code class="Clojure">&#40;jdbc/execute! ds &#91;&quot;
+create table do&#95;once &#40;
+  pid serial primary key,
+  uuid text not null,
+  name text not null&#41;&quot;&#93;&#41;
+
+  &#40;jdbc/execute! ds &#91;&quot;
+create unique index do&#95;once&#95;unique ON do&#95;once&#40;uuid, name&#41;&quot;&#93;&#41;
+</code></pre><p>We need a macro that records the task:</p><pre><code class="Clojure">&#40;defmacro do-once! &#91;uuid name &amp; body&#93;
+  `&#40;when-not &#40;done? &#126;uuid &#126;name&#41;
+     &#40;do! &#126;uuid &#126;name&#41;
+     &#126;@body&#41;&#41;
+</code></pre><p>We can now send an email to Nora:</p><pre><code class="Clojure">&#40;do-once! &quot;Nora&quot; &quot;email-2020-02-08&quot;
+            &#40;println &quot;email sent&quot;&#41;
+            &#40;prn &#40;+ 1 2 3 4&#41;&#41;&#41;
+
+=&gt; email sent
+
+10
+</code></pre><p>If we try to send Nora a second email that day it doesn't get sent:</p><pre><code class="Clojure">&#40;do-once! &quot;Nora&quot; &quot;email-2020-02-08&quot;
+            &#40;println &quot;email sent&quot;&#41;
+            &#40;prn &#40;+ 1 2 3 4&#41;&#41;&#41;
+
+=&gt; nil
+</code></pre><p>We can use a macro with named parameters to make things more explicit:</p><pre><code class="Clojure">&#40;defmacro do-once-2! &#91;&amp; {:keys &#91;uuid name action&#93;}&#93;
+  `&#40;when-not &#40;done? &#126;uuid &#126;name&#41;
+     &#40;do! &#126;uuid &#126;name&#41;
+     &#126;action&#41;&#41;
+
+&#40;do-once-2! :uuid &quot;Nora&quot;
+            :name &quot;email-2020-02-09&quot;
+            :action &#40;do &#40;println &quot;email sent&quot;&#41;
+                        &#40;prn &#40;+ 1 2 3 4&#41;&#41;&#41;&#41;
+
+=&gt; email sent
+
+10
+</code></pre><p>Or just a plain old function that takes a data:</p><pre><code class="Clojure">&#40;defn do-once-3! &#91;{:keys &#91;uuid name action&#93;}&#93;
+  &#40;when-not &#40;done? uuid name&#41;
+    &#40;do! uuid name&#41;
+    &#40;action&#41;&#41;&#41;
+
+&#40;do-once-3! {:uuid   &quot;Nora&quot;
+             :name   &quot;email-2020-02-10&quot;
+             :action &#40;fn &#91;&#93;
+                        &#40;println &quot;email sent&quot;&#41;
+                        &#40;prn &#40;+ 1 2 3 4&#41;&#41;&#41;}&#41;
+
+=&gt; email sent
+
+10
+</code></pre><p>That covers this approach to persistent do once in Clojure. The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/rate-limiting/do-once'>here</a>.</p></article></div></body></html>
