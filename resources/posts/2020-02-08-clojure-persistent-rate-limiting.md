@@ -1,8 +1,8 @@
-Title: Clojure: persistent do once
+Title: Clojure: persistent rate limiting
 
-Some business requirements require you to only do something once. An example of this would be sending a daily email to users. You could achieve this by making sure you run the function only once per day. However, if that function were to crash part way through how would you know which users had already been sent their daily email and which hadn't? Resolving this without sending some users multiple messages could be a large time sink. A more robust solution would be to make the email sending function idempotent. In this case meaning the effects of the function are applied only once per user per day and any additional applications do nothing. This article will explore one approach to solving this problem in Clojure.
+Some business needs require you to limit the number of times you do something. An example of this would be sending a daily email to users. You could achieve this by making sure you run the function only once per day. However, if that function were to crash part way through how would you know which users had already been sent their daily email and which hadn't? Resolving this without sending some users multiple emails could be a large time sink. A more robust solution would be to make the email sending function idempotent; meaning the effects of the function are applied only once per user per day and any additional applications do nothing. This article will explore one approach to solving this problem in Clojure.
 
-As this is a solution that relies on persistence we first need to set up a database:
+As this is a solution that relies on persistence, we first need to set up a database:
 
 ```Clojure
 (ns do-once.core
@@ -12,7 +12,7 @@ As this is a solution that relies on persistence we first need to set up a datab
 (def ds (jdbc/get-datasource db))
 ```
 
-We need a function that queries the database to check if a tasks has already been done:
+We need a function that queries the database to check if a task has already been done:
 
 ```Clojure
 (defn done? [uuid name]
@@ -64,7 +64,7 @@ We can now send an email to Nora:
 10
 ```
 
-If we try to send Nora a second email that day it doesn't get sent:
+If we try to send Nora a second email that day, it doesn't get sent:
 
 ```Clojure
 (do-once! "Nora" "email-2020-02-08"
@@ -92,7 +92,7 @@ We can use a macro with named parameters to make things more explicit:
 10
 ```
 
-Or just a plain old function that takes a data:
+Or just a plain old function that takes data:
 
 ```Clojure
 (defn do-once-3! [{:keys [uuid name action]}]
@@ -111,4 +111,4 @@ Or just a plain old function that takes a data:
 10
 ```
 
-That covers this approach to persistent do once in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/rate-limiting/do-once).
+That covers this approach to persistent rate limiting in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/rate-limiting/do-once).
