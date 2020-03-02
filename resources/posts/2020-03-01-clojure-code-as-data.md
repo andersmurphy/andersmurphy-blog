@@ -46,7 +46,7 @@ Looks like the `diff` function doesn't recognise the commonality between these t
 
 ### Commonality with tree-seq
 
-The `tree-seq` function returns a lazy sequence of the nodes in a tree, via a depth-first walk. The first argument returns `true` if the node is a branch (can have children); in this case we use `coll?` which returns `true` if node is a collection. The second argument will be called on these branch nodes; in this case `seq` which returns a sequence of the children of that node or `nil` if there are none.
+The `tree-seq` function returns a lazy sequence of the nodes in a tree, via a depth-first walk. It takes two functions and the root node of a tree. The first function needs to returns `true` if the node is a branch (can have children); in this case we use `coll?` which returns `true` if node is a collection. The second function will be called on these branch nodes; in this case `seq` which returns a sequence of the children of that node or `nil` if there are none.
 
 ```clojure
 (tree-seq coll? seq '(when activate?
