@@ -80,7 +80,7 @@ We can use `tree-seq` to build a sequence of each node for two pieces of code an
 
 This returns the common nodes: `(map dec items)`, `map`, `dec` and `items`.
 
-### Find common code
+### Refactoring common code
 
 Here we have some of the code used to generate the RSS feed for this blog.
 
