@@ -15,7 +15,7 @@ html {
     color: rgba(255,255,255,.5);
     background-color: #2E3440;
 }
-@media (min-width: 48em) {
+@media (min-width: 76em) {
   .sidebar {
     position: fixed;
     top: 0;
@@ -59,7 +59,7 @@ a.sidebar-nav-item:focus {
  * Sticky sidebar
  */
 
-@media (min-width: 48em) {
+@media (min-width: 76em) {
   .sidebar-sticky {
     position: absolute;
     right:  1rem;
@@ -76,22 +76,16 @@ a.sidebar-nav-item:focus {
 .content {
   padding-top:    4rem;
   padding-bottom: 4rem;
+  max-width: 44rem;
 }
 
-@media (min-width: 48em) {
+@media (min-width: 76em) {
   .content {
-    max-width: 40rem;
     margin-left: 20rem;
     margin-right: 2rem;
   }
 }
 
-@media (min-width: 64em) {
-  .content {
-    margin-left: 22rem;
-    margin-right: 4rem;
-  }
-}
 
 .content h1,
 .content a,
