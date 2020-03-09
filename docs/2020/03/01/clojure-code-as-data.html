@@ -17,7 +17,7 @@
                    '&#40;map dec items&#41;&#41;
 
 =&gt; &#91;&#91;when activate? &#40;map dec items&#41;&#93; &#91;map dec items&#93; nil&#93;
-</code></pre><p>Looks like the <code>diff</code> function doesn't recognise the commonality between these two pieces of code.</p><h3>Commonality with tree-seq</h3><p>The <code>tree-seq</code> function returns a lazy sequence of the nodes in a tree, via a depth-first walk. The first argument returns <code>true</code> if the node is a branch (can have children); in this case we use <code>coll?</code> which returns <code>true</code> if node is a collection. The second argument will be called on these branch nodes; in this case <code>seq</code> which returns a sequence of the children of that node or <code>nil</code> if there are none.</p><pre><code class="clojure">&#40;tree-seq coll? seq '&#40;when activate?
+</code></pre><p>Looks like the <code>diff</code> function doesn't recognise the commonality between these two pieces of code.</p><h3>Commonality with tree-seq</h3><p>The <code>tree-seq</code> function returns a lazy sequence of the nodes in a tree, via a depth-first walk. It takes two functions and the root node of a tree. The first function needs to returns <code>true</code> if the node is a branch (can have children); in this case we use <code>coll?</code> which returns <code>true</code> if node is a collection. The second function will be called on these branch nodes; in this case <code>seq</code> which returns a sequence of the children of that node or <code>nil</code> if there are none.</p><pre><code class="clojure">&#40;tree-seq coll? seq '&#40;when activate?
                        &#40;map dec items&#41;&#41;&#41;
 
 =&gt;
