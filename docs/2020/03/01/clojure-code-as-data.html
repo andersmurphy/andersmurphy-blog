@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: code as data</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>@ 2020. All rights reserved</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: code as data</h1><time class="post-date" datetime="2020-03-01T00:00:00+00:00">01 Mar 2020</time><p>In Clojure, the primary representation of code is the S-expression that takes the form of nested sequences (lists and vectors). The majority of Clojure's functions are designed to operate on sequences. As a result Clojure code can be manipulated using the same functions that are used to manipulate Clojure data. In other words there is no distinction between code and data. Code is data. This property is known as <a href='https://en.wikipedia.org/wiki/Homoiconicity'>homoiconicity</a>. This article will explore this concept.</p><h3>Code equality</h3><p>We can check two pieces of code for equality by turning the code into data with a <code>'</code> symbol and then comparing them with <code>=</code>.</p><pre><code class="clojure">&#40;= '&#40;map inc items&#41;
+   '&#40;map inc items&#41;&#41;
+
+=&gt; true
+
+&#40;= '&#40;map inc items&#41;
+   '&#40;map dec items&#41;&#41;
+
+=&gt; false
+</code></pre><p>Simple.</p><h3>Code diff</h3><p>We can use <code>clojure.set/diff</code> to find out the different between these two pieces of code.</p><pre><code class="clojure">&#40;clojure.data/diff '&#40;map inc items&#41;
+                   '&#40;map dec items&#41;&#41;
+
+=&gt; &#91;&#91;nil inc&#93; &#91;nil dec&#93; &#91;map nil items&#93;&#93;
+</code></pre><p>From this we can see the second item in the expression is different. What happens with nested code?</p><pre><code class="clojure">&#40;clojure.data/diff '&#40;when activate?
+                      &#40;map dec items&#41;&#41;
+                   '&#40;map dec items&#41;&#41;
+
+=&gt; &#91;&#91;when activate? &#40;map dec items&#41;&#93; &#91;map dec items&#93; nil&#93;
+</code></pre><p>Looks like the <code>diff</code> function doesn't recognise the commonality between these two pieces of code.</p><h3>Commonality with tree-seq</h3><p>The <code>tree-seq</code> function returns a lazy sequence of the nodes in a tree, via a depth-first walk. The first argument returns <code>true</code> if the node is a branch (can have children); in this case we use <code>coll?</code> which returns <code>true</code> if node is a collection. The second argument will be called on these branch nodes; in this case <code>seq</code> which returns a sequence of the children of that node or <code>nil</code> if there are none.</p><pre><code class="clojure">&#40;tree-seq coll? seq '&#40;when activate?
+                       &#40;map dec items&#41;&#41;&#41;
+
+=&gt;
+&#40;&#40;when activate? &#40;map dec items&#41;&#41;
+ when
+ activate?
+ &#40;map dec items&#41;
+ map
+ dec
+ items&#41;
+</code></pre><p>We can use <code>tree-seq</code> to build a sequence of each node for two pieces of code and then compare each node using a <code>for</code> comprehension, filtering the results which are equal.</p><pre><code class="clojure">&#40;defn find-common-code &#91;code-a code-b&#93;
+  &#40;-&gt; &#40;for &#91;a     &#40;tree-seq coll? seq code-a&#41;
+            b     &#40;tree-seq coll? seq code-b&#41;
+            :when &#40;= a b&#41;&#93;
+        a&#41;&#41;&#41;
+
+&#40;find-common-code '&#40;when activate?
+                     &#40;map dec items&#41;&#41;
+                  '&#40;map dec items&#41;&#41;
+
+=&gt; &#40;&#40;map dec items&#41; map dec items&#41;
+</code></pre><p>This returns the common nodes: <code>&#40;map dec items&#41;</code>, <code>map</code>, <code>dec</code> and <code>items</code>.</p><h3>Find common code</h3><p>Here we have some of the code used to generate the RSS feed for this blog.</p><pre><code class="clojure">&#40;defn generate-feed-items &#91;posts&#93;
+  &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+         &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+           &#91;:item
+            &#91;:title post-name&#93;
+            &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+            &#91;:link post-url&#93;
+            &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+       posts&#41;&#41;
+
+&#40;defn generate-rss-feed &#91;posts&#93;
+  &#40;xml/sexp-as-element
+   &#91;:rss
+    {:version    &quot;2.0&quot;
+     :xmlns:atom &quot;https://www.w3.org/2005/Atom&quot;
+     :xmlns:dc   &quot;https://purl.org/dc/elements/1.1/&quot;}
+    &#91;:channel
+     &#91;:title site-title&#93;
+     &#91;:description site-tagline&#93;
+     &#91;:link site-url&#93;
+     &#91;:atom:link
+      {:href site-rss :rel &quot;self&quot; :type &quot;application/rss+xml&quot;}&#93;
+     &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+            &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+              &#91;:item
+               &#91;:title post-name&#93;
+               &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+               &#91;:link post-url&#93;
+               &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+          posts&#41;&#93;&#93;&#41;&#41;
+</code></pre><p>We think some of the code might be duplicated and we want to refactor it out. Knowing what we have just learnt we can write a function to find the largest piece of common code.</p><p>First we need a function to define the largest piece of code. We decide to use string length as a simple heuristic.</p><pre><code class="clojure">&#40;defn code-string-length &#91;code&#93;
+    &#40;count &#40;str code&#41;&#41;&#41;
+
+&#40;sort-by code-string-length &gt; '&#40;&#40;+ 1 2 3&#41; &#40;&#42; 1 200&#41; &#40;map inc &#91;1 2 3 4&#93;&#41;&#41;&#41;
+
+=&gt; &#40;&#40;map inc &#91;1 2 3 4&#93;&#41; &#40;+ 1 2 3&#41; &#40;&#42; 1 200&#41;&#41;
+</code></pre><p>The <code>find-largest-common-code</code> uses <code>tree-seq</code> to get a sequence of nodes and then <code>frequencies</code> to find duplicates. We also make sure these duplicates are collections as we aren't interested in duplicates variable names, strings etc. Finally we order by our string length heuristic and pick the first item.</p><pre><code class="clojure">&#40;defn find-largest-common-code &#91;code&#93;
+  &#40;-&gt;&gt; &#40;tree-seq coll? seq code&#41;
+       frequencies
+       &#40;keep &#40;fn &#91;&#91;code freq&#93;&#93;
+               &#40;when &#40;and &#40;&gt; freq 1&#41; &#40;coll? code&#41;&#41;
+                 code&#41;&#41;&#41;
+       &#40;sort-by code-string-length &gt;&#41;
+       first&#41;&#41;
+</code></pre><p>Trying this out on our large piece of code returns the largest duplicate.</p><pre><code class="clojure">&#40;find-largest-common-code
+   '&#40;&#40;defn generate-feed-items &#91;posts&#93;
+       &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+              &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+                &#91;:item
+                 &#91;:title post-name&#93;
+                 &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+                 &#91;:link post-url&#93;
+                 &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+            posts&#41;&#41;
+
+     &#40;defn generate-rss-feed &#91;posts&#93;
+       &#40;xml/sexp-as-element
+        &#91;:rss
+         {:version    &quot;2.0&quot;
+          :xmlns:atom &quot;https://www.w3.org/2005/Atom&quot;
+          :xmlns:dc   &quot;https://purl.org/dc/elements/1.1/&quot;}
+         &#91;:channel
+          &#91;:title site-title&#93;
+          &#91;:description site-tagline&#93;
+          &#91;:link site-url&#93;
+          &#91;:atom:link
+           {:href site-rss :rel &quot;self&quot; :type &quot;application/rss+xml&quot;}&#93;
+          &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+                 &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+                   &#91;:item
+                    &#91;:title post-name&#93;
+                    &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+                    &#91;:link post-url&#93;
+                    &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+               posts&#41;&#93;&#93;&#41;&#41;&#41;&#41;
+
+=&gt;
+&#40;map
+ &#40;fn
+  &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+  &#40;let
+   &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+   &#91;:item
+    &#91;:title post-name&#93;
+    &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+    &#91;:link post-url&#93;
+    &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+ posts&#41;
+</code></pre><p>We can then refactor our code accordingly.</p><pre><code class="clojure">&#40;defn generate-feed-items &#91;posts&#93;
+  &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+         &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+           &#91;:item
+            &#91;:title post-name&#93;
+            &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+            &#91;:link post-url&#93;
+            &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+       posts&#41;&#41;
+
+&#40;defn generate-rss-feed &#91;posts&#93;
+  &#40;xml/sexp-as-element
+   &#91;:rss
+    {:version    &quot;2.0&quot;
+     :xmlns:atom &quot;https://www.w3.org/2005/Atom&quot;
+     :xmlns:dc   &quot;https://purl.org/dc/elements/1.1/&quot;}
+    &#91;:channel
+     &#91;:title site-title&#93;
+     &#91;:description site-tagline&#93;
+     &#91;:link site-url&#93;
+     &#91;:atom:link
+      {:href site-rss :rel &quot;self&quot; :type &quot;application/rss+xml&quot;}&#93;
+     &#40;generate-feed-items posts&#41;&#93;&#93;&#41;&#41;
+
+</code></pre><p>Much better.</p><h3>A macro implementation</h3><p>If we don't want to pass the code as a quoted list we can change the <code>find-largest-common-code</code> function into a macro.</p><pre><code class="clojure">&#40;defmacro find-largest-common-code &#91;&amp; body&#93;
+  `&#40;-&gt;&gt; &#40;tree-seq coll? seq &#126;body&#41;
+        frequencies
+        &#40;keep &#40;fn &#91;&#91;code freq&#93;&#93;
+                &#40;when &#40;and &#40;&gt; freq 1&#41; &#40;coll? code&#41;&#41;
+                  code&#41;&#41;&#41;
+        &#40;sort-by code-string-length &gt;&#41;
+        first&#41;&#41;
+
+&#40;find-largest-common-code
+ &#40;defn generate-feed-items &#91;posts&#93;
+   &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+          &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+            &#91;:item
+             &#91;:title post-name&#93;
+             &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+             &#91;:link post-url&#93;
+             &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+        posts&#41;&#41;
+
+ &#40;defn generate-rss-feed &#91;posts&#93;
+   &#40;xml/sexp-as-element
+    &#91;:rss
+     {:version    &quot;2.0&quot;
+      :xmlns:atom &quot;https://www.w3.org/2005/Atom&quot;
+      :xmlns:dc   &quot;https://purl.org/dc/elements/1.1/&quot;}
+     &#91;:channel
+      &#91;:title site-title&#93;
+      &#91;:description site-tagline&#93;
+      &#91;:link site-url&#93;
+      &#91;:atom:link
+       {:href site-rss :rel &quot;self&quot; :type &quot;application/rss+xml&quot;}&#93;
+      &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+             &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+               &#91;:item
+                &#91;:title post-name&#93;
+                &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+                &#91;:link post-url&#93;
+                &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+           posts&#41;&#93;&#93;&#41;&#41;&#41;
+
+=&gt;
+&#40;map
+ &#40;fn
+  &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
+  &#40;let
+   &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
+   &#91;:item
+    &#91;:title post-name&#93;
+    &#91;:pubDate &#40;date-&gt;rfc822 date&#41;&#93;
+    &#91;:link post-url&#93;
+    &#91;:guid {:isPermaLink &quot;true&quot;} post-url&#93;&#93;&#41;&#41;
+ posts&#41;
+</code></pre><p>Hopefully this example helps illustrate the value of code as data (homoiconicity).</p></article></div></body></html>
