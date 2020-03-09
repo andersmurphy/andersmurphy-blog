@@ -39,7 +39,7 @@
                   '&#40;map dec items&#41;&#41;
 
 =&gt; &#40;&#40;map dec items&#41; map dec items&#41;
-</code></pre><p>This returns the common nodes: <code>&#40;map dec items&#41;</code>, <code>map</code>, <code>dec</code> and <code>items</code>.</p><h3>Find common code</h3><p>Here we have some of the code used to generate the RSS feed for this blog.</p><pre><code class="clojure">&#40;defn generate-feed-items &#91;posts&#93;
+</code></pre><p>This returns the common nodes: <code>&#40;map dec items&#41;</code>, <code>map</code>, <code>dec</code> and <code>items</code>.</p><h3>Refactoring common code</h3><p>Here we have some of the code used to generate the RSS feed for this blog.</p><pre><code class="clojure">&#40;defn generate-feed-items &#91;posts&#93;
   &#40;map &#40;fn &#91;{:keys &#91;post-name date post-path-name&#93;}&#93;
          &#40;let &#91;post-url &#40;str site-url &quot;/&quot; post-path-name&#41;&#93;
            &#91;:item
