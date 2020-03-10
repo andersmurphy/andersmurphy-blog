@@ -109,7 +109,7 @@
      [:a {:class "sidebar-nav-item" :href site-twitter} "Twitter"]
      [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]
      [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]
-    [:p (str "@ 2015-" (current-year) "Anders Murphy. All rights reserved.")]]])
+    [:p (str "@ 2015-" (current-year) " Anders Murphy.")]]])
 
 (defn add-post-content [{:keys [file] :as m}]
   (let [{:keys [html metadata]} (-> file slurp (md-to-html-string-with-meta))]
