@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8" /><title>Clojure: java interop with bean</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: java interop with bean</h1><time class="post-date" datetime="2020-03-27T00:00:00+00:00">27 Mar 2020</time><p>One of the great things with Clojure is it has fantastic java interop. In this article we explore the <code>bean</code> function and how it makes working with java object more idiomatic.</p><h3>Some Java to interop with</h3><p>First we import a java library. For this example we will use <code>googlei18n/libphonenumber</code> a google library for processing numbers. We want to use it to split a phone number into its different parts (country code and national number):</p><pre><code class="Clojure">&#40;import &#91;com.google.i18n.phonenumbers PhoneNumberUtil&#93;&#41;
+</code></pre><p>Let's parse a phone number:</p><pre><code class="Clojure">&#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;
+
+=&gt;
+#object&#91;com.google.i18n.phonenumbers.Phonenumber$PhoneNumber 0x57762fc2 &quot;Country Code: 41 National Number: 446681800&quot;&#93;
+</code></pre><p>We get an object back. The string name of the object implies that it might contain what we are interested in (country code and national number).</p><h3>Without Bean</h3><p>Lets see if the object contains a method for extracting the country code from this object:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;.getDeclaredMethods com.google.i18n.phonenumbers.Phonenumber$PhoneNumber&#41;
+     &#40;map #&#40;.getName %&#41;&#41;
+     &#40;filter #&#40;clojure.string/includes? % &quot;Code&quot;&#41;&#41;&#41;
+
+=&gt;
+&#40;&quot;hashCode&quot;
+ &quot;hasPreferredDomesticCarrierCode&quot;
+ &quot;clearCountryCode&quot;
+ &quot;clearPreferredDomesticCarrierCode&quot;
+ &quot;getCountryCode&quot;
+ &quot;setCountryCode&quot;
+ &quot;clearCountryCodeSource&quot;
+ &quot;setPreferredDomesticCarrierCode&quot;
+ &quot;setCountryCodeSource&quot;
+ &quot;getPreferredDomesticCarrierCode&quot;
+ &quot;hasCountryCodeSource&quot;
+ &quot;getCountryCodeSource&quot;
+ &quot;hasCountryCode&quot;&#41;
+</code></pre><p>And a method for extracting the national number:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;.getDeclaredMethods com.google.i18n.phonenumbers.Phonenumber$PhoneNumber&#41;
+     &#40;map #&#40;.getName %&#41;&#41;
+     &#40;filter #&#40;clojure.string/includes? % &quot;Number&quot;&#41;&#41;&#41;
+
+=&gt;
+&#40;&quot;hasNationalNumber&quot;
+ &quot;hasNumberOfLeadingZeros&quot;
+ &quot;clearNationalNumber&quot;
+ &quot;clearNumberOfLeadingZeros&quot;
+ &quot;setNumberOfLeadingZeros&quot;
+ &quot;setNationalNumber&quot;
+ &quot;getNumberOfLeadingZeros&quot;
+ &quot;getNationalNumber&quot;&#41;
+ </code></pre><p>We can now use <code>.getCountryCode</code> and <code>.getNationalNumber</code> to build a function that splits the phone number into its different parts:</p><pre><code class="Clojure">&#40;let &#91;number-obj     &#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;
+      countryCode    &#40;.getCountryCode number-obj&#41;
+      nationalNumber &#40;.getNationalNumber number-obj&#41;&#93;
+  {:phone/full-number      &#40;str &quot;+&quot; countryCode nationalNumber&#41;
+   :phone/prefix           &#40;str &quot;+&quot; countryCode&#41;
+   :phone/number-no-prefix &#40;str nationalNumber&#41;}&#41;
+
+=&gt;
+#:phone{:full-number      &quot;+41446681800&quot;,
+        :prefix           &quot;+41&quot;,
+        :number-no-prefix &quot;446681800&quot;}
+</code></pre><h3>With Bean</h3><p>The <code>bean</code> function converts a java object into a clojure map:</p><pre><code class="Clojure">&#40;bean &#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;&#41;
+
+=&gt;
+{:numberOfLeadingZeros         1,
+ :preferredDomesticCarrierCode &quot;&quot;,
+ :extension                    &quot;&quot;,
+ :italianLeadingZero           false,
+ :class                        com.google.i18n.phonenumbers.Phonenumber$PhoneNumber,
+ :countryCodeSource
+ #object&#91;com.google.i18n.phonenumbers.Phonenumber$PhoneNumber$CountryCodeSource 0x2724e628 &quot;UNSPECIFIED&quot;&#93;,
+ :nationalNumber               446681800,
+ :rawInput                     &quot;&quot;,
+ :countryCode                  41}
+</code></pre><p>This allows us to use all the tools of the language (in this case destructuring) to extract the data we care about:</p><pre><code class="Clojure">&#40;let &#91;{:keys &#91;countryCode nationalNumber&#93;}
+      &#40;bean &#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;&#41;&#93;
+  {:phone/full-number      &#40;str &quot;+&quot; countryCode nationalNumber&#41;
+   :phone/prefix           &#40;str &quot;+&quot; countryCode&#41;
+   :phone/number-no-prefix &#40;str nationalNumber&#41;}&#41;
+
+=&gt;
+#:phone{:full-number      &quot;+41446681800&quot;,
+        :prefix           &quot;+41&quot;,
+        :number-no-prefix &quot;446681800&quot;}
+</code></pre><p>Much simpler!</p><p>That covers using the <code>bean</code> function and how it makes working with java object more idiomatic.</p></article></div></body></html>
