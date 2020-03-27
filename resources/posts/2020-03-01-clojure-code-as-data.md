@@ -2,7 +2,6 @@ Title: Clojure: code as data
 
 In Clojure, the primary representation of code is the S-expression that takes the form of nested sequences (lists and vectors). The majority of Clojure's functions are designed to operate on sequences. As a result, Clojure code can be manipulated using the same functions that are used to manipulate Clojure data. In other words, there is no distinction between code and data. Code is data. This property is known as [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity). This article will explore this concept.
 
-
 ### Code equality
 
 We can check two pieces of code for equality by turning the code into data with a `'` symbol and then comparing them with `=`:
