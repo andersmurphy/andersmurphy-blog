@@ -4,7 +4,7 @@ One of the great things with Clojure is it has fantastic java interop. In this a
 
 ### Some Java to interop with
 
-First we import a java library. For this example we will use `googlei18n/libphonenumber` a google library for processing numbers. We want to use it to split a phone number into its different parts (country code and national number):
+First we import a java library. For this example we will use  [googlei18n/libphonenumber](https://github.com/googlei18n/libphonenumber/tree/master/java/libphonenumber/src/com/google/i18n/phonenumbers) a google library for processing numbers. We want to use it to split a phone number into its different parts (country code and national number):
 
 ```Clojure
 (import [com.google.i18n.phonenumbers PhoneNumberUtil])
