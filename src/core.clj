@@ -19,13 +19,15 @@
 (def highlight-url "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0")
 (def directory (io/file "resources/posts"))
 (defn desc [a b] (compare b a))
-(def files (sort desc (drop 1 (file-seq directory))))
+(defn files [] (sort desc (drop 1 (file-seq directory))))
 
 (defn replace-n
   [s n match replacement]
   (if (= n 0)
     s
     (recur (str/replace-first s match replacement) (dec n) match replacement)))
+
+(defn today [] (str (LocalDate/now)))
 
 (defn add-file [file] {:file file})
 
@@ -236,11 +238,6 @@
                   (map add-post-page))
             files))
 
-(defn write-rss!
-  [tags]
-  (with-open [out-file (java.io.FileWriter. "docs/feed.xml")]
-    (xml/emit tags out-file)))
-
 (defn date->rfc822
   [date]
   (let [local-date (-> (apply str (interpose "-" date))
@@ -264,9 +261,27 @@
                [:link post-url] [:guid {:isPermaLink "true"} post-url]]))
           posts)]]))
 
+(defn write-rss!
+  [tags]
+  (with-open [out-file (java.io.FileWriter. "docs/feed.xml")]
+    (xml/emit tags out-file)))
+
+(defn generate-sitemap
+  [posts]
+  (xml/sexp-as-element
+   [:urlset {:xmlns "https://www.sitemaps.org/schemas/sitemap/0.9"}
+    (map (fn [{:keys [date post-path-name]}]
+           [:url [:loc (str site-url "/" post-path-name)] [:lastmod date]])
+         (conj posts {:post-path-name "" :date (today)}))]))
+
+(defn write-sitemap!
+  [xml]
+  (with-open [out-file (java.io.FileWriter. "docs/sitemap.xml")]
+    (xml/emit xml out-file)))
+
 (defn generate-site
   []
-  (let [posts (get-posts files)]
+  (let [posts (get-posts (files))]
     (->> (partition-all 10 posts)
          add-page-urls
          (map page-html)
@@ -275,4 +290,6 @@
         write-404!)
     (run! write-post! posts)
     (-> (generate-rss-feed posts)
-        write-rss!)))
+        write-rss!)
+    (-> (generate-sitemap posts)
+        write-sitemap!)))
