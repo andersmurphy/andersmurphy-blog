@@ -6,7 +6,7 @@
 &#40;def email-table &#91;{:userid 1 :email &quot;bob@email.com&quot;}
                   {:userid 2 :email &quot;jo@email.com&quot;}
                   {:userid 3 :email &quot;sarah@email.com&quot;}&#93;&#41;
-</code></pre><h3>Using concat, group-by and merge</h3><p>We can achieve this using <code>concat</code>, <code>gourp-by</code> and <code>merge</code>. We concatenate the two sequences together, group the maps by <code>:userid</code> key and then map over the grouped maps (rows) merging them.</p><pre><code class="clojure">&#40;defn merge-on-key
+</code></pre><h2>Using concat, group-by and merge</h2><p>We can achieve this using <code>concat</code>, <code>gourp-by</code> and <code>merge</code>. We concatenate the two sequences together, group the maps by <code>:userid</code> key and then map over the grouped maps (rows) merging them.</p><pre><code class="clojure">&#40;defn merge-on-key
   &quot;Merger rows of table1 and table2 on matching key k.&quot;
   &#91;k table1 table2&#93;
   &#40;-&gt;&gt; &#40;concat table1 table2&#41;
@@ -36,7 +36,7 @@
 =&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
     {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
     {:userid 3, :name &quot;Sarah&quot;}&#41;
- </code></pre><p>This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.</p><h3>Using clojure.set/join</h3><p>If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the <code>join</code> function from the <code>clojure.set</code> namespace.</p><pre><code class="clojure">&#40;def name-table &#91;{:userid 1 :name &quot;Bob&quot;}
+ </code></pre><p>This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.</p><h2>Using clojure.set/join</h2><p>If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the <code>join</code> function from the <code>clojure.set</code> namespace.</p><pre><code class="clojure">&#40;def name-table &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
                  {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
 

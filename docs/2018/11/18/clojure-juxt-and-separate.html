@@ -10,11 +10,11 @@ clojure.core/juxt
   returns a vector containing the result of applying each fn to the
   args &#40;left-to-right&#41;.
   &#40;&#40;juxt a b c&#41; x&#41; =&gt; &#91;&#40;a x&#41; &#40;b x&#41; &#40;c x&#41;&#93;
-</code></pre><p>So <code>juxt</code> takes a number of functions and returns a function that applies each of those functions to its args.</p><h3>Sort-by multiple keys</h3><p>Sort-by returns a sorted sequence of the items in a collection where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use <code>juxt</code> to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, and so on.</p><pre><code class="clojure">&#40;sort-by &#40;juxt :a :b&#41;
+</code></pre><p>So <code>juxt</code> takes a number of functions and returns a function that applies each of those functions to its args.</p><h2>Sort-by multiple keys</h2><p>Sort-by returns a sorted sequence of the items in a collection where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use <code>juxt</code> to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, and so on.</p><pre><code class="clojure">&#40;sort-by &#40;juxt :a :b&#41;
  &#91;{:a 3 :b 4} {:a 2 :b 2} {:a 2 :b 1}&#93;&#41;
 
 =&gt; &#40;{:a 2 :b 1} {:a 2 :b 2} {:a 3 :b 4}&#41;
-</code></pre><p>When you need to sort items by criteria of decreasing importance this comes in handy.</p><h3>Group-by multiple keys</h3><p>Group-by returns a map of elements grouped by key, where the supplied function determines the grouping. If you want to group by multiple functions, you can use <code>juxt</code> to pass in two or more functions.</p><pre><code class="clojure">&#40;defn health-status &#91;{:keys &#91;health&#93;}&#93;
+</code></pre><p>When you need to sort items by criteria of decreasing importance this comes in handy.</p><h2>Group-by multiple keys</h2><p>Group-by returns a map of elements grouped by key, where the supplied function determines the grouping. If you want to group by multiple functions, you can use <code>juxt</code> to pass in two or more functions.</p><pre><code class="clojure">&#40;defn health-status &#91;{:keys &#91;health&#93;}&#93;
   &#40;if &#40;&lt; health 50&#41;
     :below-half-health
     :above-half-health&#41;&#41;
@@ -53,7 +53,7 @@ clojure.core/juxt
     &#91;{:name &quot;Elendil&quot;, :faction :elves, :health 98}&#93;
     &#91;:orcs :above-half-health&#93;
     &#91;{:name &quot;Gazkral&quot;, :faction :orcs, :health 65}&#93;}
-</code></pre><p>Now we know how many orcs get cut down by Elendil's cleave attack.</p><h3>Separate</h3><p>There was once a function, in the now deprecated <code>clojure.contrib.seq-utils</code> library, called <code>separate</code>. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function like this:</p><pre><code class="clojure">&#40;defn separate &#91;pred s&#93;
+</code></pre><p>Now we know how many orcs get cut down by Elendil's cleave attack.</p><h2>Separate</h2><p>There was once a function, in the now deprecated <code>clojure.contrib.seq-utils</code> library, called <code>separate</code>. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function like this:</p><pre><code class="clojure">&#40;defn separate &#91;pred s&#93;
   &#91;&#40;filter pred s&#41; &#40;remove pred s&#41;&#93;&#41;
 
 &#40;separate odd? &#91;1 2 3 2 1&#93;&#41;
