@@ -2,7 +2,7 @@ Title: Clojure: a debug macro for threading macros using tap>
 
 This article will cover how to make a debug macro using tap. See [this article](https://andersmurphy.com/2019/06/01/clojure-intro-to-tap-and-accessing-private-vars.html) for an introduction to Clojure 1.10's tap system.
 
-### Setting up tap>
+## Setting up tap>
 
 First register a handler function with `add-tap` that writes whatever we pass into `tap>` to the `debug` atom.
 
@@ -35,7 +35,7 @@ Don't know how to create ISeq from: java.lang.Boolean
 
 We get an error as `tap>` doesn't return the result of the value we pass into it but the value of `true` instead.
 
-### Writing debug* as a function
+## Writing debug* as a function
 
 Let's write a simple function that writes our result to tap and then returns the result of the function to the expression that is calling tap.
 
@@ -75,7 +75,7 @@ This works. But it would be more helpful if we knew what code lead to that resul
 
 Not quite. We want the value of `:fn` to be our code before it gets evaluated not the result after. Whenever you want to do something with code as data rather than the result of it's evaluation you need to use macro.
 
-### Rewriting debug* as a macro
+## Rewriting debug* as a macro
 
 Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
 
@@ -99,7 +99,7 @@ Rewriting our debug function as a macro is relatively straight forwards we chang
 
 Much better.
 
-### Writing the debug->> macro
+## Writing the debug->> macro
 
 Next let's write a `debug->>` macro that will write each step to the `debug` atom. The `repeat` function generates a sequence of `'debug*` symbols which we `interleave` with the functions `fns` that have been passed into our macro. Finally we `~@` to splice (think apply) the resulting list into the regular `->>` macro.
 
@@ -122,7 +122,7 @@ Next let's write a `debug->>` macro that will write each step to the `debug` ato
 
 There are two issues with the output of our macro. The first is that it wrote three steps to the `debug` atom and there should only be two. The second is that we only want to show `(filter odd?)` for the second step, not the whole chain of functions up to that point `(filter odd? (debug* (map inc [1 2 3 4 5])))`.
 
-### Multiple evaluation and variable capture
+## Multiple evaluation and variable capture
 
 Let's try and fix the first issue. The `clojure.walk/macroexpand-all` function recursively performs all possible macroexpansions in the form we give it. This can be really useful for working out what's going wrong with a macro.
 
@@ -244,7 +244,7 @@ Everything looks right. There are only two calls to `tap>` that will get evaluat
 
 Excellent.
 
-### Removing debug* from the output
+## Removing debug* from the output
 
 Now let's see if we can fix the second issue and only show `(filter odd?)` for the second step, not `(filter odd? (debug* (map inc [1 2 3 4 5])))`. To do this we create a function `drop-debug` that removes any nested lists that start with `'debug*`.
 
@@ -281,7 +281,7 @@ Now let's see if we can fix the second issue and only show `(filter odd?)` for t
 
 Perfect.
 
-### Writing the debug-> macro
+## Writing the debug-> macro
 
 Finally let's implement `debug->` for good measure.
 

@@ -2,7 +2,7 @@ Title: Clojure: emoji in strings
 
 Sometimes your problem domain requires the use of emoji. This article will cover how emoji are represented in Clojure strings.
 
-### Emoji literal
+## Emoji literal
 
 We can represent emoji literally by copy pasting the emoji into your source code.
 
@@ -12,7 +12,7 @@ We can represent emoji literally by copy pasting the emoji into your source code
 => "🔮"
 ```
 
-### Using unicode
+## Using unicode
 
 Another option is to use unicode. Clojure uses Java's string class which unfortunately doesn't have support for unicode literals. Instead we have to write our own function for converting unicode to strings.
 
@@ -26,7 +26,7 @@ Another option is to use unicode. Clojure uses Java's string class which unfortu
 => "🔮"
 ```
 
-### Things to watch out for
+## Things to watch out for
 
 It's worth bearing in mind that Java uses UTF-16 encoding. This means that unicode characters will use one 16-bit word or two 16-bits words, depending on the character. We can see this by using `count`.
 

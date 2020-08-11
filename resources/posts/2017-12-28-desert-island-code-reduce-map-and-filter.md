@@ -14,7 +14,7 @@ A cruel fate indeed.
 
 But wait, what if we were to write our own implementations of: map, filter and reduce?
 
-### Reduce
+## Reduce
 
 Map and filter can be built with reduce, so lets start with implementing that.
 Good old for loop to the rescue.
@@ -31,7 +31,7 @@ const reduce = (reduceFunc, startingValue, coll) => {
 reduce((acc, item) => acc + item, 0, [ 1, 2, 3, 4]) // 10
 ```
 
-### Map
+## Map
 
 Whenever you want to derive a new value from
 a collection you can use reduce. Let see how we can use it to implement Map.
@@ -49,7 +49,7 @@ const map = (mapFunc, coll) => reduce(
 map(x => x + 1, [ 1, 2, 3, 4, 5]) // [ 2, 3, 4, 5, 6]
 ```
 
-### Filter
+## Filter
 
 Finally, lets implement filter.
 

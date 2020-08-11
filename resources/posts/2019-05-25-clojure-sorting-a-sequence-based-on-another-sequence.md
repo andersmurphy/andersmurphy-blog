@@ -2,7 +2,7 @@ Title: Clojure: sorting a sequence based on another sequence
 
 Sometimes web responses contain an unordered sequence of items along with a separate manifest that specifies the ordering. This article will cover how you can write a function to sort the list of items by the manifest order as well as using [Clojure Spec](https://clojure.org/guides/spec#_exercise) to generate test data to verify its output.
 
-### Sorting by manifest order
+## Sorting by manifest order
 
 Let's start by writing some test data.
 
@@ -34,7 +34,7 @@ Now that we have some data we can use the `sort-by` function and the `.indexOf` 
 
 This seems to work. However, `.indexOf` gets called for every item in the list of items. Performance might suffer for large amounts of data. Let's write some performance tests and see whether we are right.
 
-### Generating data
+## Generating data
 
 First we need to write a function that generates a large number of unique string ids. This is so that we can generate the same set of ids for our manifest and items. The `shuffle` function makes sure every call to this function returns the result in a random order.
 
@@ -105,7 +105,7 @@ With the `::items-with-manifest` spec finished we can now generate a large amoun
 
 Warning! The output is quite large and will flood your repl.
 
-### Performance test
+## Performance test
 
 Now that we can generate test data, we test the performance of the initial implementation with the `time` function. It's worth noting the use of `do` to avoid flooding the repl with output results.
 
@@ -139,7 +139,7 @@ As suspected, the function is very slow for large input. This is because each ca
 
 The results from `time` show this implementation is much faster than the initial implementation.
 
-### Validation and generative testing
+## Validation and generative testing
 
 We can also spec the `hash-map-index-sort` function with `s/fdef` and use the spec to create a generative test. The `:args` key defines the input to the function. The `:ret` key defines the output data. Finally, the `:fn` key defines the relation between input and output that we want to validate; in this case we want to check that the order of the output items is the same as the order of ids in the input manifest.
 

@@ -2,7 +2,7 @@ Title: Clojure: personalising text
 
 Sometimes you want to make a user's experience feel more personal. An easy way to achieve this is by personalising text based content. For example in a text base adventure game you could replace placeholders in the text with information relevant to that particular player such as their name or class. This could help make your game more engaging.
 
-### Personalising a string
+## Personalising a string
 
 Let's start by writing a simple function for personalising strings.
 
@@ -19,7 +19,7 @@ Let's start by writing a simple function for personalising strings.
 => "The warrior called Ivan entered the dungeon."
 ```
 
-### Personalising the string values of a map
+## Personalising the string values of a map
 
 Now that we have a function for personalising strings let's convert all the string values of a map using the `map-values` function we implemented in [this article](https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html).
 
@@ -76,7 +76,7 @@ Although this doesn't throw any exceptions, if we look closely it has caused une
     :treasures-found 1}
 ```
 
-### Personalising strings in a nested data structure
+## Personalising strings in a nested data structure
 
 To apply a function to all the nodes of an arbitrarily nested data structures we can use the `clojure.walk/postwalk` function. Here are the docs.
 

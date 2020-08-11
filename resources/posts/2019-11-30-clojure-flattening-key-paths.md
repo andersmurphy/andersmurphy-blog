@@ -2,7 +2,7 @@ Title: Clojure: flattening key paths
 
 This article will cover how to flatten the nested key paths of a map in Clojure; turning a nested map like `{:a {:b {:c {:d 1} :e 2}}}` into a flat map like `{:a-b-c-d 1 :a-b-e 2}`.
 
-### Flattening key paths recursively
+## Flattening key paths recursively
 
 We `map` over the key value pairs of the top level map. If we encounter a `map?` that is `not-empty`, we `conj` the current key onto a vector, thus gradually building a path and then call `flatten-paths` recursively. If we encounter anything else, we take the current path and turn it into a single key:
 
@@ -60,7 +60,7 @@ And a harness `find-when-overflow-occurs` to tell us roughly at what depth we ge
 
 On my machine I get a stack overflow at a depth of 600. In practice, you are unlikely to encounter a map that is this deeply nested. However, lets see if we can refactor `flatten-paths` to use the sequence abstraction so that it can handle deeper maps.
 
-### Flattening key paths with lazy-seq
+## Flattening key paths with lazy-seq
 
 The `lazy-seq` takes a body of expressions that returns an `ISeq` or `nil` and yields a `Seqable` object that will invoke the body only the first time `seq`
 is called. It will cache the result and return it on all subsequent

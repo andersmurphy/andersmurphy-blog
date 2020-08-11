@@ -4,7 +4,7 @@ Inconsistent case is a problems that tends to come up at application boundaries 
 
 One "solution" to this problem is to accept the fact that your app will have a mix of cases. However, this can lead to mistake and frustration, does this function expect `customer-id`, `cutomerId` or `customer_id`? What format does our mobile client expect? A more practical solution to this problem, the one this article will cover, is to add automatic case conversion at these boundaries in your software stack.
 
-### Converting the case of a key
+## Converting the case of a key
 
 Let's start by writing a simple case conversion function for converting `kebab-case` keywords to `camelCase` keywords.
 
@@ -20,7 +20,7 @@ Let's start by writing a simple case conversion function for converting `kebab-c
 => :fooBarBaz
 ```
 
-### Converting the case of keys in a map
+## Converting the case of keys in a map
 
 Now that we have a function for converting case let's convert all the keys of a map using the `map-keys` function we implemented in [this article](https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html).
 
@@ -35,7 +35,7 @@ Now that we have a function for converting case let's convert all the keys of a 
 => {:characterId 1, :firstName "John", :secondName "Snow"}
 ```
 
-### Converting case of keys in a nested data structure
+## Converting case of keys in a nested data structure
 
 For converting the keys of arbitrarily nested data structures we can use the `clojure.walk/postwalk` function. Let's check out the docs.
 

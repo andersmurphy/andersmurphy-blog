@@ -14,7 +14,7 @@ A cruel fate indeed.
 
 But wait, what if we were to write our own implementations of: pipe and compose?
 
-### Pipe
+## Pipe
 
 What does pipe do?
 
@@ -43,7 +43,7 @@ const map = mapFunc => coll => coll.map(mapFunc)
 pipe(map(x => x - 2), map(x => x * 2))([1, 2, 3]) // [-2,0,2]
 ```
 
-### Compose
+## Compose
 
 What does compose do?
 
@@ -75,7 +75,7 @@ compose(map(x => x - 2), map(x => x * 2))([1, 2, 3]) // [0,2,4]
 ```
 
 
-### Bonus: Reduce Right
+## Bonus: Reduce Right
 
 We saw how to write our own implementation of reduce in [this post](https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter/).
 But how would we implement reduce right? Reduce right is almost identical

@@ -2,7 +2,7 @@ Title: Ruby: functional programming
 
 In one of my previous jobs I worked as a full stack engineer on a codebase with a Ruby backend and a Javascript/React frontend. Having used Clojure a fair bit in my spare time I was keen to code in a functional style. At first glance this seems tricky in Ruby as it doesn't have first class functions.
 
-### Lambda
+## Lambda
 
 Ruby might not have first class functions but it does have `lambda`.
 
@@ -81,7 +81,7 @@ We can pass methods as functions using `&` combined with the symbol of the metho
 => 6
 ```
 
-### Currying
+## Currying
 
  `lambda` even has built in currying:
 
@@ -94,7 +94,7 @@ inc = add.curry.(1)
 => 14
 ```
 
-### Compose & Pipe
+## Compose & Pipe
 
 It's really useful to be able to compose functions. We can do this in Ruby by writing our own `comp` function with reduce. This will compose functions right to left:
 

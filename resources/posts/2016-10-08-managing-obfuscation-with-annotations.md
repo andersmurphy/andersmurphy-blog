@@ -32,7 +32,7 @@ This is because ProGuard has obfuscate the class name, method name or field name
 
 The simplest way to get around this problem is to add the appropriate `-keep` line to your ProGuard file. However, this is tedious and error prone and is often forgotten.  Instead this post will cover another solution that is my opinion more practical.
 
-### Step 1: Create a DontObfuscate annotation
+## Step 1: Create a DontObfuscate annotation
 Create an annotation called **DontObfuscate** in your project. The retention policy should be set to CLASS, as we don't need the annotation at runtime, but will need it for bytecode-level post-processing as that's when ProGuard performs obfuscation.
 
 ```java
@@ -41,7 +41,7 @@ public @interface DontObfuscate {
 }
 ```
 
-### Step 2: Update your projects ProGuard file
+## Step 2: Update your projects ProGuard file
 Add the following lines to your project **proguard-rules.pro** file.
 
 ```base
@@ -51,7 +51,7 @@ Add the following lines to your project **proguard-rules.pro** file.
 
 This will ensure ProGuard doesn't obfuscate any class that has the DonObfuscate annotation.
 
-### Step 3: Annotate the classes that you don't want obfuscated
+## Step 3: Annotate the classes that you don't want obfuscated
 Add the DontObfuscate annotation to the classes you don't want ProGuard to obfuscate.
 
 ```java

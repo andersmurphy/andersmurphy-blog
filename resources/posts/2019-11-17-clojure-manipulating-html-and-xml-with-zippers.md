@@ -3,7 +3,7 @@ Title: Clojure: manipulating HTML and XML with zippers
 Clojure provides a powerful namespace for manipulating HTML/XML called
 `clojure.zip`. It uses the concept of functional zipper (see [Functional Pearls The zipper](http://gallium.inria.fr/~huet/PUBLIC/zip.pdf)) to make manipulating hierarchical data structures simple and efficient. This article will cover how to use zippers to manipulate HTML/XML in Clojure.
 
-### A quick overview of zippers
+## A quick overview of zippers
 
 Lets start by requiring the `clojure.xml` for parsing XML and `clojure.zip` for zipper functions.
 
@@ -103,7 +103,7 @@ After calling `zip/next` again `:ppath` now contains a path.
 
 In summary, zippers are a location which is a two element vector that consists of a node and a path. What makes zipper so compelling is that `clojure.zip` comes with a collection of functions for performing common operations on them like navigation and editing (we've already seen `zip/xml-zip` and `zip/next`). Zippers also let us iterate rather than recur over a tree which has practical applications (like avoiding stack overflow errors for deeply nested trees).
 
-### Putting zippers to work
+## Putting zippers to work
 
 In this example we will scrape an RSS feed, generate some HTML and then inject it into an existing HTML page replacing part of the original content.
 

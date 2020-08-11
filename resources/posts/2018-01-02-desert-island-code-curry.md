@@ -14,7 +14,7 @@ A cruel fate indeed.
 
 But wait, what if we were to write our own implementation of: curry?
 
-### Curry
+## Curry
 
 Currying is a technique for translating the evaluation of a function that takes
 multiple arguments (multiple arity/n-ary function) into evaluating a sequence of

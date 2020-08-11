@@ -6,7 +6,7 @@ We have a URL with some placeholder values that we want to replace.
 "https://www.shop.com/$seller/items/$item-code/prices/$currency"
 ```
 
-### str
+## str
 
 One way of doing this is to use `str` function.
 
@@ -23,7 +23,7 @@ One way of doing this is to use `str` function.
 
 There's nothing wrong with this solution. However, it does encapsulate/hide information that might be useful at the call site: order of arguments and what URL it is operating on.
 
-### format
+## format
 
 Another approach would be to use the `format` function, which gives us string interpolation.
 
@@ -38,7 +38,7 @@ Another approach would be to use the `format` function, which gives us string in
 
 The downside of this is that the placeholders in the URL are not self-documenting.
 
-### replace-several
+## replace-several
 
 What about using a string replace function? Clojure core does have functions for replacing matches in strings, but it doesn't have a built-in function for replacing multiple different matches. Let's see how we could implement our own `replace-several` function.
 

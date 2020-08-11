@@ -4,7 +4,7 @@ Clojure 1.10 introduced a new system called tap. From the release notes: *tap is
 
 Tap has a nice simple api. We can send a value to the set of registered handler functions with `tap>`. We can register a handlers function with `add-tap`. Finally we can unregister a handler function with `remove-tap`.
 
-### Adding a tap handler and sending values
+## Adding a tap handler and sending values
 
 Create an atom `bar` and register an anonymous handler function to the tap system with `add-tap`. This will `conj` any values we pass to `tap>` to the `bar` atom.
 
@@ -64,7 +64,7 @@ var: clojure.core/tapset is not public
 
 No luck, `tapset` is not public.
 
-### Creating and accessing private vars
+## Creating and accessing private vars
 
 In Clojure you can create private vars by adding the key `:private` to a var's metadata.
 
@@ -96,7 +96,7 @@ Even though these private vars are not intended to be accessed we can work aroun
 
 There are rarely any reasons to ever have to do this in production code, and even then it would not be advisable. However, it can be very useful when exploring a new api in the repl.
 
-### Back to tapset
+## Back to tapset
 
 Armed with our new knowledge of how to access private vars we can find out what's in `tapset`. Notice the `@@` we need to derefence `tapset` twice: once to get the value of the var, and once to get the value of the atom.
 
@@ -138,7 +138,7 @@ Back to normal. So if we want to be able to prevent the same function from getti
 
 Even though we called the `add-tap` function twice with the same function, it only got added once.
 
-### Removing tap handlers
+## Removing tap handlers
 
 The other advantage of using named functions is that you can use `remove-tap` to remove tap functions from the `tapset`. With an anonymous function you would have to hang on to the a reference to be able to remove it from the `tapset`.
 

@@ -8,14 +8,14 @@ Butter Knife is a field and method binding library for Android views which uses 
 
 This is a quick tutorial for getting started with Butter Knife.
 
-### Step 1: Download dependency
+## Step 1: Download dependency
 Add the following dependency to the app's **build.gradle** file:
 
 ```groovy
 compile 'com.jakewharton:butterknife:7.0.1'
 ```
 
-### Step 2: Add annotation
+## Step 2: Add annotation
 In the activity, add the `@Bind` annotation before the declaration of the view field you want to bind to, passing in the corresponding view `R.id` as an argument:
 
 ```java
@@ -23,7 +23,7 @@ In the activity, add the `@Bind` annotation before the declaration of the view f
 Button trueButton;
 ```
 
-### Step 3: Remove boilerplate
+## Step 3: Remove boilerplate
 Now remove the old view binding:
 
 ```java
@@ -31,7 +31,7 @@ trueButton = (Button) findViewById(R.id.true_button);
 ```
 
 
-### Step 4: Call bind
+## Step 4: Call bind
 In the `onCreate()` method of the activity, before using the view, call bind on the Butterknife class:
 
 *Note: you only have to do this once, regardless of how many views you are binding.*

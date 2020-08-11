@@ -2,13 +2,13 @@ Title: Clojure: sending emails with SendGrid
 
 Your business needs you to generate an automated email report containing data from your app. In this example we will use the [SendGrid](https://sendgrid.com) web API to email a `.csv` file.
 
-### Get a SendGrid API key
+## Get a SendGrid API key
 
 First, you need to get a SendGrid API key. I'm not going to cover this in any more detail as there is plenty of [documentation](https://sendgrid.com/docs/ui/account-and-settings/api-keys/) available on their website.
 
 Once you have your API key, you can pass it into your app as an environment variable.
 
-### Set up the example data
+## Set up the example data
 
 We want to send some data in `.csv` format as an attachment. We are just using a list of maps in this case. However, in a real-world application, this could be data you get back from a database query. Here's the data.
 
@@ -38,7 +38,7 @@ Next, we need a function to convert this data into csv format.
          (str/join "\n"))))
 ```
 
-### Sendgrid Rest API
+## Sendgrid Rest API
 
 First lets look at the SendGrid Web API [documentation](https://sendgrid.com/docs/API_Reference/Web_API_v3/Mail/index.html). From the documentation, we can see that we need to make the following request.
 

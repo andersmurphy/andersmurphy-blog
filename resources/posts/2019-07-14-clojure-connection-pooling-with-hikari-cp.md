@@ -5,7 +5,7 @@ responsiveness of your app for any task that requires connecting to the database
 
 This guide will use [hikari-cp](https://github.com/tomekw/hikari-cp) a Clojure wrapper around [HikariCP](https://github.com/brettwooldridge/HikariCP) a java database connection pooling library. It assumes you are using [leiningen](https://leiningen.org) as your build/dependency management tool and have a [postgresql](https://www.postgresql.org) database set up and running. It also won't cover using environment variables to store your database url out of source control (which is highly recommended for security).
 
-### Initial set up
+## Initial set up
 
 Start postgres.
 
@@ -19,7 +19,7 @@ Create a database called `databasename`.
 createdb databasename
 ```
 
-### Dependencies
+## Dependencies
 
 Add `org.clojure/java.jdbc`, `org.postgresql/postgresql` and `hikari-cp` to your dependencies.
 
@@ -31,7 +31,7 @@ Add `org.clojure/java.jdbc`, `org.postgresql/postgresql` and `hikari-cp` to your
                  [hikari-cp "2.7.1"]])
 ```
 
-### Parsing a database URL
+## Parsing a database URL
 
 Create a helper function for passing urls.
 
@@ -54,7 +54,7 @@ Create a helper function for passing urls.
 
 This function parses urls that are of the form `postgresql://username:password@localhost:5432/databasename"`. It also handles defaults if certain parameters are missing.
 
-### Setting up the connection pool
+## Setting up the connection pool
 
 Define the connection.
 
@@ -100,7 +100,7 @@ You should see some logs from hikari start to flood the repl.
 ...
 ```
 
-### Stop the logs flooding the repl
+## Stop the logs flooding the repl
 
 The hikari logs can be quite noisy. Logback can be used to filter out the DEBUG and INFO level messages.
 

@@ -7,10 +7,10 @@ correctly (disabling optimization/obfuscation) ProGuard can have little to no ne
 
 <!--more-->
 
-### Step 1: Create ProGuard main file
+## Step 1: Create ProGuard main file
 Create a file named **proguard-main.pro** in the app level of your project directory. This file is where you add proguard settings that are shared between your debug and release builds.
 
-### Step 2: Create ProGuard debug header file
+## Step 2: Create ProGuard debug header file
 Create a file named **proguard-header-debug.pro** in the app level of your project directory. This file is where you add proguard settings that are specific to debug builds.
 
 ```bash
@@ -20,7 +20,7 @@ Create a file named **proguard-header-debug.pro** in the app level of your proje
 
 We have added `-dontoptimize` to disable code optimization and `-dontobfuscate` to disable obfuscation. If these were not disabled the debugger would struggle to find the executable code that maps to your source and if it did it would be hard to decipher as the code would be obfuscated. Disabling optimization/obfuscation also means that ProGuard will have little to no impact on build times.
 
-### Step 3: Create ProGuard release header file
+## Step 3: Create ProGuard release header file
 Create a file named **proguard-header-release.pro** in the app level of your project directory. This file is where you add proguard settings that are specific to release builds.
 
 ```bash
@@ -30,7 +30,7 @@ Create a file named **proguard-header-release.pro** in the app level of your pro
 
 We have specified the number of optimization passes and which optimizations ProGuard should do. More importantly we have removed `-dontoptimize` and `-dontobfuscate` meaning this build will be optimized and obfuscated.
 
-### Step 4: Update the app build.gradle
+## Step 4: Update the app build.gradle
 Update your app's the buildTypes block in your **build.gradle** file as shown below.
 
 ```groovy

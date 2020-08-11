@@ -2,7 +2,7 @@ Title: Clojure: generating HTML and XML
 
 HTML and XML are ubiquitous, whether it's the pages of a static site or configuration for a logger, being able to programmatically generate these files can be really powerful. This article will cover how to generate HTML and XML files in Clojure.
 
-### HTML
+## HTML
 
 In some languages you use template ([ERB](https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html)) to generate HTML/XML or a language syntax extension ([JSX](https://reactjs.org/docs/introducing-jsx.html)). Inevitably, as you need to solve more and more interesting problems the limitations of these template/extension languages becomes an issue, eventually you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively implementing the underlying language in addition to it's own syntax, often with some awkward differences.
 
@@ -58,7 +58,7 @@ pointing to something that doesn't exist.<a href="https://andersmurphy.com">Head
 </html>
 ```
 
-### XML
+## XML
 
 For generating XML we are going to use Clojure.data.xml. Clojure.data.xml is a library for representing XML in Clojure. It uses vectors to represent elements, and maps to represent an element's attributes (identical to Hiccup).
 

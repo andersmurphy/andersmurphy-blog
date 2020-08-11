@@ -2,7 +2,7 @@ Title: Clojure: sorting tuples
 
 A tuple is a finite ordered sequence of elements. A common use of tuples in Clojure is for representing pairs of data that are related; for example a key and a value when mapping over a map (hashmap/dictionary). That being said, tuples can be of any length and are a common way of representing larger sets of related data in languages that don't use maps as prolifically as Clojure. This articles explores sorting tuples in Clojure.
 
-### Sorting same length tuples
+## Sorting same length tuples
 
 If the tuples are the same length, they are sorted by a lexical sort; with the first item used for the primary sort, the second item for the secondary sort etc.
 
@@ -22,7 +22,7 @@ Execution error (ClassCastException) at java.util.TimSort/countRunAndMakeAscendi
 class java.lang.String cannot be cast to class java.lang.Number
 ```
 
-### Sorting different length tuples
+## Sorting different length tuples
 
 If the tuples are of different lengths the default sort will be based on the length of the tuples rather than a lexical sort of their contents, falling back on the lexical sort for tuples of the same length:
 
@@ -32,7 +32,7 @@ If the tuples are of different lengths the default sort will be based on the len
 => ([1 0] [1 1] [2 3] [1 2 1])
 ```
 
-### Sorting different length tuples by their contents
+## Sorting different length tuples by their contents
 
 If we want different length tuples to be sorted by a lexical sort of their contents, we need to write our own comparator:
 

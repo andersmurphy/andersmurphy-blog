@@ -2,7 +2,7 @@ Title: Clojure: using java.time with clojure.java.jdbc
 
 Java 8 introduced `java.time` to replace the existing java representations of time `java.util.Date`, `java.sql.Timestamp` etc. There were many problems with this old implementation: it wasn't thread safe, it had a clunky API and no built in representation for timezones. `java.time` is the successor to the fantastic `joda.time` project which solves all these problems. So if `java.time` fixes everything then why this article? Well, `java.sql.Timestamp` still rears its ugly head at the database layer where it is still the default representation of time in the `java.jdbc` database drivers. In this article we will cover how to automate the conversion between `java.sql.Timestamp` and `java.time` so you never have to deal with `java.sql.Timestamp` again.
 
-### Initial set up
+## Initial set up
 
 Start postgres.
 
@@ -27,7 +27,7 @@ Add `org.clojure/java.jdbc` and `org.postgresql/postgresql` to your dependencies
                  [org.postgresql/postgresql "42.2.3"]])
 ```
 
-### Database connection
+## Database connection
 
 Start with importing all the needed dependencies, creating a database connection and a test table.
 
@@ -50,7 +50,7 @@ Start with importing all the needed dependencies, creating a database connection
    log_date date )")
 ```
 
-### Extending JDBC with java.time
+## Extending JDBC with java.time
 
 Extend `jdbc/IResultsetReadColumn` to convert `java.sql.Timestamp` to `java.time.Instant` and `java.sql.Date` to `java.time.LocalDate`.
 
@@ -76,7 +76,7 @@ Extend `jdbc/ISQLValue` to convert `java.time.Instant` to `java.sql.Timestamp` a
     (Date/valueOf v)))
 ```
 
-### Read and write time
+## Read and write time
 
 Inserting `java.time` values works as expected.
 
@@ -107,7 +107,7 @@ Same for reading `java.time` values.
      :log_date #object[java.time.LocalDate 0x265e4f6d "2019-08-03"]})
 ```
 
-### Reader literals
+## Reader literals
 
 To make `java.time` values easier to work with we can add support for reader literals. For Clojure to be able to print the literals define the following methods.
 

@@ -2,7 +2,7 @@ Title: Clojure: contains? and some
 
 Checking for containment, whether a collection contains an item, is a common task in software development. This post covers the ways you can check for containment in Clojure.
 
-### Contains?
+## Contains?
 
 The `contains?` function springs to mind, lets try it out in the repl.
 
@@ -62,7 +62,7 @@ clojure.core/contains?
 
 So for vectors, `contains?` is only useful for checking if an array contains an index, not a value.
 
-### Some
+## Some
 
 The documentation for `contains?` mentions the `some` function. Let's investigate the docs for `some`.
 

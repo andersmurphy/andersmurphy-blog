@@ -12,7 +12,7 @@ We have two sequences of maps (tables) and we want to merge them on matching key
                   {:userid 3 :email "sarah@email.com"}])
 ```
 
-### Using concat, group-by and merge
+## Using concat, group-by and merge
 
 We can achieve this using `concat`, `gourp-by` and `merge`. We concatenate the two sequences together, group the maps by `:userid` key and then map over the grouped maps (rows) merging them.
 
@@ -56,7 +56,7 @@ This works for sequences of the same length, but what do we get if the sequences
 
 This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.
 
-### Using clojure.set/join
+## Using clojure.set/join
 
 If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the `join` function from the `clojure.set` namespace.
 

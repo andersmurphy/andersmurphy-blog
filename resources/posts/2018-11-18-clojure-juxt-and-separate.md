@@ -18,7 +18,7 @@ clojure.core/juxt
 
 So `juxt` takes a number of functions and returns a function that applies each of those functions to its args.
 
-### Sort-by multiple keys
+## Sort-by multiple keys
 
 Sort-by returns a sorted sequence of the items in a collection where the sort order is determined by comparing the key function of each item. If you want to have a secondary sort for when the first keys are equal you can use `juxt` to pass in two or more key functions, with each additional key being: a secondary, tertiary sort, and so on.
 
@@ -31,7 +31,7 @@ Sort-by returns a sorted sequence of the items in a collection where the sort or
 
 When you need to sort items by criteria of decreasing importance this comes in handy.
 
-### Group-by multiple keys
+## Group-by multiple keys
 
 Group-by returns a map of elements grouped by key, where the supplied function determines the grouping. If you want to group by multiple functions, you can use `juxt` to pass in two or more functions.
 
@@ -79,7 +79,7 @@ Group-by returns a map of elements grouped by key, where the supplied function d
 
 Now we know how many orcs get cut down by Elendil's cleave attack.
 
-### Separate
+## Separate
 
 There was once a function, in the now deprecated `clojure.contrib.seq-utils` library, called `separate`. It would return a vector containing a sequence of the items that satisfied the predicate followed by a sequence of items that didn't satisfy the predicate. We can recreate this helpful function like this:
 

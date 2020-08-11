@@ -22,18 +22,18 @@ This post will cover how to get started with Kotlin in an Android project.
 *Note: For those who are interested in why I chose Kotlin over other JVM languages
 (like Scala), I recommend reading [this article by Jake Wharton].*
 
-### Step 1: Install the Kotlin plugin
+## Step 1: Install the Kotlin plugin
 
 Browse the JetBrains plugin repository for the Kotlin plugin. Install it and
 then restart Android Studio.
 
 ![Kotlin Plugins](/assets/kotlin_install_plugins.jpg)
 
-### Step 2: Open an existing project
+## Step 2: Open an existing project
 
 Open an existing Android Studio project and navigate to a Java file.
 
-### Step 3: Convert the Java file into a Kotlin file
+## Step 3: Convert the Java file into a Kotlin file
 
 Bring up the find action dialog `⇧ ⌘ A` and type "convert". Select "convert Java File
 to Kotlin File", as shown below:
@@ -157,7 +157,7 @@ class AnswerActivity : BaseActivity(), AnswerView {
 
 ```
 
-### Step 4: Configure Kotlin in the project
+## Step 4: Configure Kotlin in the project
 
 Bring up the find action dialog `⇧ ⌘ A` and type "configure". Select "configure Kotlin in project", as
 shown below:
@@ -166,7 +166,7 @@ shown below:
 
 This will add the appropriate dependencies to your module's **build.gradle** file.
 
-### Step 5: Compile the App
+## Step 5: Compile the App
 
 Compile the code and you should have a working app that has one of its classes written in Kotlin.
 Hopefully, that's enough for you to get started. For more examples, feel free to check out
