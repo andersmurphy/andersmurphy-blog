@@ -271,7 +271,8 @@
   (xml/sexp-as-element
    [:urlset {:xmlns "https://www.sitemaps.org/schemas/sitemap/0.9"}
     (map (fn [{:keys [date post-path-name]}]
-           [:url [:loc (str site-url "/" post-path-name)] [:lastmod date]])
+           [:url [:loc (str site-url "/" post-path-name)]
+            [:lastmod (date->rfc822 date)]])
          (conj posts {:post-path-name "" :date (today)}))]))
 
 (defn write-sitemap!
