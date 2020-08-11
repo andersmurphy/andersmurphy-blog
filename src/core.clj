@@ -115,8 +115,11 @@
   [:div {:class "sidebar"}
    [:div {:class "container sidebar-sticky"}
     [:div {:class "sidebar-about"}
-     [:img {:class "portrait" :src (str site-url "/assets/anderspixel.png")}]
-     [:h1 [:a {:href site-url} site-title]] [:p {:class "lead"} site-tagline]]
+     [:img
+      {:class "portrait"
+       :src   (str site-url "/assets/anderspixel.png")
+       :alt   "portrait"}] [:h1 [:a {:href site-url} site-title]]
+     [:p {:class "lead"} site-tagline]]
     [:nav {:class "sidebar-nav"}
      [:a {:class "sidebar-nav-item" :href site-github} "Github"]
      [:a {:class "sidebar-nav-item" :href site-twitter} "Twitter"]
