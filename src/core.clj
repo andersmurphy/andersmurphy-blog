@@ -21,89 +21,100 @@
 (defn desc [a b] (compare b a))
 (def files (sort desc (drop 1 (file-seq directory))))
 
-(defn replace-n [s n match replacement]
+(defn replace-n
+  [s n match replacement]
   (if (= n 0)
     s
-    (recur (str/replace-first s match replacement)
-           (dec n)
-           match
-           replacement)))
+    (recur (str/replace-first s match replacement) (dec n) match replacement)))
 
-(defn add-file [file]
-  {:file file})
+(defn add-file [file] {:file file})
 
-(defn add-file-name [{:keys [file] :as m}]
-  (assoc m :file-name (.getName file)))
+(defn add-file-name [{:keys [file] :as m}] (assoc m :file-name (.getName file)))
 
-(defn add-post-path-name [{:keys [file-name] :as m}]
-  (assoc m :post-path-name (str (-> (str/split file-name #".md")
-                                    first
-                                    (replace-n 3 #"-" "/"))
-                                ".html")))
+(defn add-post-path-name
+  [{:keys [file-name] :as m}]
+  (assoc m
+         :post-path-name
+         (str (-> (str/split file-name #".md")
+                  first
+                  (replace-n 3 #"-" "/"))
+              ".html")))
 
-(defn add-date [{:keys [file-name] :as m}]
-  (assoc m :date (->> (str/split file-name #"-")
-                      (take 3))))
+(defn add-date
+  [{:keys [file-name] :as m}]
+  (assoc m
+         :date
+         (->> (str/split file-name #"-")
+              (take 3))))
 
 (def month-int->month-str
-  {"01" "Jan" "02" "Feb" "03" "Mar" "04" "Apr" "05" "May" "06" "Jun"
-   "07" "Jul" "08" "Aug" "09" "Sep" "10" "Oct" "11" "Nov" "12" "Dec"})
+  {"01" "Jan"
+   "02" "Feb"
+   "03" "Mar"
+   "04" "Apr"
+   "05" "May"
+   "06" "Jun"
+   "07" "Jul"
+   "08" "Aug"
+   "09" "Sep"
+   "10" "Oct"
+   "11" "Nov"
+   "12" "Dec"})
 
-(defn date->post-date [[year month day]]
+(defn date->post-date
+  [[year month day]]
   (str day " " (month-int->month-str month) " " year))
 
-(defn date->datetime [[year month day]]
+(defn date->datetime
+  [[year month day]]
   (str (str/join "-" [year month day]) "T00:00:00+00:00"))
 
-(defn current-year []
-  (-> (LocalDateTime/now) str (str/split #"-") first))
+(defn current-year
+  []
+  (-> (LocalDateTime/now)
+      str
+      (str/split #"-")
+      first))
 
-(defn first-paragraph [s]
+(defn first-paragraph
+  [s]
   (-> (str/split s #"<p>")
       second
       (str/split #"</p>")
       first))
 
-(defn head [title]
-  [:head
-   [:meta {:charset "UTF-8"}]
-   [:title title]
+(defn head
+  [title]
+  [:head [:meta {:charset "UTF-8"}] [:title title]
    ;; styles
-   [:link {:rel  "stylesheet"
-           :type "text/css"
-           :href (str site-url "/styles.css")}]
-   [:link {:rel  "stylesheet"
-           :type "text/css"
-           :href (str site-url "/theme.css")}]
+   [:link
+    {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
+   [:link
+    {:rel "stylesheet" :type "text/css" :href (str site-url "/theme.css")}]
    ;; code highlights
-   [:link {:rel  "stylesheet"
-           :href (str site-url "/nord.css")}]
+   [:link {:rel "stylesheet" :href (str site-url "/nord.css")}]
    [:script {:src (str highlight-url "/highlight.min.js")}]
    [:script {:src (str highlight-url "/languages/clojure.min.js")}]
    [:script "hljs.initHighlightingOnLoad();"]
    ;; icons
-   [:link {:rel   "apple-touch-icon-precomposed"
-           :sizes "144x144"
-           :href  (str site-url "/assets/apple-touch-icon-precomposed.png")}]
-   [:link {:rel  "shortcut icon"
-           :href (str site-url "/assets/favicon.ico")}]
+   [:link
+    {:rel   "apple-touch-icon-precomposed"
+     :sizes "144x144"
+     :href  (str site-url "/assets/apple-touch-icon-precomposed.png")}]
+   [:link {:rel "shortcut icon" :href (str site-url "/assets/favicon.ico")}]
    ;; enables responsiveness on mobile devices
-   [:meta {:name    "viewport"
-           :content "width=device-width, initial-scale=1.0"}]
+   [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; google description
-   [:meta {:name    "description"
-           :content "A blog mostly about software development."}]])
+   [:meta
+    {:name    "description"
+     :content "A blog mostly about software development."}]])
 
 (def sidebar
   [:div {:class "sidebar"}
    [:div {:class "container sidebar-sticky"}
     [:div {:class "sidebar-about"}
-     [:img {:class "portrait"
-            :src   (str site-url "/assets/anderspixel.png")}]
-     [:h1 [:a {:href site-url}
-           site-title]]
-     [:p {:class "lead"}
-      site-tagline]]
+     [:img {:class "portrait" :src (str site-url "/assets/anderspixel.png")}]
+     [:h1 [:a {:href site-url} site-title]] [:p {:class "lead"} site-tagline]]
     [:nav {:class "sidebar-nav"}
      [:a {:class "sidebar-nav-item" :href site-github} "Github"]
      [:a {:class "sidebar-nav-item" :href site-twitter} "Twitter"]
@@ -111,154 +122,150 @@
      [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]
     [:p (str "© 2015-" (current-year) " Anders Murphy")]]])
 
-(defn add-post-content [{:keys [file] :as m}]
-  (let [{:keys [html metadata]} (-> file slurp (md-to-html-string-with-meta))]
-    (assoc m :post-content html
-           :post-name (-> metadata :title first))))
+(defn add-post-content
+  [{:keys [file] :as m}]
+  (let [{:keys [html metadata]} (-> file
+                                    slurp
+                                    (md-to-html-string-with-meta))]
+    (assoc m
+           :post-content html
+           :post-name    (-> metadata
+                             :title
+                             first))))
 
-(defn prepend-doctype-header [html]
-  (str "<!DOCTYPE html>\n" html))
+(defn prepend-doctype-header [html] (str "<!DOCTYPE html>\n" html))
 
-(defn add-post-page [{:keys [post-name date post-content date] :as m}]
-  (->> (html [:html
-              (head post-name)
-              [:body
-               sidebar
+(defn add-post-page
+  [{:keys [post-name post-content date] :as m}]
+  (->> (html [:html (head post-name)
+              [:body sidebar
                [:div {:class "content container"}
-                [:article {:class "post"}
-                 [:h1 {:class "post-title"} post-name]
-                 [:time {:class    "post-date"
-                         :datetime (date->datetime date)}
-                  (date->post-date date)]
-                 post-content]]]])
+                [:article {:class "post"} [:h1 {:class "post-title"} post-name]
+                 [:time {:class "post-date" :datetime (date->datetime date)}
+                  (date->post-date date)] post-content]]]])
        prepend-doctype-header
        (assoc m :post-html)))
 
-(defn page-html [{:keys [page-content previous-page-url next-page-url] :as m}]
-  (->> (html [:html
-              (head site-title)
-              [:body
-               sidebar
-               [:div {:class "content container"}
-                [:div {:class "posts"}
-                 (map (fn [{:keys [post-name date post-path-name post-content]}]
-                        [:article {:class "post"}
-                         [:h1 {:class "post-title"}
-                          [:a {:href (str site-url "/" post-path-name)}
-                           post-name]]
-                         [:time {:class    "post-date"
-                                 :datetime (date->datetime date)}
-                          (date->post-date date)]
-                         [:p (first-paragraph post-content)]])
-                      page-content)]
-                [:div {:class "pagination"}
-                 (when previous-page-url
-                   [:div {:class "pagination-item"}
-                    [:a {:href (str site-url "/" previous-page-url)} "<-"]])
-                 (when next-page-url
-                   [:div {:class "pagination-item"}
-                    [:a {:href (str site-url "/" next-page-url)}
-                     "->"]])]]]])
-       prepend-doctype-header
-       (assoc m :page-html)))
+(defn page-html
+  [{:keys [page-content previous-page-url next-page-url] :as m}]
+  (->>
+   (html
+    [:html (head site-title)
+     [:body sidebar
+      [:div {:class "content container"}
+       [:div {:class "posts"}
+        (map (fn [{:keys [post-name date post-path-name post-content]}]
+               [:article {:class "post"}
+                [:h1 {:class "post-title"}
+                 [:a {:href (str site-url "/" post-path-name)} post-name]]
+                [:time {:class "post-date" :datetime (date->datetime date)}
+                 (date->post-date date)] [:p (first-paragraph post-content)]])
+             page-content)]
+       [:div {:class "pagination"}
+        (when previous-page-url
+          [:div {:class "pagination-item"}
+           [:a {:href (str site-url "/" previous-page-url)} "<-"]])
+        (when next-page-url
+          [:div {:class "pagination-item"}
+           [:a {:href (str site-url "/" next-page-url)} "->"]])]]]])
+   prepend-doctype-header
+   (assoc m :page-html)))
 
 (def html-404
-  (->> (html [:html
-              (head site-title)
-              [:body
-               sidebar
-               [:div {:class "content container"}
-                [:article {:class "post"}
-                 [:h1 {:class "post-title"} "404: Page not found"]
-                 [:p "Sorry, we've misplaced that URL or it's
+  (->>
+   (html
+    [:html (head site-title)
+     [:body sidebar
+      [:div {:class "content container"}
+       [:article {:class "post"}
+        [:h1 {:class "post-title"} "404: Page not found"]
+        [:p
+         "Sorry, we've misplaced that URL or it's
                  pointing to something that doesn't exist."
-                  [:a {:href site-url} "Head back home"]
-                  " to try finding it again."]]]]])
-       prepend-doctype-header))
+         [:a {:href site-url} "Head back home"]
+         " to try finding it again."]]]]])
+   prepend-doctype-header))
 
-(defn write-file! [path-name content]
+(defn write-file!
+  [path-name content]
   (let [docs-path-name (str "docs/" path-name)]
     (io/make-parents docs-path-name)
     (spit docs-path-name content)))
 
-(defn write-post! [{:keys [post-path-name post-html]}]
+(defn write-post!
+  [{:keys [post-path-name post-html]}]
   (write-file! post-path-name post-html))
 
-(defn write-page! [{:keys [page-path-name page-html]}]
+(defn write-page!
+  [{:keys [page-path-name page-html]}]
   (write-file! page-path-name page-html))
 
-(defn link-pages [pages]
-  (reduce (fn [pages next-page]
-            (let [previous-page (first pages)]
-              (if previous-page
-                (conj (drop 1 pages)
-                      (assoc previous-page
-                             :next-page-url
-                             (:page-path-name next-page))
-                      (assoc next-page
-                             :previous-page-url
-                             (:page-path-name previous-page)))
-                (conj pages next-page))))
-          '() pages))
+(defn link-pages
+  [pages]
+  (reduce
+   (fn [pages next-page]
+     (let [previous-page (first pages)]
+       (if previous-page
+         (conj
+          (drop 1 pages)
+          (assoc previous-page :next-page-url (:page-path-name next-page))
+          (assoc next-page :previous-page-url (:page-path-name previous-page)))
+         (conj pages next-page))))
+   '()
+   pages))
 
-(defn add-page-urls [pages]
+(defn add-page-urls
+  [pages]
   (let [number-of-pages (count pages)]
     (->> (inc number-of-pages)
          (range 2)
          (map #(str "page/" % ".html"))
          (into ["index.html"])
-         (map (fn [page url] {:page-content   page
-                              :page-path-name url})
-              pages)
+         (map (fn [page url] {:page-content page :page-path-name url}) pages)
          link-pages)))
 
-(defn write-404! [s]
-  (let [path-name "docs/404.html"]
-    (spit path-name s)))
+(defn write-404! [s] (let [path-name "docs/404.html"] (spit path-name s)))
 
-(defn get-posts [files]
-  (sequence
-   (comp (map add-file)
-         (map add-file-name)
-         (map add-post-path-name)
-         (map add-date)
-         (map add-post-content)
-         (map add-post-page))
-   files))
+(defn get-posts
+  [files]
+  (sequence (comp (map add-file)
+                  (map add-file-name)
+                  (map add-post-path-name)
+                  (map add-date)
+                  (map add-post-content)
+                  (map add-post-page))
+            files))
 
-(defn write-rss! [tags]
+(defn write-rss!
+  [tags]
   (with-open [out-file (java.io.FileWriter. "docs/feed.xml")]
     (xml/emit tags out-file)))
 
-(defn date->rfc822 [date]
+(defn date->rfc822
+  [date]
   (let [local-date (-> (apply str (interpose "-" date))
                        (LocalDate/parse)
                        (.atStartOfDay)
                        (.atZone (ZoneId/of "UTC")))]
     (.format local-date DateTimeFormatter/RFC_1123_DATE_TIME)))
 
-(defn generate-rss-feed [posts]
+(defn generate-rss-feed
+  [posts]
   (xml/sexp-as-element
    [:rss
     {:version    "2.0"
      :xmlns:atom "https://www.w3.org/2005/Atom"
      :xmlns:dc   "https://purl.org/dc/elements/1.1/"}
-    [:channel
-     [:title site-title]
-     [:description site-tagline]
-     [:link site-url]
-     [:atom:link
-      {:href site-rss :rel "self" :type "application/rss+xml"}]
+    [:channel [:title site-title] [:description site-tagline] [:link site-url]
+     [:atom:link {:href site-rss :rel "self" :type "application/rss+xml"}]
      (map (fn [{:keys [post-name date post-path-name]}]
             (let [post-url (str site-url "/" post-path-name)]
-              [:item
-               [:title post-name]
-               [:pubDate (date->rfc822 date)]
-               [:link post-url]
-               [:guid {:isPermaLink "true"} post-url]]))
+              [:item [:title post-name] [:pubDate (date->rfc822 date)]
+               [:link post-url] [:guid {:isPermaLink "true"} post-url]]))
           posts)]]))
 
-(defn generate-site []
+(defn generate-site
+  []
   (let [posts (get-posts files)]
     (->> (partition-all 10 posts)
          add-page-urls
