@@ -2,7 +2,7 @@ Title: Clojure: code as data
 
 In Clojure, the primary representation of code is the S-expression that takes the form of nested sequences (lists and vectors). The majority of Clojure's functions are designed to operate on sequences. As a result, Clojure code can be manipulated using the same functions that are used to manipulate Clojure data. In other words, there is no distinction between code and data. Code is data. This property is known as [homoiconicity](https://en.wikipedia.org/wiki/Homoiconicity). This article will explore this concept.
 
-### Code equality
+## Code equality
 
 We can check two pieces of code for equality by turning the code into data with a `'` symbol and then comparing them with `=`:
 
@@ -20,7 +20,7 @@ We can check two pieces of code for equality by turning the code into data with 
 
 Simple.
 
-### Code diff
+## Code diff
 
 We can use `clojure.set/diff` to find out the difference between these two pieces of code:
 
@@ -43,7 +43,7 @@ From this we can see that the second item in the expression is different. But wh
 
 Looks like the `diff` function doesn't recognise the commonality between these two pieces of code.
 
-### Commonality with tree-seq
+## Commonality with tree-seq
 
 The `tree-seq` function returns a lazy sequence of the nodes in a tree, via a depth-first walk. It takes two functions and the root node of a tree. The first function needs to return `true` if the node is a branch (can have children); in this case we use `coll?` which returns `true` if the node is a collection. The second function will be called on these branch nodes; in this case `seq` which returns a sequence of the children of that node or `nil` if there are none:
 
@@ -79,7 +79,7 @@ We can use `tree-seq` to build a sequence of each node for two pieces of code an
 
 This returns the common nodes: `(map dec items)`, `map`, `dec` and `items`.
 
-### Refactoring common code
+## Refactoring common code
 
 Here we have some of the code used to generate the RSS feed for this blog:
 
@@ -222,7 +222,7 @@ We can then refactor our code accordingly:
 
 Much better!
 
-### A macro implementation
+## A macro implementation
 
 If we don't want to pass the code as a quoted list, we can change the `find-largest-common-code` function into a macro:
 
