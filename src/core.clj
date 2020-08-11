@@ -142,7 +142,7 @@
 
 (defn add-post-page
   [{:keys [post-name post-content date] :as m}]
-  (->> (html [:html (head post-name)
+  (->> (html [:html {:lang "en"} (head post-name)
               [:body sidebar
                [:div {:class "content container"}
                 [:article {:class "post"} [:h1 {:class "post-title"} post-name]
@@ -155,7 +155,7 @@
   [{:keys [page-content previous-page-url next-page-url] :as m}]
   (->>
    (html
-    [:html (head site-title)
+    [:html {:lang "en"} (head site-title)
      [:body sidebar
       [:div {:class "content container"}
        [:div {:class "posts"}
@@ -179,7 +179,7 @@
 (def html-404
   (->>
    (html
-    [:html (head site-title)
+    [:html {:lang "en"} (head site-title)
      [:body sidebar
       [:div {:class "content container"}
        [:article {:class "post"}
