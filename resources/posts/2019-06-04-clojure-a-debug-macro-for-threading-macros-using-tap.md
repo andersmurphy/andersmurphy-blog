@@ -4,7 +4,7 @@ This article will cover how to make a debug macro using tap. See [this article](
 
 ## Setting up tap>
 
-First register a handler function with `add-tap` that writes whatever we pass into `tap>` to the `debug` atom.
+First, register a handler function with `add-tap` that writes whatever we pass into `tap>` to the `debug` atom.
 
 ```clojure
 (def debug (atom []))
@@ -23,7 +23,7 @@ First register a handler function with `add-tap` that writes whatever we pass in
 => [(2 3 4 5 6)]
 ```
 
-When we dereference `debug` we get the result of evaluating `(map inc [1 2 3 4 5])`. This seems to works at the top level of our code, but what happens when we call tap in the middle of a nested expression?
+When we de-reference `debug` we get the result of evaluating `(map inc [1 2 3 4 5])`. This seems to work at the top level of our code, but what happens when we call tap in the middle of a nested expression?
 
 ```clojure
 (take 1 (tap> (map inc [1 2 3 4 5])))
@@ -73,11 +73,11 @@ This works. But it would be more helpful if we knew what code lead to that resul
 => [{:fn (2 3 4 5 6), :ret (2 3 4 5 6)}]
 ```
 
-Not quite. We want the value of `:fn` to be our code before it gets evaluated not the result after. Whenever you want to do something with code as data rather than the result of it's evaluation you need to use macro.
+Not quite. We want the value of `:fn` to be our code before it gets evaluated, not the result after the evaluation. Whenever you want to do something with code as data rather than the result of it's evaluation, you need to use a macro.
 
 ## Rewriting debug* as a macro
 
-Rewriting our debug function as a macro is relatively straight forwards we change `defn` to `defmacro`, syntax quote the `do` form, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
+Rewriting our debug function as a macro is relatively straight forward; we change `defn` to `defmacro`, syntax quote the `do` form, and unquote the `args` with `~`. Finally, we use `quote` to prevent the `args` from being evaluated.
 
 
 ```clojure
@@ -101,7 +101,7 @@ Much better.
 
 ## Writing the debug->> macro
 
-Next let's write a `debug->>` macro that will write each step to the `debug` atom. The `repeat` function generates a sequence of `'debug*` symbols which we `interleave` with the functions `fns` that have been passed into our macro. Finally we `~@` to splice (think apply) the resulting list into the regular `->>` macro.
+Next, let's write a `debug->>` macro that will write each step to the `debug` atom. The `repeat` function generates a sequence of `'debug*` symbols which we `interleave` with the functions `fns` that have been passed into our macro. Finally, we `~@` to splice (think apply) the resulting list into the regular `->>` macro.
 
 ```clojure
 (defmacro debug->> [& fns]
@@ -169,9 +169,9 @@ Let's try and fix the first issue. The `clojure.walk/macroexpand-all` function r
    (map inc [1 2 3 4 5]))))
 ```
 
-Looking at the output code we can see that `tap>` appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our `debug` atom three times and one `:fn` value contained the `tap>` function that had not been evaluated. This is called multiple evaluation and is a common pitfalls of macros writing to watch out for.
+Looking at the output code, we can see that `tap>` appears four times. It gets evaluated three times, and it gets uses as data once. This is consistent with our output, which wrote to our `debug` atom three times and one `:fn` value contained the `tap>` function that had not been evaluated. This is called multiple evaluation and is a common pitfall of writing macros.
 
-The reason the tap function is getting evaluated so many times is because our code calls `~args` several times. Once to be passed into our `:ret` value to get the result, once as a return value of the macro and once to be passed into `quote`. We don't have to worry about this last value as `quote` will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro instead of `~args`.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list, this helps prevent another common pitfall of macro writing called variable capture; when a macro introduces a binding that shadows another binding leading to unexpected results.
+The reason the tap function is getting evaluated so many times is because our code calls `~args` several times; once to be passed into our `:ret` value to get the result, once as a return value of the macro and once to be passed into `quote`. We don't have to worry about this last value as `quote` will prevent it from being evaluated. However, the other two we only want to evaluate once. We can do this by using a `let` binding and assigning `~args` to an auto-gensym value `args#` and then using that value in the rest of the macro instead of `~args`.  Clojure automatically ensures that each instance of `args#` resolves to the same symbol within the same syntax-quoted list. This helps prevent another common pitfall of macro writing called variable capture; when a macro introduces a binding that shadows another binding leading to unexpected results.
 
 ```clojure
 (defmacro debug* [args]
@@ -283,7 +283,7 @@ Perfect.
 
 ## Writing the debug-> macro
 
-Finally let's implement `debug->` for good measure.
+Finally, let's implement `debug->` for good measure.
 
 ```clojure
 (defmacro debug-> [& fns]
