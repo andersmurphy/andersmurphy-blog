@@ -2,7 +2,7 @@ Title: Clojure: intro to tap> and accessing private vars
 
 Clojure 1.10 introduced a new system called tap. From the release notes: *tap is a shared, globally accessible system for distributing a series of informational or diagnostic values to a set of (presumably effectful) handler functions. It can be used as a better debug prn, or for facilities like logging etc.*
 
-Tap has a nice simple api. We can send a value to the set of registered handler functions with `tap>`. We can register a handlers function with `add-tap`. Finally we can unregister a handler function with `remove-tap`.
+Tap has a nice simple api. We can send a value to the set of registered handler functions with `tap>`. We can register a handlers function with `add-tap`. Finally, we can unregister a handler function with `remove-tap`.
 
 ## Adding a tap handler and sending values
 
@@ -26,7 +26,7 @@ Create an atom `bar` and register an anonymous handler function to the tap syste
 => [2 "foo"]
 ```
 
-When we dereference `bar` we get the values `[2 "foo"]` that have been passed to `tap>`. What happens if we add the same anonymous handler function to the tap system again?
+When we de-reference `bar` we get the values `[2 "foo"]` that have been passed to `tap>`. What happens if we add the same anonymous handler function to the tap system again?
 
 ```clojure
 (reset! bar [])
@@ -40,7 +40,7 @@ When we dereference `bar` we get the values `[2 "foo"]` that have been passed to
 => ["foo" "foo"]
 ```
 
-Surprising, even though we called tap once two `"foo"`s got written to our atom. Let's investigate the `add-tap` source and work out what's going on.
+Surprisingly, even though we called tap once, two `"foo"`s got written to our atom. Let's investigate the `add-tap` source and work out what's going on.
 
 ```clojure
 (source add-tap)
@@ -52,7 +52,7 @@ Surprising, even though we called tap once two `"foo"`s got written to our atom.
   nil)
 ```
 
-So `add-tap` adds the tap handlers to an atom called `tapset`. From the name, we can guess that it might be a set which means we shouldn't be able to register the same tap function twice. Let's try and access `tapset`.
+So, `add-tap` adds the tap handlers to an atom called `tapset`. From the name, we can guess that it might be a set which means we shouldn't be able to register the same tap function twice. Let's try and access `tapset`.
 
 ```clojure
 clojure.core/tapset
@@ -82,7 +82,7 @@ Syntax error compiling at (form-init1817879857542651664.clj:1:1).
 var: user/private-var is not public
 ```
 
-Even though these private vars are not intended to be accessed we can work around this by using `#'` to refer directly to the var. We can then dereference it to access its value.
+Even though these private vars are not intended to be accessed, we can work around this by using `#'` to refer directly to the var. We can then de-reference it to access its value.
 
 ```clojure
 #'user/private-var
@@ -140,7 +140,7 @@ Even though we called the `add-tap` function twice with the same function, it on
 
 ## Removing tap handlers
 
-The other advantage of using named functions is that you can use `remove-tap` to remove tap functions from the `tapset`. With an anonymous function you would have to hang on to the a reference to be able to remove it from the `tapset`.
+The other advantage of using named functions is that you can use `remove-tap` to remove tap functions from the `tapset`. With an anonymous function you would have to hang on to a reference to be able to remove it from the `tapset`.
 
 ```clojure
 (remove-tap conj-to-bar)
