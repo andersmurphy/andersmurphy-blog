@@ -4,7 +4,7 @@ HTML and XML are ubiquitous, whether it's the pages of a static site or configur
 
 ## HTML
 
-In some languages you use template ([ERB](https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html)) to generate HTML/XML or a language syntax extension ([JSX](https://reactjs.org/docs/introducing-jsx.html)). Inevitably, as you need to solve more and more interesting problems the limitations of these template/extension languages becomes an issue, eventually you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively implementing the underlying language in addition to it's own syntax, often with some awkward differences.
+In some languages you use template ([ERB](https://ruby-doc.org/stdlib-2.6.4/libdoc/erb/rdoc/ERB.html)) to generate HTML/XML or a language syntax extension ([JSX](https://reactjs.org/docs/introducing-jsx.html)). Inevitably, as you need to solve more and more interesting problems, the limitations of these template/extension languages become an issue. Eventually, you either live with those limitations or the template/extension language ends up being a super set of the language they are extending. Effectively, the templating language implements the underlying language in addition to it's own syntax, often with some awkward differences.
 
 Clojure takes a different approach, rather than implementing a new embedded syntax it represents HTML and XML with Clojure data structures (vectors and maps). This gives you all the power of Clojure for manipulating and building HTML and XML files. This is possible as Lisp and HTML/XML are both trees that represent data. For a more in depth discussion on the similarities between Lisp and XML check out [this](https://www.defmacro.org/ramblings/lisp.html) article.
 
@@ -77,7 +77,7 @@ Require `clojure.data.xml`.
             [clojure.data.xml :as xml]))
 ```
 
-The `sexp-as-element` function is used to generate an XML RSS feed. `map` iterates over a sequence of posts and generate the corresponding RSS items. There's nothing special about the syntax in this example its just regular Clojure. Finally, `emit` writes the XML to file.
+The `sexp-as-element` function is used to generate an XML RSS feed. `map` iterates over a sequence of posts and generates the corresponding RSS items. There's nothing special about the syntax in this example, it's just regular Clojure. Finally, `emit` writes the XML to file.
 
 ```clojure
 (def site-title "Site Title")
