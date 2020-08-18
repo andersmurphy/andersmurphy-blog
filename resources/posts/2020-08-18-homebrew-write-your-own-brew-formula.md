@@ -47,5 +47,13 @@ brew install --build-from-source clj-zprint.rb
 
 You can now call `clj-zprint` from the shell/terminal.
 
+## Uninstall the package
+
+To uninstall the package we can run:
+
+```bash
+brew uninstall clj-zprint
+```
+
 The full example project can be found
 [here](https://github.com/andersmurphy/clj-cookbook/blob/master/brew-formulae/README.md).
