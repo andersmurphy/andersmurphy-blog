@@ -35,7 +35,7 @@ fi
 cd ..
     ```
 
-This script runs a curl request to get the zprint binary from github depending on your operating system and caches it. This isn't ideal as the binary won't be shared across projects, but at the time of writing zprint doesn't have a [homebrew](https://brew.sh/) formula (I'll cover rolling our own brew formula in a separate blog post).
+This script runs a curl request to get the zprint binary from github depending on your operating system and caches it. This isn't ideal as the binary won't be shared across projects, but at the time of writing zprint doesn't have a [homebrew](https://brew.sh/) formula (I'll cover rolling our own brew formula in a separate [blog post](https://andersmurphy.com/2020/08/18/homebrew-write-your-own-brew-formula.html)).
 
 It's worth noting that we've added `set -e` to the top of this script ensuring it will exit as soon as there is an error. This means it won't run if we fail to download the executable preventing unexpected output.
 
