@@ -1,6 +1,6 @@
 Title: Homebrew: write your own brew formula
 
-[GraalVM](https://www.graalvm.org/) is a recent development in the Java ecosystem that allows you to generate native binaries for applications that run on the Java Virtual Machine (JVM). One of the main advantages of this is that it gets around the JVMs slow startup time which is a problem for short lived programs that are run often. This has lead to a projects like [zprint releasing native binaries](https://github.com/kkinnear/zprint/releases/tag/1.0.0). This is great but, it doesn't give you a nice reproducible way to install/manage/uninstall this executable. For that we want a package manager like [homebrew](https://brew.sh/).
+[GraalVM](https://www.graalvm.org/) is a recent development in the Java ecosystem that allows you to generate native binaries for applications that run on the Java Virtual Machine (JVM). One of the main advantages of this is that it gets around the JVMs slow startup time which is a problem for short lived programs that are run often. This has lead to a projects like [zprint releasing native binaries](https://github.com/kkinnear/zprint/releases/tag/1.0.0). This is great but, it doesn't give you a nice reproducible way to install/manage/uninstall these executables. For that we want a package manager like [homebrew](https://brew.sh/).
 
 To install a package via homebrew you need to have a brew formula. A formula is a package definition written in Ruby. There isn't currently a brew formula for zprint so we will need to write our own.
 
