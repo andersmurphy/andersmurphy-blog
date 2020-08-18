@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Homebrew: write your own brew formula</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Homebrew: write your own brew formula</h1><time class="post-date" datetime="2020-08-18T00:00:00+00:00">18 Aug 2020</time><p><a href='https://www.graalvm.org/'>GraalVM</a> is a recent development in the Java ecosystem that allows you to generate native binaries for applications that run on the Java Virtual Machine (JVM). One of the main advantages of this is that it gets around the JVMs slow startup time which is a problem for short lived programs that are run often. This has lead to a projects like <a href='https://github.com/kkinnear/zprint/releases/tag/1.0.0'>zprint releasing native binaries</a>. This is great but, it doesn't give you a nice reproducible way to install/manage/uninstall this executable. For that we want a package manager like <a href='https://brew.sh/'>homebrew</a>.</p><p>To install a package via homebrew you need to have a brew formula. A formula is a package definition written in Ruby. There isn't currently a brew formula for zprint so we will need to write our own.</p><h2>The formula</h2><p>Write the following formula in a file called <code>clj-zprint.rb</code>:</p><pre><code class="Ruby">class CljZprint &lt; Formula
+  desc &quot;Formatter for Clojure&quot;
+  homepage &quot;https://github.com/kkinnear/zprint&quot;
+  version &quot;2020.08.09&quot;
+
+  if OS.linux?
+    url &quot;https://github.com/kkinnear/zprint/releases/download/1.0.0/zprintl-1.0.0&quot;
+    sha256 &quot;b707f1188c175c2028c014f0ae88cb384283aa6d097bb31298d66852162581b1&quot;
+  else
+    url &quot;https://github.com/kkinnear/zprint/releases/download/1.0.0/zprintm-1.0.0&quot;
+    sha256 &quot;b707f1188c175c2028c014f0ae88cb384283aa6d097bb31298d66852162581b1&quot;
+  end
+
+  def install
+    system &quot;mv zprintm-1.0.0 clj-zprint&quot;
+    system &quot;chmod 755 clj-zprint&quot;
+    bin.install &quot;clj-zprint&quot;
+  end
+
+  test do
+    system &quot;#{bin}/clj-zprint&quot;
+  end
+end
+</code></pre><p>We create a class called <code>CljZprint</code> that extends the <code>Formula</code> class. We add some meta data: description, homepage and version. We specify which binary to download based on the OS the formula is running on and how it should be installed. Finally we test that the executable has been installed correctly by running it.</p><h2>Install the package</h2><p>To install the package we run the formula with the following command (in the directory that contains the formula):</p><pre><code class="bash">brew install --build-from-source clj-zprint.rb
+</code></pre><p>You can now call <code>clj-zprint</code> from the shell/terminal.</p><p>The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/blob/master/brew-formulae/README.md'>here</a>.</p></article></div></body></html>
