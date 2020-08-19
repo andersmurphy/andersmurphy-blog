@@ -51,13 +51,15 @@ Next we want to add some code to `git-hooks/pre-commit` that runs zprint on each
 
 ```Bash
 #!/bin/bash
-for file in $(git diff --cached --name-only | grep -E '\.(clj)$')
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(clj)$')
 do
   .cache/clj-zprint "{:search-config? true}"  < "$file" > "$file.out"
   mv "$file.out" "$file"
   $(git add "$file")
 done
 ```
+
+The `--diff-filter=ACM` filter makes sure we remove deleted files, as running the formatter on files that don't exists will cause an error.
 
 ## Configure zprint
 
