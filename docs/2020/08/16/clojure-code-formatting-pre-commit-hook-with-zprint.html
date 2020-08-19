@@ -19,13 +19,13 @@ fi
 cd ..
     </code></pre><p>This script runs a curl request to get the zprint binary from github depending on your operating system and caches it. This isn't ideal as the binary won't be shared across projects, but at the time of writing zprint doesn't have a <a href='https://brew.sh/'>homebrew</a> formula (I'll cover rolling our own brew formula in a separate <a href='https://andersmurphy.com/2020/08/18/homebrew-write-your-own-brew-formula.html'>blog post</a>).</p><p>It's worth noting that we've added <code>set -e</code> to the top of this script ensuring it will exit as soon as there is an error. This means it won't run if we fail to download the executable preventing unexpected output.</p><p>Update the <code>.gitignore</code> so that we don't add the cached executable to the project source control:</p><pre><code class="txt">/.cache/
 </code></pre><h2>Run zprint</h2><p>Next we want to add some code to <code>git-hooks/pre-commit</code> that runs zprint on each of our staged .clj files:</p><pre><code class="Bash">#!/bin/bash
-for file in $&#40;git diff --cached --name-only | grep -E '\.&#40;clj&#41;$'&#41;
+for file in $&#40;git diff --cached --name-only --diff-filter=ACM | grep -E '\.&#40;clj&#41;$'&#41;
 do
   .cache/clj-zprint &quot;{:search-config? true}&quot;  &lt; &quot;$file&quot; &gt; &quot;$file.out&quot;
   mv &quot;$file.out&quot; &quot;$file&quot;
   $&#40;git add &quot;$file&quot;&#41;
 done
-</code></pre><h2>Configure zprint</h2><p>We can configure zprint by adding a <code>.zprintrc</code> configuration file to the root of the project:</p><pre><code class="clojure">{:style &#91;:community :justified&#93;
+</code></pre><p>The <code>&ndash;diff-filter=ACM</code> filter makes sure we remove deleted files, as running the formatter on files that don't exists will cause an error.</p><h2>Configure zprint</h2><p>We can configure zprint by adding a <code>.zprintrc</code> configuration file to the root of the project:</p><pre><code class="clojure">{:style &#91;:community :justified&#93;
  :map {:comma? false}}
 </code></pre><h2>Setup</h2><p>Configure git to point to the <code>git-hooks</code> directory:</p><pre><code class="bash">git config core.hooksPath git-hooks
 </code></pre><p>Make the script executable:</p><pre><code class="bash">chmod +x git-hooks/pre-commit
