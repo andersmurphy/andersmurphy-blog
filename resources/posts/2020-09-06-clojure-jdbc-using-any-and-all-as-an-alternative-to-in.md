@@ -1,4 +1,4 @@
-Title: Clojure: jdbc using any and all as alternatives for in
+Title: Clojure: jdbc using any and all as alternatives to in
 
 [next-jdbc](https://github.com/seancorfield/next-jdbc) uses parameterised queries to prevent SQL Injections. These queries can take parameters by passing question marks (?) in the query and then by replacing each question mark index with required values. However this can make some sql operators more challenging to use programmatically. In particular `in(?,?,?)`. In this post we cover using [postgresql](https://www.postgresql.org/)'s `any(?)` and `all(?)` to get around this.
 
