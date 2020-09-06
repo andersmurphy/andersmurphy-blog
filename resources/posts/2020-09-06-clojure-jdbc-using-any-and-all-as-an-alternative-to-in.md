@@ -22,7 +22,7 @@ We need a table:
 (jdbc/execute!
   ds
   ["create table user_info (pid serial primary key, name text not null)"])
- (jdbc/execute! ds ["create unique index user_info_unique ON user_info(name)"])
+(jdbc/execute! ds ["create unique index user_info_unique ON user_info(name)"])
 ```
 
 And some data:
@@ -37,7 +37,9 @@ And some data:
 Use `in` to find users with the name Bob or Jane:
 
 ```clojure
-(sql/query ds ["select * from user_info where name in(?, ?)" "Bob" "Jane"])
+(sql/query
+ ds
+ ["select * from user_info where name in(?, ?)" "Bob" "Jane"])
 
 =>
 [#:user_info{:pid 1, :name "Bob"} #:user_info{:pid 2, :name "Jane"}]
@@ -47,7 +49,9 @@ Use `in` to find users with the name Bob or Jane:
 Use `not in` to find users who don't have the name Bob or Jane:
 
 ```clojure
-(sql/query ds ["select * from user_info where name not in(?, ?)" "Bob" "Jane"])
+(sql/query
+ ds
+ ["select * from user_info where name not in(?, ?)" "Bob" "Jane"])
 
 =>
 [#:user_info{:pid 3, :name "Megan"} #:user_info{:pid 4, :name "Alice"}]
@@ -57,8 +61,9 @@ Use `not in` to find users who don't have the name Bob or Jane:
 If we want to use parameterised queries with a variable number of names we would need to do something like this:
 
 ```clojure
-(sql/query ds
-            (let [names ["Bob" "Jane"]]
+(sql/query
+ ds
+ (let [names ["Bob" "Jane"]]
               (into [(str "select * from user_info where name in ("
                           (str/join ", " (repeat (count names) "?"))
                           ")")]
@@ -72,8 +77,9 @@ If we want to use parameterised queries with a variable number of names we would
 The above is quite cumbersome. If we rewrite our query to use `=` and `any` we can pass an array to the parameterised query instead:
 
 ```clojure
-(sql/query ds
-            ["select * from user_info where name = any(?)"
+(sql/query
+ ds
+ ["select * from user_info where name = any(?)"
              (into-array String ["Bob" "Jane"])])
 
 =>
@@ -83,9 +89,10 @@ The above is quite cumbersome. If we rewrite our query to use `=` and `any` we c
 If we want the same behaviour as `not in` we can use `!=` and `all`:
 
 ```clojure
-(sql/query ds
-            ["select * from user_info where name != all(?)"
-             (into-array String ["Bob" "Jane"])])
+(sql/query
+ ds
+ ["select * from user_info where name != all(?)"
+ (into-array String ["Bob" "Jane"])])
 
 =>
 [#:user_info{:pid 3, :name "Megan"} #:user_info{:pid 4, :name "Alice"}]
@@ -111,12 +118,16 @@ We can streamline this by extending the `next.jdbc.prepare/SettableParameter` pr
 So now we can pass vectors straight into our parameterised queries:
 
 ```clojure
-(sql/query ds ["select * from user_info where name = any(?)" ["Bob" "Jane"]])
+(sql/query
+ ds
+ ["select * from user_info where name = any(?)" ["Bob" "Jane"]])
 
 =>
 [#:user_info{:pid 1, :name "Bob"} #:user_info{:pid 2, :name "Jane"}]
 
-(sql/query ds ["select * from user_info where name != all(?)" ["Bob" "Jane"]])
+(sql/query
+ ds
+ ["select * from user_info where name != all(?)" ["Bob" "Jane"]])
 
 =>
 [#:user_info{:pid 3, :name "Megan"} #:user_info{:pid 4, :name "Alice"}]
@@ -125,12 +136,16 @@ So now we can pass vectors straight into our parameterised queries:
 This also supports different homogeneous array types automatically:
 
 ```clojure
-(sql/query ds ["select * from user_info where pid != all(?)" [1 2]])
+(sql/query
+ ds
+ ["select * from user_info where pid != all(?)" [1 2]])
 
 =>
 [#:user_info{:pid 3, :name "Megan"} #:user_info{:pid 4, :name "Alice"}]
 
-(sql/query ds ["select * from user_info where pid = any(?)" [1 2]])
+(sql/query
+ ds
+ ["select * from user_info where pid = any(?)" [1 2]])
 
 =>
 [#:user_info{:pid 1, :name "Bob"} #:user_info{:pid 2, :name "Jane"}]
