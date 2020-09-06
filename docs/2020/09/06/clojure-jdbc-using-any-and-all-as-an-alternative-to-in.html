@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: jdbc using any and all as alternatives for in</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: jdbc using any and all as alternatives for in</h1><time class="post-date" datetime="2020-09-06T00:00:00+00:00">06 Sep 2020</time><p><a href='https://github.com/seancorfield/next-jdbc'>next-jdbc</a> uses parameterised queries to prevent SQL Injections. These queries can take parameters by passing question marks (?) in the query and then by replacing each question mark index with required values. However this can make some sql operators more challenging to use programmatically. In particular <code>in&#40;?,?,?&#41;</code>. In this post we cover using <a href='https://www.postgresql.org/'>postgresql</a>'s <code>any&#40;?&#41;</code> and <code>all&#40;?&#41;</code> to get around this.</p><p>First we need to set up a database:</p><pre><code class="clojure">&#40;ns in-any-all.core
+  &#40;:require &#91;next.jdbc :as jdbc&#93;
+            &#91;next.jdbc.sql :as sql&#93;
+            &#91;clojure.string :as str&#93;
+            &#91;next.jdbc.prepare :as p&#93;&#41;
+  &#40;:import &#91;java.sql PreparedStatement&#93;&#41;&#41;
+
+&#40;def db {:dbtype &quot;postgresql&quot; :dbname &quot;databasename&quot;}&#41;
+&#40;def ds &#40;jdbc/get-datasource db&#41;&#41;
+</code></pre><p>We need a table:</p><pre><code class="clojure">&#40;jdbc/execute!
+  ds
+  &#91;&quot;create table user&#95;info &#40;pid serial primary key, name text not null&#41;&quot;&#93;&#41;
+ &#40;jdbc/execute! ds &#91;&quot;create unique index user&#95;info&#95;unique ON user&#95;info&#40;name&#41;&quot;&#93;&#41;
+</code></pre><p>And some data:</p><pre><code class="clojure">&#40;sql/insert! ds :user&#95;info {:name &quot;Bob&quot;}&#41;
+&#40;sql/insert! ds :user&#95;info {:name &quot;Jane&quot;}&#41;
+&#40;sql/insert! ds :user&#95;info {:name &quot;Megan&quot;}&#41;
+&#40;sql/insert! ds :user&#95;info {:name &quot;Alice&quot;}&#41;
+</code></pre><p>Use <code>in</code> to find users with the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
+
+</code></pre><p>Use <code>not in</code> to find users who don't have the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name not in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
+
+</code></pre><p>If we want to use parameterised queries with a variable number of names we would need to do something like this:</p><pre><code class="clojure">&#40;sql/query ds
+            &#40;let &#91;names &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;
+              &#40;into &#91;&#40;str &quot;select &#42; from user&#95;info where name in &#40;&quot;
+                          &#40;str/join &quot;, &quot; &#40;repeat &#40;count names&#41; &quot;?&quot;&#41;&#41;
+                          &quot;&#41;&quot;&#41;&#93;
+                    names&#41;&#41;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
+
+</code></pre><p>The above is quite cumbersome. If we rewrite our query to use <code>=</code> and <code>any</code> we can pass an array to the parameterised query instead:</p><pre><code class="clojure">&#40;sql/query ds
+            &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot;
+             &#40;into-array String &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#41;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
+</code></pre><p>If we want the same behaviour as <code>not in</code> we can use <code>!=</code> and <code>all</code>:</p><pre><code class="clojure">&#40;sql/query ds
+            &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot;
+             &#40;into-array String &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#41;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
+</code></pre><p>Though this approach isn't without inconveniences as we have to specify the array type and use <code>into-array</code>.</p><p>We can streamline this by extending the <code>next.jdbc.prepare/SettableParameter</code> protocol to automatically convert Clojure vectors to the appropriate typed array:</p><pre><code class="clojure">&#40;extend-protocol p/SettableParameter
+ clojure.lang.IPersistentVector
+   &#40;set-parameter &#91;v &#94;PreparedStatement s i&#93;
+     &#40;let &#91;conn      &#40;.getConnection s&#41;
+           meta      &#40;.getParameterMetaData s&#41;
+           type-name &#40;.getParameterTypeName meta i&#41;&#93;
+       &#40;if-let &#91;elem-type &#40;when &#40;= &#40;first type-name&#41; \&#95;&#41;
+                            &#40;apply str &#40;rest type-name&#41;&#41;&#41;&#93;
+         &#40;.setObject s i &#40;.createArrayOf conn elem-type &#40;to-array v&#41;&#41;&#41;
+         &#40;.setObject i s v&#41;&#41;&#41;&#41;&#41;
+</code></pre><p>So now we can pass vectors straight into our parameterised queries:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
+
+&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
+</code></pre><p>This also supports different homogeneous array types automatically:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where pid != all&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
+
+&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where pid = any&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
+
+=&gt;
+&#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
+</code></pre><p>The full example project can be found <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/sql/in-any-all'>here</a>.</p></article></div></body></html>
