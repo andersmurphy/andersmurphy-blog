@@ -11,23 +11,28 @@
 </code></pre><p>We need a table:</p><pre><code class="clojure">&#40;jdbc/execute!
   ds
   &#91;&quot;create table user&#95;info &#40;pid serial primary key, name text not null&#41;&quot;&#93;&#41;
- &#40;jdbc/execute! ds &#91;&quot;create unique index user&#95;info&#95;unique ON user&#95;info&#40;name&#41;&quot;&#93;&#41;
+&#40;jdbc/execute! ds &#91;&quot;create unique index user&#95;info&#95;unique ON user&#95;info&#40;name&#41;&quot;&#93;&#41;
 </code></pre><p>And some data:</p><pre><code class="clojure">&#40;sql/insert! ds :user&#95;info {:name &quot;Bob&quot;}&#41;
 &#40;sql/insert! ds :user&#95;info {:name &quot;Jane&quot;}&#41;
 &#40;sql/insert! ds :user&#95;info {:name &quot;Megan&quot;}&#41;
 &#40;sql/insert! ds :user&#95;info {:name &quot;Alice&quot;}&#41;
-</code></pre><p>Use <code>in</code> to find users with the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
+</code></pre><p>Use <code>in</code> to find users with the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
 
-</code></pre><p>Use <code>not in</code> to find users who don't have the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name not in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
+</code></pre><p>Use <code>not in</code> to find users who don't have the name Bob or Jane:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name not in&#40;?, ?&#41;&quot; &quot;Bob&quot; &quot;Jane&quot;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
 
-</code></pre><p>If we want to use parameterised queries with a variable number of names we would need to do something like this:</p><pre><code class="clojure">&#40;sql/query ds
-            &#40;let &#91;names &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;
+</code></pre><p>If we want to use parameterised queries with a variable number of names we would need to do something like this:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#40;let &#91;names &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;
               &#40;into &#91;&#40;str &quot;select &#42; from user&#95;info where name in &#40;&quot;
                           &#40;str/join &quot;, &quot; &#40;repeat &#40;count names&#41; &quot;?&quot;&#41;&#41;
                           &quot;&#41;&quot;&#41;&#93;
@@ -36,15 +41,17 @@
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
 
-</code></pre><p>The above is quite cumbersome. If we rewrite our query to use <code>=</code> and <code>any</code> we can pass an array to the parameterised query instead:</p><pre><code class="clojure">&#40;sql/query ds
-            &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot;
+</code></pre><p>The above is quite cumbersome. If we rewrite our query to use <code>=</code> and <code>any</code> we can pass an array to the parameterised query instead:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot;
              &#40;into-array String &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#41;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
-</code></pre><p>If we want the same behaviour as <code>not in</code> we can use <code>!=</code> and <code>all</code>:</p><pre><code class="clojure">&#40;sql/query ds
-            &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot;
-             &#40;into-array String &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#41;&#93;&#41;
+</code></pre><p>If we want the same behaviour as <code>not in</code> we can use <code>!=</code> and <code>all</code>:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot;
+ &#40;into-array String &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#41;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
@@ -58,21 +65,29 @@
                             &#40;apply str &#40;rest type-name&#41;&#41;&#41;&#93;
          &#40;.setObject s i &#40;.createArrayOf conn elem-type &#40;to-array v&#41;&#41;&#41;
          &#40;.setObject i s v&#41;&#41;&#41;&#41;&#41;
-</code></pre><p>So now we can pass vectors straight into our parameterised queries:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
+</code></pre><p>So now we can pass vectors straight into our parameterised queries:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name = any&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
 
-&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
+&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where name != all&#40;?&#41;&quot; &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
-</code></pre><p>This also supports different homogeneous array types automatically:</p><pre><code class="clojure">&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where pid != all&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
+</code></pre><p>This also supports different homogeneous array types automatically:</p><pre><code class="clojure">&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where pid != all&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 3, :name &quot;Megan&quot;} #:user&#95;info{:pid 4, :name &quot;Alice&quot;}&#93;
 
-&#40;sql/query ds &#91;&quot;select &#42; from user&#95;info where pid = any&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
+&#40;sql/query
+ ds
+ &#91;&quot;select &#42; from user&#95;info where pid = any&#40;?&#41;&quot; &#91;1 2&#93;&#93;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
