@@ -64,10 +64,10 @@ If we want to use parameterised queries with a variable number of names we would
 (sql/query
  ds
  (let [names ["Bob" "Jane"]]
-              (into [(str "select * from user_info where name in ("
-                          (str/join ", " (repeat (count names) "?"))
-                          ")")]
-                    names)))
+   (into [(str "select * from user_info where name in ("
+               (str/join ", " (repeat (count names) "?"))
+               ")")]
+         names)))
 
 =>
 [#:user_info{:pid 1, :name "Bob"} #:user_info{:pid 2, :name "Jane"}]
