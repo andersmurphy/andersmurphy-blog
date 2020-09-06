@@ -33,10 +33,10 @@
 </code></pre><p>If we want to use parameterised queries with a variable number of names we would need to do something like this:</p><pre><code class="clojure">&#40;sql/query
  ds
  &#40;let &#91;names &#91;&quot;Bob&quot; &quot;Jane&quot;&#93;&#93;
-              &#40;into &#91;&#40;str &quot;select &#42; from user&#95;info where name in &#40;&quot;
-                          &#40;str/join &quot;, &quot; &#40;repeat &#40;count names&#41; &quot;?&quot;&#41;&#41;
-                          &quot;&#41;&quot;&#41;&#93;
-                    names&#41;&#41;&#41;
+   &#40;into &#91;&#40;str &quot;select &#42; from user&#95;info where name in &#40;&quot;
+               &#40;str/join &quot;, &quot; &#40;repeat &#40;count names&#41; &quot;?&quot;&#41;&#41;
+               &quot;&#41;&quot;&#41;&#93;
+         names&#41;&#41;&#41;
 
 =&gt;
 &#91;#:user&#95;info{:pid 1, :name &quot;Bob&quot;} #:user&#95;info{:pid 2, :name &quot;Jane&quot;}&#93;
