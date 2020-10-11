@@ -1,6 +1,6 @@
 Title: Clojure: previous, current and next
 
-This article will cover the common pattern of iterating over a list of items whilst keeping a reference to the previous, current and next item.
+This article will cover a common pattern of iterating over a list of items whilst keeping a reference to the previous, current and next item.
 
 Recently I had to implement link pagination for this blog. My initial attempt was rather naive:
 
