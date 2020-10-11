@@ -207,17 +207,12 @@
 
 (defn link-pages
   [pages]
-  (reduce
-   (fn [pages next-page]
-     (let [previous-page (first pages)]
-       (if previous-page
-         (conj
-          (drop 1 pages)
-          (assoc previous-page :next-page-url (:page-path-name next-page))
-          (assoc next-page :previous-page-url (:page-path-name previous-page)))
-         (conj pages next-page))))
-   '()
-   pages))
+  (->> (concat [nil] pages [nil])
+       (partition 3 1)
+       (map (fn [[prev current next]]
+              (cond-> current
+                prev (assoc :previous-page-url (:page-path-name next))
+                next (assoc :next-page-url     (:page-path-name next)))))))
 
 (defn add-page-urls
   [pages]
