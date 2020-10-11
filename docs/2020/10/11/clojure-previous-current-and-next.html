@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: previous, current and next</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: previous, current and next</h1><time class="post-date" datetime="2020-10-11T00:00:00+00:00">11 Oct 2020</time><p>This article will cover the common pattern of iterating over a list of items whilst keeping a reference to the previous, current and next item.</p><p>Recently I had to implement link pagination for this blog. My initial attempt was rather naive:</p><pre><code class="clojur">&#40;defn link-pages
+  &#91;pages&#93;
+  &#40;reduce
+   &#40;fn &#91;pages next-page&#93;
+     &#40;let &#91;previous-page &#40;first pages&#41;&#93;
+       &#40;if previous-page
+         &#40;conj
+          &#40;drop 1 pages&#41;
+          &#40;assoc previous-page :next-page &#40;:name next-page&#41;&#41;
+          &#40;assoc next-page :previous-page &#40;:name previous-page&#41;&#41;&#41;
+         &#40;conj pages next-page&#41;&#41;&#41;&#41;
+   '&#40;&#41;
+   pages&#41;&#41;
+</code></pre><p>Using <code>conj</code> and an empty list to build a new list of pages that reference each other. It also had an inconvenient side effect of reversing the input list.</p><pre><code class="clojur">&#40;link-pages
+  &#91;{:name &quot;page1&quot;}
+   {:name &quot;page2&quot;}
+   {:name &quot;page3&quot;}
+   {:name &quot;page4&quot;}
+   {:name &quot;page5&quot;}&#93;&#41;
+
+=&gt;
+&#40;{:name &quot;page5&quot;, :previous-page &quot;page4&quot;}
+ {:name &quot;page4&quot;, :previous-page &quot;page3&quot;, :next-page &quot;page5&quot;}
+ {:name &quot;page3&quot;, :previous-page &quot;page2&quot;, :next-page &quot;page4&quot;}
+ {:name &quot;page2&quot;, :previous-page &quot;page1&quot;, :next-page &quot;page3&quot;}
+ {:name &quot;page1&quot;, :next-page &quot;page2&quot;}&#41;
+</code></pre><p>I've since found a much more elegant way of implementing this:</p><pre><code class="clojure">&#40;defn link-pages
+  &#91;pages&#93;
+  &#40;-&gt;&gt; &#40;concat &#91;nil&#93; pages &#91;nil&#93;&#41;
+       &#40;partition 3 1&#41;
+       &#40;map &#40;fn &#91;&#91;prev current next&#93;&#93;
+              &#40;cond-&gt; current
+                prev &#40;assoc :previous-page &#40;:name prev&#41;&#41;
+                next &#40;assoc :next-page     &#40;:name next&#41;&#41;&#41;&#41;&#41;&#41;&#41;
+</code></pre><p>The core of this implementation revolves around the <code>partition</code> function which partitions a list into chunks (smaller lists) of n items (in this case 3). It can also be supplied an step which is the number of items to offset each chunk by. For example:</p><pre><code class="clojure">&#40;partition 3 1 &#91;1 2 3 4 6 7 8 9&#93;&#41;
+
+=&gt;
+;; &#40;prev current next&#41;
+&#40;&#40;1 2 3&#41; &#40;2 3 4&#41; &#40;3 4 6&#41; &#40;4 6 7&#41; &#40;6 7 8&#41; &#40;7 8 9&#41;&#41;
+</code></pre><p>We use <code>nil</code> to denote the beginning and end of the list by adding it to the beginning and end of our initial input.</p><pre><code class="clojure">&#40;partition 3 1 &#91;nil 1 2 3 4 6 7 8 9 nil&#93;&#41;
+
+=&gt;
+;; &#40;prev current next&#41;
+&#40;&#40;nil 1 2&#41; &#40;1 2 3&#41; &#40;2 3 4&#41; &#40;3 4 6&#41; &#40;4 6 7&#41; &#40;6 7 8&#41; &#40;7 8 9&#41; &#40;8 9 nil&#41;&#41;
+</code></pre><p>Finally <code>cond-&gt;</code> is just a nice way to conditionally do some things to a map (note that, unlike <code>cond</code>, <code>cond-&gt;</code> doesn't short circuit after the first true expression).</p><pre><code class="clojur">&#40;link-pages
+  &#91;{:name &quot;page1&quot;}
+   {:name &quot;page2&quot;}
+   {:name &quot;page3&quot;}
+   {:name &quot;page4&quot;}
+   {:name &quot;page5&quot;}&#93;&#41;
+
+=&gt;
+&#40;{:name &quot;page1&quot;, :next-page &quot;page2&quot;}
+ {:name &quot;page2&quot;, :previous-page &quot;page1&quot;, :next-page &quot;page3&quot;}
+ {:name &quot;page3&quot;, :previous-page &quot;page2&quot;, :next-page &quot;page4&quot;}
+ {:name &quot;page4&quot;, :previous-page &quot;page3&quot;, :next-page &quot;page5&quot;}
+ {:name &quot;page5&quot;, :previous-page &quot;page4&quot;}&#41;
+</code></pre><p>Not only is this solution simpler, it no longer has the side effect of reversing the list.</p><p>The full example of the pagination logic for this blog can be found <a href='https://github.com/andersmurphy/andersmurphy-blog/blob/5edbd830c2b27c75b458fc477783131c0fae7b2b/src/core.clj#L208'>here</a>.</p></article></div></body></html>
