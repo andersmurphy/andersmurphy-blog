@@ -127,6 +127,14 @@ Like `sort`, the `sort-by` function can also take a comparator to change the ord
 => ({:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2})
 ```
 
+You can also use `comp` and `-` to change the sort order.
+
+```clojure
+(sort-by (comp - :a) [{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}])
+
+=> ({:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2})
+```
+
 ## Secondary sort
 
 Secondary sorts can be achieved using the `juxt` function.
