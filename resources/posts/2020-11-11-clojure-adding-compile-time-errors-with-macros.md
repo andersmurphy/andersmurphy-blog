@@ -48,4 +48,4 @@ Passing in a valid key compiles.
 #'user/bar
 ```
 
-That covers this short post on using macros to add compile time errors. This can be a really useful pattern from adding compile time checks for static inputs.
+That covers this short post on using macros to add compile time errors. This can be a really useful pattern for adding compile time checks for static inputs.
