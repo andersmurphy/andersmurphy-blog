@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: adding compile time errors with macros</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: adding compile time errors with macros</h1><time class="post-date" datetime="2020-11-11T00:00:00+00:00">11 Nov 2020</time><p>Clojure is a dynamic language. But something you might not know is that unlike a lot of other dynamic languages it's not an interpreted language it's actually compiled. Even when programming at the REPL the Java Virtual Machine's (JVM) Just In Time (JIT) compiler compiles Clojure code to byte code before evaluating it. Combining this with macros which are evaluated at compile time allows us to add compile time errors to our code.</p><p>In this example we are going create a macro that will throw an error at compile time if we pass a key that isn't in the <code>valid-keys</code> set.</p><pre><code class="Clojure">&#40;def valid-keys #{:a :b :c}&#41;
+</code></pre><p>The <code>key=?</code> macro uses <code>assert</code> to check whether <code>valid-key</code> is in <code>valid-keys</code>. Because we haven't quoted this part of the code it will be evaluated at compile time and throw an error if the assertion fails.</p><pre><code class="Clojure">&#40;defmacro key=?
+  &quot;Check if valid-key is equal to k. Throws compile time error if valid
+  key is not in a pre-defined set of valid keys.&quot;
+  &#91;valid-key k&#93;
+  &#40;assert &#40;valid-keys valid-key&#41;
+          &#40;str
+           &quot; is not a valid key.\n\n&quot;
+           &quot;Valid  keys are: &quot;
+           valid-keys
+           &quot;\n&quot;&#41;&#41;
+  `&#40;= &#126;valid-key &#126;k&#41;&#41;
+</code></pre><p>Passing in an invalid key throws an informative compile time error message.</p><pre><code class="Clojure">&#40;defn foo &#91;a&#93;
+  &#40;key=? :d a&#41;&#41;
+
+=&gt; Unexpected error macroexpanding key=? at &#40;form-init734607845340377328.clj:2:3&#41;.
+Assert failed:  is not a valid key.
+
+Valid  keys are: #{:c :b :a}
+
+&#40;valid-keys valid-key&#41;
+</code></pre><p>Passing in a valid key compiles.</p><pre><code class="Clojure">&#40;defn bar &#91;a&#93;
+  &#40;key=? :c a&#41;&#41;
+
+=&gt;
+#'user/bar
+</code></pre><p>That covers this short post on using macros to add compile time errors. This can be really useful pattern from adding compile time checks for static inputs.</p></article></div></body></html>
