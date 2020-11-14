@@ -39,12 +39,11 @@ If we want different length tuples to be sorted by a lexical sort of their conte
 ```clojure
 (defn tuple-compare [a b]
   (let [[x & xs] (seq a)
-        [y & ys] (seq b)]
-    (let [c (compare x y)]
-      (cond
-        (nil? x) c
-        (#{1 -1} c) c
-        :else       (recur xs ys)))))
+        [y & ys] (seq b)
+        c        (compare x y)]
+    (cond (nil? x)    c
+          (#{1 -1} c) c
+          :else       (recur xs ys))))
 
 (sort tuple-compare [[1 1] [2] [3 1] [0 1 2] [2]])
 
