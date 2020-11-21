@@ -208,10 +208,10 @@
 (defn link-pages
   [pages]
   (->> (concat [nil] pages [nil])
-       (partition-all 3 1)
+       (partition 3 1)
        (map (fn [[prev current next]]
               (cond-> current
-                prev (assoc :previous-page-url (:page-path-name next))
+                prev (assoc :previous-page-url (:page-path-name prev))
                 next (assoc :next-page-url     (:page-path-name next)))))))
 
 (defn add-page-urls
