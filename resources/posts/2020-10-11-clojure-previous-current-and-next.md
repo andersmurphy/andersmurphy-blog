@@ -92,4 +92,4 @@ Finally `cond->` is just a nice way to conditionally do some things to a map (no
 Not only is this solution simpler, it no longer has the side effect of reversing the list.
 
 The full example of the pagination logic for this blog can be found
-[here](https://github.com/andersmurphy/andersmurphy-blog/blob/5edbd830c2b27c75b458fc477783131c0fae7b2b/src/core.clj#L208).
+[here](https://github.com/andersmurphy/andersmurphy-blog/blob/232e86a9e19098856d2b3fd902408fb1118440ff/src/core.clj#L208).
