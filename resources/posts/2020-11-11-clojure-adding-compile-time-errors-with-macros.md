@@ -115,4 +115,35 @@ Valid keys are: #{:c :b :a}
 (valid-keys resolved-k)
 ```
 
+
+
+Instead of writing our own error message we can use `clojure.spec.alpha` to generate one for us. We use `s/assert*` as we always want to perform this check at compile time regardless of the state of `s/*compile-asserts*` and `s/check-asserts`.
+
+```Clojure
+(require '[clojure.spec.alpha :as s])
+
+(s/def ::valid-key #{:a :b :c})
+
+(defmacro validate-key-at-compile-time
+  "Check if k is valid. Throws compile time error if k
+  is not in a pre-defined set of valid keys."
+  [k]
+  (let [resolved-k (if (symbol? k) @(resolve 'k) k)]
+      (s/assert* ::valid-key resolved-k))
+  k)
+```
+
+This throws an exception as expected.
+
+```Clojure
+(def k :d)
+
+(defn bar []
+  (validate-key-at-compile-time k))
+
+=>
+Syntax error macroexpanding validate-key-at-compile-time at (form-init18033988220353259505.clj:2:3).
+:d - failed: #{:c :b :a}
+```
+
 That covers this short post on using macros to add compile time errors. This can be a really useful pattern for adding compile time checks for static inputs.
