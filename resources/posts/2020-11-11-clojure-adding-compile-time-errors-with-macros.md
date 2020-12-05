@@ -98,7 +98,7 @@ Now the code compiles correctly.
   (validate-key-at-compile-time k))
 ```
 
-And throws and error when k is not a valid key.
+And throws an error when k is not a valid key.
 
 ```Clojure
 (def k :d)
@@ -114,8 +114,6 @@ Valid keys are: #{:c :b :a}
 
 (valid-keys resolved-k)
 ```
-
-
 
 Instead of writing our own error message we can use `clojure.spec.alpha` to generate one for us. We use `s/assert*` as we always want to perform this check at compile time regardless of the state of `s/*compile-asserts*` and `s/check-asserts`.
 
