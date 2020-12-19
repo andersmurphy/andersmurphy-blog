@@ -4,11 +4,11 @@ Sometimes you want to compare strings for similarity. To do this we can use [cos
 
 If we split a string into individual words (tokens) we can then assign each token a number, creating a vector of numbers for that string. We can then calculate the angle between two vectors. If the angle is small the strings are similar if it's large they are dissimilar.
 
-We can apply this idea to compare two bodies of text for similarity. This can be useful, for example generating a list of related articles at the bottom of a blog post.
+We can apply this idea to compare two bodies of text for similarity. This can be useful, for example when generating a list of related articles at the bottom of a blog post.
 
 ## Cosine similarity
 
-We split the string into vectors of tokens. Create a vector of all the unique tokens from both strings;`all-tokens`. Create a vector for each of the strings which contains the count of each token from `all-tokens` that appears in that string. Finally we put these vectors into the cosine formula `(/ (dot a b) (* (mag a) (mag b)))`.
+We split the string into vectors of tokens. Create a vector of all the unique tokens from both strings; `all-tokens`. Create a vector for each of the strings which contains the count of each token from `all-tokens` that appears in that string. Finally we put these vectors into the cosine formula `(/ (dot a b) (* (mag a) (mag b)))`.
 
 ```Clojure
 (require '[clojure.string :as str])
@@ -48,7 +48,7 @@ The cosine function outputs an angle value between 0 and 1. Strings that have an
 => 0.0
 ```
 
-I've included this version of the cosine function that prints the workings. For those who want to see the step by step evaluation.
+I've included this version of the cosine function that prints the intermediary workings. For those who want to see the step by step evaluation.
 
 ```Clojure
 (defn cosine [a-string b-string]
@@ -127,4 +127,4 @@ By filtering the tokens by stopwords we get more accurate results.
 
 These strings do not convey similar meaning.
 
-That covers using cosine similarity to compare strings. This can be really useful for finding similarity between strings. It's worth pointing out it isn't limited to strings you could use it to compare any data you can represent as a vector (mathematical term not the Clojure collection type).
+That covers using cosine similarity to compare strings. This can be really useful for finding similarity between strings. It's worth pointing out it isn't limited to strings you could use it to compare any data you can represent as a vector.
