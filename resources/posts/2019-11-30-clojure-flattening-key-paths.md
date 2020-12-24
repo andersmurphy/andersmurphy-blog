@@ -70,20 +70,19 @@ We use the `lazy-seq` to define a function that recursively builds a list of the
 
 ```clojure
 (defn flatten-paths [m separator]
-  (letfn [(flatten-paths [m separator path]
-            (lazy-seq
-             (when-let [[[k v] & xs] (seq m)]
-               (cond (and (map? v) (not-empty v))
-                     (into (flatten-paths v separator (conj path k))
-                           (flatten-paths xs separator path))
-                     :else
-                     (into [(->> (conj path k)
-                                 (map name)
-                                 (clojure.string/join separator)
-                                 keyword) v]
-                           (flatten-paths xs separator path))))))]
-    (->> (flatten-paths m separator [])
-         (apply hash-map))))
+    (letfn [(flatten-paths [m separator path]
+              (lazy-seq
+               (when-let [[[k v] & xs] (seq m)]
+                 (cond (and (map? v) (not-empty v))
+                       (into (flatten-paths v separator (conj path k))
+                             (flatten-paths xs separator path))
+                       :else
+                       (cons [(->> (conj path k)
+                                   (map name)
+                                   (clojure.string/join separator)
+                                   keyword) v]
+                             (flatten-paths xs separator path))))))]
+      (into {} (flatten-paths m separator []))))
 
 (flatten-paths (create-n-nested-map 1000000) "-")
 
