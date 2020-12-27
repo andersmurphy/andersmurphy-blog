@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: cond->, deep-merge, remove-nils and the shape of output</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: cond->, deep-merge, remove-nils and the shape of output</h1><time class="post-date" datetime="2020-12-27T00:00:00+00:00">27 Dec 2020</time><p>This article will cover various ways of conditionally hydrating/decorating an existing map with additional data. We'll explore different approaches and how they affect readability of the code as well as performance.</p><p>The inspiration for this article came from this <a href='https://www.youtube.com/watch?v=9fhnJpCgtUw'>fantastic talk</a> and its concept of being able to visualise the shape of your data.</p><p>Let's start with some data that needs to be hydrated:</p><pre><code class="Clojure">&#40;def heavy-ship-data
+  {:ship-class &quot;Heavy&quot;
+   :name  &quot;Thunder&quot;
+   :main-systems {:engine {:type &quot;Ion&quot;}}}&#41;
+
+&#40;def light-ship-data
+  {:ship-class &quot;Light&quot;
+   :name  &quot;Lightning&quot;
+   :main-systems {:engine {:type &quot;Flux&quot;}}}&#41;
+</code></pre><p>The <code>cond-&gt;</code> macro is really useful for conditionally hydrating data:</p><pre><code class="Clojure">&#40;defn ready-ship-cond-&gt;
+  &#91;{class :ship-class :as ship-data
+    {{engine-type :type} :engine} :main-systems}&#93;
+  &#40;cond-&gt; ship-data
+    &#40;= class &quot;Heavy&quot;&#41;      &#40;assoc-in &#91;:main-systems :shield :type&#93;
+                                     &quot;Heavy shield&quot;&#41;
+    &#40;= engine-type &quot;Flux&quot;&#41; &#40;assoc-in &#91;:main-systems :engine :fuel&#93;
+                                     &quot;Fussion cells&quot;&#41;
+    &#40;= engine-type &quot;Flux&quot;&#41; &#40;assoc-in &#91;:name&#93; &quot;Fluxmaster&quot;&#41;
+    true                   &#40;assoc-in &#91;:main-systems :engine :upgrade&#93;
+                                     &quot;Neutron spoils&quot;&#41;
+    true                   &#40;assoc-in &#91;:main-systems :turret&#93;
+                                     {:type &quot;Auto plasma incinerator&quot;}&#41;&#41;&#41;
+</code></pre><p>There are a few subjective downsides to this. First it's not obvious what the shape of the data is, secondly there's repetition of paths for items that share part of their path.</p><p>But it works well enough. We conditionally <code>assoc-in</code> values into a map.</p><pre><code class="Clojure">&#40;ready-ship-cond-&gt; heavy-ship-data&#41;
+
+=&gt;
+{:ship-class &quot;Heavy&quot;,
+ :name &quot;Thunder&quot;,
+ :main-systems
+ {:engine {:type &quot;Ion&quot;, :upgrade &quot;Neutron spoils&quot;},
+  :shield {:type &quot;Heavy shield&quot;},
+  :turret {:type &quot;Auto plasma incinerator&quot;}}}
+
+&#40;ready-ship-cond-&gt; light-ship-data&#41;
+
+=&gt;
+{:ship-class &quot;Light&quot;,
+ :name &quot;Fluxmaster&quot;,
+ :main-systems
+ {:engine
+  {:type &quot;Flux&quot;, :fuel &quot;Fussion cells&quot;, :upgrade &quot;Neutron spoils&quot;},
+  :turret {:type &quot;Auto plasma incinerator&quot;}}}
+</code></pre><p>But what if we wanted to make this code look more like the shape of the data it actually represents. Lets imagine a function <code>foo-merge</code> that would be called like this:</p><pre><code class="Clojure">&#40;foo-merge
+   ship-data
+   {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
+                   :engine  {:upgrade &quot;Neutron spoils&quot;
+                             :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
+                                       &quot;Fussion cells&quot;&#41;}
+                   :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
+                                    &quot;Heavy shield&quot;&#41;}}
+    :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;
+</code></pre><p>I personally find this more readable. We've removed the repeating paths and the input now matches the shape of the data.</p><p>To implement <code>foo-merge</code> we need to implement a function that can merge nested maps <code>deep-merge</code>:</p><pre><code class="Clojure">&#40;defn deep-merge
+  &#91;&amp; maps&#93;
+  &#40;if &#40;every? map? maps&#41; &#40;apply merge-with deep-merge maps&#41; &#40;last maps&#41;&#41;&#41;
+</code></pre><p>We'd also need to implement a function that removes nil values. As the behaviour of <code>cond-&gt;</code> will not associate nil values:</p><pre><code class="Clojure">&#40;defn remove-nils
+  &#91;m&#93;
+  &#40;postwalk
+   &#40;fn &#91;x&#93;
+     &#40;if &#40;map? x&#41;
+       &#40;-&gt;&gt; &#40;keep &#40;fn &#91;&#91;k v&#93;&#93; &#40;when &#40;nil? v&#41; k&#41;&#41; x&#41;
+            &#40;apply dissoc x&#41;&#41;
+       x&#41;&#41;
+   m&#41;&#41;
+</code></pre><p>Finally we van implement <code>deep-merge-no-nils</code> which should have the behaviour we desire:</p><pre><code class="Clojure">&#40;defn deep-merge-no-nils
+  &#91;&amp; maps&#93;
+  &#40;apply deep-merge &#40;remove-nils maps&#41;&#41;&#41;
+</code></pre><p>Our new implementation of the ready-ship hydrator:</p><pre><code class="Clojure">&#40;defn ready-ship-deep-merge-no-nils
+  &#91;{class :ship-class :as ship-data
+    {{engine-type :type} :engine} :main-systems}&#93;
+  &#40;deep-merge-no-nils
+   ship-data
+   {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
+                   :engine {:upgrade &quot;Neutron spoils&quot;
+                            :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
+                                       &quot;Fussion cells&quot;&#41;}
+                   :shield {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
+                                    &quot;Heavy shield&quot;&#41;}}
+    :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;&#41;
+</code></pre><p>This doesn't quire work as we expect as it leads to insertion of empty maps in some cases <code>:shield {}</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
+   &#40;ready-ship-deep-merge-no-nils heavy-ship-data&#41;&#41;
+
+=&gt; true
+
+&#40;= &#40;ready-ship-cond-&gt;             light-ship-data&#41;
+   &#40;ready-ship-deep-merge-no-nils light-ship-data&#41;&#41;
+
+=&gt; false
+
+&#40;clojure.data/diff
+ &#40;ready-ship-cond-&gt;             light-ship-data&#41;
+ &#40;ready-ship-deep-merge-no-nils light-ship-data&#41;&#41;
+
+=&gt;
+&#40;nil
+ {:main-systems {:shield {}}}
+ {:main-systems
+  {:turret {:type &quot;Auto plasma incinerator&quot;},
+   :engine
+   {:type &quot;Flux&quot;, :fuel &quot;Fussion cells&quot;, :upgrade &quot;Neutron spoils&quot;}},
+  :name &quot;Fluxmaster&quot;,
+  :ship-class &quot;Light&quot;}&#41;
+</code></pre><p>Before we look into ways of solving this edge case let's see what the performance of <code>ready-ship-deep-merge-no-nils</code> vs the original implementation <code>ready-ship-cond-&gt;</code>.</p><p>To do this we use <a href='https://github.com/hugoduncan/criterium'>criterium </a> a great library for doing performance benchmarks in clojure:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
+
+&#40;c/bench &#40;ready-ship-cond-&gt; heavy-ship-data&#41;&#41;
+
+=&gt;
+...
+Execution time mean : 738.743093 ns
+...
+
+&#40;c/bench &#40;ready-ship-deep-merge-no-nils heavy-ship-data&#41;&#41;
+
+=&gt;
+...
+Execution time mean : 16.707967 µs
+...
+
+</code></pre><p>Turns out <code>deep-merge</code> and <code>clojure.walk/postwalk</code> are not cheap and this leads to the <code>ready-ship-deep-merge-no-nils</code> implementation being over 22 times slower than the <code>ready-ship-cond-&gt;</code> implementation.</p><p>When you have a visual representation of code that you like and an implementation that is less attractive but more performant you can use a macro to get the best of both worlds. Macros allow you to rewrite code at compile time from a representation you prefer to an implementation that works.</p><p>How would we got from our map representation to <code>cond-&gt;</code> and <code>assoc-in</code> implementation? First we will need the paths to each leaf node in our map:</p><pre><code class="Clojure">&#40;defn all-paths &#91;m&#93;
+  &#40;letfn &#91;&#40;all-paths &#91;m path&#93;
+            &#40;lazy-seq
+             &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
+               &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                     &#40;into &#40;all-paths v &#40;conj path k&#41;&#41;
+                           &#40;all-paths xs path&#41;&#41;
+                     :else
+                     &#40;cons &#91;&#40;conj path k&#41; v&#93;
+                           &#40;all-paths xs path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
+    &#40;all-paths m &#91;&#93;&#41;&#41;&#41;
+</code></pre><p>This function returns a list of tuples containing the path and value for each leaf value in a nested map.</p><pre><code class="Clojure">&#40;all-paths {:ship-class &quot;Heavy&quot;
+              :name  &quot;Thunder&quot;
+              :main-systems {:engine {:type &quot;Ion&quot;}
+                             :shield {:type &quot;Phase&quot;}}}
+
+=&gt;
+&#40;&#91;&#91;:ship-class&#93; &quot;Heavy&quot;&#93;
+   &#91;&#91;:name&#93; &quot;Thunder&quot;&#93;
+   &#91;&#91;:main-systems :shield :type&#93; &quot;Phase&quot;&#93;
+   &#91;&#91;:main-systems :engine :type&#93; &quot;Ion&quot;&#93;&#41;
+</code></pre><p>We can then write a mecro that builds a list of <code>let-bindings</code> and <code>conditions</code> that can be passed into a <code>let</code> and <code>cond-&gt;</code>:</p><pre><code class="Clojure">&#40;defmacro cond-deep-merge &#91;m1 m2&#93;
+  &#40;assert &#40;map? m2&#41;&#41;
+  &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
+        symbol-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
+        let-bindings     &#40;mapcat &#40;fn &#91;&#91;s &#91;&#95; v&#93;&#93;&#93; &#91;s v&#93;&#41; symbol-pairs&#41;
+        conditions       &#40;mapcat &#40;fn &#91;&#91;s &#91;path &#95;&#93;&#93;&#93;
+                                   &#91;`&#40;not &#40;nil? &#126;s&#41;&#41; `&#40;assoc-in &#126;path &#126;s&#41;&#93;&#41;
+                                 symbol-pairs&#41;&#93;
+    `&#40;let &#91;&#126;@let-bindings&#93;
+       &#40;cond-&gt; &#126;m1
+         &#126;@conditions&#41;&#41;&#41;&#41;
+</code></pre><p>It's easier to understand what's going on with this macro by using <code>macroexpand-1</code>:</p><pre><code class="Clojure">&#40;macroexpand-1 '&#40;cond-deep-merge {:a 1} {:b &#40;when true 3&#41; :c false }&#41;&#41;
+
+&#40;clojure.core/let
+    &#91;G&#95;&#95;26452 &#40;when true 3&#41; G&#95;&#95;26453 false&#93;
+  &#40;clojure.core/cond-&gt;
+      {:a 1}
+    &#40;clojure.core/not &#40;clojure.core/nil? G&#95;&#95;26452&#41;&#41;
+    &#40;clojure.core/assoc-in &#91;:b&#93; G&#95;&#95;26452&#41;
+    &#40;clojure.core/not &#40;clojure.core/nil? G&#95;&#95;26453&#41;&#41;
+    &#40;clojure.core/assoc-in &#91;:c&#93; G&#95;&#95;26453&#41;&#41;&#41;
+</code></pre><p>Effectively, we only assoc values to <code>m1</code> if the value is not nil, where value can be the result of an expression:</p><pre><code class="Clojure">&#40;defn ready-ship-cond-deep-merge
+  &#91;{class :ship-class :as ship-data
+    {{engine-type :type} :engine} :main-systems}&#93;
+  &#40;cond-deep-merge
+   ship-data
+   {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
+                   :engine  {:upgrade &quot;Neutron spoils&quot;
+                             :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
+                                        &quot;Fussion cells&quot;&#41;}
+                   :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
+                                     &quot;Heavy shield&quot;&#41;}}
+    :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;&#41;
+</code></pre><p>Not only does the <code>ready-ship-cond-deep-merge</code> implementation produce the exact same result as <code>ready-ship-cond-&gt;</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
+   &#40;ready-ship-cond-deep-merge    heavy-ship-data&#41;&#41;
+
+=&gt; true
+
+&#40;= &#40;ready-ship-cond-&gt;             light-ship-data&#41;
+   &#40;ready-ship-cond-deep-merge    light-ship-data&#41;&#41;
+
+=&gt; true
+</code></pre><p>It's also just as performant!</p><pre><code class="Clojure">&#40;c/bench &#40;ready-ship-cond-deep-merge    heavy-ship-data&#41;&#41;
+
+=&gt;
+...
+Execution time mean : 775.762294 ns
+...
+
+</code></pre><p>In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that capture the shape of our output data. Improving programmer ergonomics without sacrificing performance.</p></article></div></body></html>
