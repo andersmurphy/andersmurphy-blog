@@ -1,4 +1,4 @@
-Title: Clojure: cond->, deep-merge, remove-nils and the shape of output
+Title: Clojure: cond->, deep-merge, remove-nils and the shape of data
 
 This article will cover various ways of conditionally hydrating/decorating an existing map with additional data. We'll explore different approaches and how they affect readability of the code as well as performance.
 
@@ -87,7 +87,7 @@ To implement `foo-merge` we need to implement a function that can merge nested m
   (if (every? map? maps) (apply merge-with deep-merge maps) (last maps)))
 ```
 
-We'd also need to implement a function that removes nil values. As the behaviour of `cond->` will not associate nil values:
+We also need to implement a function that removes nil values. As the behaviour of `cond->` means it will not associate nil values:
 
 ```Clojure
 (defn remove-nils
