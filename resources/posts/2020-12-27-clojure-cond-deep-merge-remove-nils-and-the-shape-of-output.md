@@ -28,7 +28,7 @@ The `cond->` macro is really useful for conditionally hydrating data:
     (= class "Heavy")      (assoc-in [:main-systems :shield :type]
                                      "Heavy shield")
     (= engine-type "Flux") (assoc-in [:main-systems :engine :fuel]
-                                     "Fussion cells")
+                                     "Fusion cells")
     (= engine-type "Flux") (assoc-in [:name] "Fluxmaster")
     true                   (assoc-in [:main-systems :engine :upgrade]
                                      "Neutron spoils")
@@ -58,11 +58,11 @@ But it works well enough. We conditionally `assoc-in` values into a map.
  :name "Fluxmaster",
  :main-systems
  {:engine
-  {:type "Flux", :fuel "Fussion cells", :upgrade "Neutron spoils"},
+  {:type "Flux", :fuel "Fusion cells", :upgrade "Neutron spoils"},
   :turret {:type "Auto plasma incinerator"}}}
 ```
 
-But what if we wanted to make this code look more like the shape of the data it actually represents. Lets imagine a function `foo-merge` that would be called like this:
+But what if we wanted to make this code look more like the shape of the data it actually represents. Let's imagine a function `foo-merge` that would be called like this:
 
 ```Clojure
 (foo-merge
@@ -70,7 +70,7 @@ But what if we wanted to make this code look more like the shape of the data it 
    {:main-systems {:turret  {:type "Auto plasma incinerator"}
                    :engine  {:upgrade "Neutron spoils"
                              :fuel    (when (= engine-type "Flux")
-                                       "Fussion cells")}
+                                       "Fusion cells")}
                    :shield  {:type (when (= class "Heavy")
                                     "Heavy shield")}}
     :name (when (= engine-type "Flux") "Fluxmaster")})
@@ -120,13 +120,13 @@ Our new implementation of the ready-ship hydrator:
    {:main-systems {:turret  {:type "Auto plasma incinerator"}
                    :engine {:upgrade "Neutron spoils"
                             :fuel    (when (= engine-type "Flux")
-                                       "Fussion cells")}
+                                       "Fusion cells")}
                    :shield {:type (when (= class "Heavy")
                                     "Heavy shield")}}
     :name (when (= engine-type "Flux") "Fluxmaster")}))
 ```
 
-This doesn't quire work as we expect as it leads to insertion of empty maps in some cases `:shield {}`:
+This doesn't quite work as we expect as it leads to insertion of empty maps in some cases `:shield {}`:
 
 ```Clojure
 (= (ready-ship-cond->             heavy-ship-data)
@@ -149,7 +149,7 @@ This doesn't quire work as we expect as it leads to insertion of empty maps in s
  {:main-systems
   {:turret {:type "Auto plasma incinerator"},
    :engine
-   {:type "Flux", :fuel "Fussion cells", :upgrade "Neutron spoils"}},
+   {:type "Flux", :fuel "Fusion cells", :upgrade "Neutron spoils"}},
   :name "Fluxmaster",
   :ship-class "Light"})
 ```
@@ -182,7 +182,7 @@ Turns out `deep-merge` and `clojure.walk/postwalk` are not cheap and this leads 
 
 When you have a visual representation of code that you like and an implementation that is less attractive but more performant you can use a macro to get the best of both worlds. Macros allow you to rewrite code at compile time from a representation you prefer to an implementation that works.
 
-How would we got from our map representation to `cond->` and `assoc-in` implementation? First we will need the paths to each leaf node in our map:
+How would we get from our map representation to `cond->` and `assoc-in` implementation? First we will need the paths to each leaf node in our map:
 
 ```Clojure
 (defn all-paths [m]
@@ -213,7 +213,7 @@ This function returns a list of tuples containing the path and value for each le
    [[:main-systems :engine :type] "Ion"])
 ```
 
-We can then write a mecro that builds a list of `let-bindings` and `conditions` that can be passed into a `let` and `cond->`:
+We can then write a macro that builds a list of `let-bindings` and `conditions` that can be passed into a `let` and `cond->`:
 
 ```Clojure
 (defmacro cond-deep-merge [m1 m2]
@@ -255,7 +255,7 @@ Effectively, we only assoc values to `m1` if the value is not nil, where value c
    {:main-systems {:turret  {:type "Auto plasma incinerator"}
                    :engine  {:upgrade "Neutron spoils"
                              :fuel    (when (= engine-type "Flux")
-                                        "Fussion cells")}
+                                        "Fusion cells")}
                    :shield  {:type (when (= class "Heavy")
                                      "Heavy shield")}}
     :name (when (= engine-type "Flux") "Fluxmaster")}))
@@ -287,4 +287,4 @@ Execution time mean : 775.762294 ns
 
 ```
 
-In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that capture the shape of our output data. Improving programmer ergonomics without sacrificing performance.
+In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance.
