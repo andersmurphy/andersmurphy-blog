@@ -15,7 +15,7 @@
     &#40;= class &quot;Heavy&quot;&#41;      &#40;assoc-in &#91;:main-systems :shield :type&#93;
                                      &quot;Heavy shield&quot;&#41;
     &#40;= engine-type &quot;Flux&quot;&#41; &#40;assoc-in &#91;:main-systems :engine :fuel&#93;
-                                     &quot;Fussion cells&quot;&#41;
+                                     &quot;Fusion cells&quot;&#41;
     &#40;= engine-type &quot;Flux&quot;&#41; &#40;assoc-in &#91;:name&#93; &quot;Fluxmaster&quot;&#41;
     true                   &#40;assoc-in &#91;:main-systems :engine :upgrade&#93;
                                      &quot;Neutron spoils&quot;&#41;
@@ -38,14 +38,14 @@
  :name &quot;Fluxmaster&quot;,
  :main-systems
  {:engine
-  {:type &quot;Flux&quot;, :fuel &quot;Fussion cells&quot;, :upgrade &quot;Neutron spoils&quot;},
+  {:type &quot;Flux&quot;, :fuel &quot;Fusion cells&quot;, :upgrade &quot;Neutron spoils&quot;},
   :turret {:type &quot;Auto plasma incinerator&quot;}}}
-</code></pre><p>But what if we wanted to make this code look more like the shape of the data it actually represents. Lets imagine a function <code>foo-merge</code> that would be called like this:</p><pre><code class="Clojure">&#40;foo-merge
+</code></pre><p>But what if we wanted to make this code look more like the shape of the data it actually represents. Let's imagine a function <code>foo-merge</code> that would be called like this:</p><pre><code class="Clojure">&#40;foo-merge
    ship-data
    {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
                    :engine  {:upgrade &quot;Neutron spoils&quot;
                              :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
-                                       &quot;Fussion cells&quot;&#41;}
+                                       &quot;Fusion cells&quot;&#41;}
                    :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
                                     &quot;Heavy shield&quot;&#41;}}
     :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;
@@ -72,11 +72,11 @@
    {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
                    :engine {:upgrade &quot;Neutron spoils&quot;
                             :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
-                                       &quot;Fussion cells&quot;&#41;}
+                                       &quot;Fusion cells&quot;&#41;}
                    :shield {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
                                     &quot;Heavy shield&quot;&#41;}}
     :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;&#41;
-</code></pre><p>This doesn't quire work as we expect as it leads to insertion of empty maps in some cases <code>:shield {}</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
+</code></pre><p>This doesn't quite work as we expect as it leads to insertion of empty maps in some cases <code>:shield {}</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
    &#40;ready-ship-deep-merge-no-nils heavy-ship-data&#41;&#41;
 
 =&gt; true
@@ -96,7 +96,7 @@
  {:main-systems
   {:turret {:type &quot;Auto plasma incinerator&quot;},
    :engine
-   {:type &quot;Flux&quot;, :fuel &quot;Fussion cells&quot;, :upgrade &quot;Neutron spoils&quot;}},
+   {:type &quot;Flux&quot;, :fuel &quot;Fusion cells&quot;, :upgrade &quot;Neutron spoils&quot;}},
   :name &quot;Fluxmaster&quot;,
   :ship-class &quot;Light&quot;}&#41;
 </code></pre><p>Before we look into ways of solving this edge case let's see what the performance of <code>ready-ship-deep-merge-no-nils</code> vs the original implementation <code>ready-ship-cond-&gt;</code>.</p><p>To do this we use <a href='https://github.com/hugoduncan/criterium'>criterium </a> a great library for doing performance benchmarks in clojure:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
@@ -115,7 +115,7 @@ Execution time mean : 738.743093 ns
 Execution time mean : 16.707967 µs
 ...
 
-</code></pre><p>Turns out <code>deep-merge</code> and <code>clojure.walk/postwalk</code> are not cheap and this leads to the <code>ready-ship-deep-merge-no-nils</code> implementation being over 22 times slower than the <code>ready-ship-cond-&gt;</code> implementation.</p><p>When you have a visual representation of code that you like and an implementation that is less attractive but more performant you can use a macro to get the best of both worlds. Macros allow you to rewrite code at compile time from a representation you prefer to an implementation that works.</p><p>How would we got from our map representation to <code>cond-&gt;</code> and <code>assoc-in</code> implementation? First we will need the paths to each leaf node in our map:</p><pre><code class="Clojure">&#40;defn all-paths &#91;m&#93;
+</code></pre><p>Turns out <code>deep-merge</code> and <code>clojure.walk/postwalk</code> are not cheap and this leads to the <code>ready-ship-deep-merge-no-nils</code> implementation being over 22 times slower than the <code>ready-ship-cond-&gt;</code> implementation.</p><p>When you have a visual representation of code that you like and an implementation that is less attractive but more performant you can use a macro to get the best of both worlds. Macros allow you to rewrite code at compile time from a representation you prefer to an implementation that works.</p><p>How would we get from our map representation to <code>cond-&gt;</code> and <code>assoc-in</code> implementation? First we will need the paths to each leaf node in our map:</p><pre><code class="Clojure">&#40;defn all-paths &#91;m&#93;
   &#40;letfn &#91;&#40;all-paths &#91;m path&#93;
             &#40;lazy-seq
              &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
@@ -136,7 +136,7 @@ Execution time mean : 16.707967 µs
    &#91;&#91;:name&#93; &quot;Thunder&quot;&#93;
    &#91;&#91;:main-systems :shield :type&#93; &quot;Phase&quot;&#93;
    &#91;&#91;:main-systems :engine :type&#93; &quot;Ion&quot;&#93;&#41;
-</code></pre><p>We can then write a mecro that builds a list of <code>let-bindings</code> and <code>conditions</code> that can be passed into a <code>let</code> and <code>cond-&gt;</code>:</p><pre><code class="Clojure">&#40;defmacro cond-deep-merge &#91;m1 m2&#93;
+</code></pre><p>We can then write a macro that builds a list of <code>let-bindings</code> and <code>conditions</code> that can be passed into a <code>let</code> and <code>cond-&gt;</code>:</p><pre><code class="Clojure">&#40;defmacro cond-deep-merge &#91;m1 m2&#93;
   &#40;assert &#40;map? m2&#41;&#41;
   &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
         symbol-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
@@ -165,7 +165,7 @@ Execution time mean : 16.707967 µs
    {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
                    :engine  {:upgrade &quot;Neutron spoils&quot;
                              :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
-                                        &quot;Fussion cells&quot;&#41;}
+                                        &quot;Fusion cells&quot;&#41;}
                    :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
                                      &quot;Heavy shield&quot;&#41;}}
     :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;&#41;
@@ -185,4 +185,4 @@ Execution time mean : 16.707967 µs
 Execution time mean : 775.762294 ns
 ...
 
-</code></pre><p>In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that capture the shape of our output data. Improving programmer ergonomics without sacrificing performance.</p></article></div></body></html>
+</code></pre><p>In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance.</p></article></div></body></html>
