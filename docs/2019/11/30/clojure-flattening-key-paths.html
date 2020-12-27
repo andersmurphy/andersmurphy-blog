@@ -34,20 +34,19 @@
 
 =&gt; 599
 </code></pre><p>On my machine I get a stack overflow at a depth of 600. In practice, you are unlikely to encounter a map that is this deeply nested. However, lets see if we can refactor <code>flatten-paths</code> to use the sequence abstraction so that it can handle deeper maps.</p><h2>Flattening key paths with lazy-seq</h2><p>The <code>lazy-seq</code> takes a body of expressions that returns an <code>ISeq</code> or <code>nil</code> and yields a <code>Seqable</code> object that will invoke the body only the first time <code>seq</code> is called. It will cache the result and return it on all subsequent seq calls. The caching of the body is what allows the <code>lazy-seq</code> macro to call itself recursively without consuming more stackframes the way a normal recursive call would.</p><p>We use the <code>lazy-seq</code> to define a function that recursively builds a list of the flattened key paths. The use of <code>&#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93; ...&#41;</code> is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail. It's also worth noting that to combine the output of the head and the tail operations we use <code>into</code> (strict) rather than <code>concat</code> (lazy). For more details check out <a href='https://stuartsierra.com/2015/04/26/clojure-donts-concat'>this article</a>.</p><pre><code class="clojure">&#40;defn flatten-paths &#91;m separator&#93;
-  &#40;letfn &#91;&#40;flatten-paths &#91;m separator path&#93;
-            &#40;lazy-seq
-             &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
-               &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
-                     &#40;into &#40;flatten-paths v separator &#40;conj path k&#41;&#41;
-                           &#40;flatten-paths xs separator path&#41;&#41;
-                     :else
-                     &#40;into &#91;&#40;-&gt;&gt; &#40;conj path k&#41;
-                                 &#40;map name&#41;
-                                 &#40;clojure.string/join separator&#41;
-                                 keyword&#41; v&#93;
-                           &#40;flatten-paths xs separator path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
-    &#40;-&gt;&gt; &#40;flatten-paths m separator &#91;&#93;&#41;
-         &#40;apply hash-map&#41;&#41;&#41;&#41;
+    &#40;letfn &#91;&#40;flatten-paths &#91;m separator path&#93;
+              &#40;lazy-seq
+               &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
+                 &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                       &#40;into &#40;flatten-paths v separator &#40;conj path k&#41;&#41;
+                             &#40;flatten-paths xs separator path&#41;&#41;
+                       :else
+                       &#40;cons &#91;&#40;-&gt;&gt; &#40;conj path k&#41;
+                                   &#40;map name&#41;
+                                   &#40;clojure.string/join separator&#41;
+                                   keyword&#41; v&#93;
+                             &#40;flatten-paths xs separator path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
+      &#40;into {} &#40;flatten-paths m separator &#91;&#93;&#41;&#41;&#41;&#41;
 
 &#40;flatten-paths &#40;create-n-nested-map 1000000&#41; &quot;-&quot;&#41;
 
