@@ -54,7 +54,7 @@
   &#40;if &#40;every? map? maps&#41; &#40;apply merge-with deep-merge maps&#41; &#40;last maps&#41;&#41;&#41;
 </code></pre><p>We also need to implement a function that removes nil values. As the behaviour of <code>cond-&gt;</code> means it will not associate nil values:</p><pre><code class="Clojure">&#40;defn remove-nils
   &#91;m&#93;
-  &#40;postwalk
+  &#40;clojure.walk/postwalk
    &#40;fn &#91;x&#93;
      &#40;if &#40;map? x&#41;
        &#40;-&gt;&gt; &#40;keep &#40;fn &#91;&#91;k v&#93;&#93; &#40;when &#40;nil? v&#41; k&#41;&#41; x&#41;
@@ -136,7 +136,7 @@ Execution time mean : 16.707967 µs
    &#91;&#91;:name&#93; &quot;Thunder&quot;&#93;
    &#91;&#91;:main-systems :shield :type&#93; &quot;Phase&quot;&#93;
    &#91;&#91;:main-systems :engine :type&#93; &quot;Ion&quot;&#93;&#41;
-</code></pre><p>We can then write a macro that builds a list of <code>let-bindings</code> and <code>conditions</code> that can be passed into a <code>let</code> and <code>cond-&gt;</code>:</p><pre><code class="Clojure">&#40;defmacro cond-deep-merge &#91;m1 m2&#93;
+</code></pre><p>We can then write a macro that builds a list of <code>let-bindings</code> and <code>conditions</code> that can be passed into a <code>let</code> and <code>cond-&gt;</code>:</p><pre><code class="Clojure">&#40;defmacro cond-merge &#91;m1 m2&#93;
   &#40;assert &#40;map? m2&#41;&#41;
   &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
         symbol-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
@@ -147,7 +147,7 @@ Execution time mean : 16.707967 µs
     `&#40;let &#91;&#126;@let-bindings&#93;
        &#40;cond-&gt; &#126;m1
          &#126;@conditions&#41;&#41;&#41;&#41;
-</code></pre><p>It's easier to understand what's going on with this macro by using <code>macroexpand-1</code>:</p><pre><code class="Clojure">&#40;macroexpand-1 '&#40;cond-deep-merge {:a 1} {:b &#40;when true 3&#41; :c false }&#41;&#41;
+</code></pre><p>It's easier to understand what's going on with this macro by using <code>macroexpand-1</code>:</p><pre><code class="Clojure">&#40;macroexpand-1 '&#40;cond-merge {:a 1} {:b &#40;when true 3&#41; :c false }&#41;&#41;
 
 &#40;clojure.core/let
     &#91;G&#95;&#95;26452 &#40;when true 3&#41; G&#95;&#95;26453 false&#93;
@@ -157,10 +157,10 @@ Execution time mean : 16.707967 µs
     &#40;clojure.core/assoc-in &#91;:b&#93; G&#95;&#95;26452&#41;
     &#40;clojure.core/not &#40;clojure.core/nil? G&#95;&#95;26453&#41;&#41;
     &#40;clojure.core/assoc-in &#91;:c&#93; G&#95;&#95;26453&#41;&#41;&#41;
-</code></pre><p>Effectively, we only assoc values to <code>m1</code> if the value is not nil, where value can be the result of an expression:</p><pre><code class="Clojure">&#40;defn ready-ship-cond-deep-merge
+</code></pre><p>Effectively, we only assoc values to <code>m1</code> if the value is not nil, where value can be the result of an expression:</p><pre><code class="Clojure">&#40;defn ready-ship-cond-merge
   &#91;{class :ship-class :as ship-data
     {{engine-type :type} :engine} :main-systems}&#93;
-  &#40;cond-deep-merge
+  &#40;cond-merge
    ship-data
    {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
                    :engine  {:upgrade &quot;Neutron spoils&quot;
@@ -169,16 +169,16 @@ Execution time mean : 16.707967 µs
                    :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
                                      &quot;Heavy shield&quot;&#41;}}
     :name &#40;when &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot;&#41;}&#41;&#41;
-</code></pre><p>Not only does the <code>ready-ship-cond-deep-merge</code> implementation produce the exact same result as <code>ready-ship-cond-&gt;</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
-   &#40;ready-ship-cond-deep-merge    heavy-ship-data&#41;&#41;
+</code></pre><p>Not only does the <code>ready-ship-cond-merge</code> implementation produce the exact same result as <code>ready-ship-cond-&gt;</code>:</p><pre><code class="Clojure">&#40;= &#40;ready-ship-cond-&gt;             heavy-ship-data&#41;
+   &#40;ready-ship-cond-merge    heavy-ship-data&#41;&#41;
 
 =&gt; true
 
 &#40;= &#40;ready-ship-cond-&gt;             light-ship-data&#41;
-   &#40;ready-ship-cond-deep-merge    light-ship-data&#41;&#41;
+   &#40;ready-ship-cond-merge    light-ship-data&#41;&#41;
 
 =&gt; true
-</code></pre><p>It's also just as performant!</p><pre><code class="Clojure">&#40;c/bench &#40;ready-ship-cond-deep-merge    heavy-ship-data&#41;&#41;
+</code></pre><p>It's also just as performant!</p><pre><code class="Clojure">&#40;c/bench &#40;ready-ship-cond-merge    heavy-ship-data&#41;&#41;
 
 =&gt;
 ...
