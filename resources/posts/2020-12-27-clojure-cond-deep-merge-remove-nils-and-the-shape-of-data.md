@@ -92,7 +92,7 @@ We also need to implement a function that removes nil values. As the behaviour o
 ```Clojure
 (defn remove-nils
   [m]
-  (postwalk
+  (clojure.walk/postwalk
    (fn [x]
      (if (map? x)
        (->> (keep (fn [[k v]] (when (nil? v) k)) x)
@@ -216,7 +216,7 @@ This function returns a list of tuples containing the path and value for each le
 We can then write a macro that builds a list of `let-bindings` and `conditions` that can be passed into a `let` and `cond->`:
 
 ```Clojure
-(defmacro cond-deep-merge [m1 m2]
+(defmacro cond-merge [m1 m2]
   (assert (map? m2))
   (let [path-value-pairs (all-paths m2)
         symbol-pairs     (map (fn [pair] [(gensym) pair]) path-value-pairs)
@@ -232,7 +232,7 @@ We can then write a macro that builds a list of `let-bindings` and `conditions` 
 It's easier to understand what's going on with this macro by using `macroexpand-1`:
 
 ```Clojure
-(macroexpand-1 '(cond-deep-merge {:a 1} {:b (when true 3) :c false }))
+(macroexpand-1 '(cond-merge {:a 1} {:b (when true 3) :c false }))
 
 (clojure.core/let
     [G__26452 (when true 3) G__26453 false]
@@ -247,10 +247,10 @@ It's easier to understand what's going on with this macro by using `macroexpand-
 Effectively, we only assoc values to `m1` if the value is not nil, where value can be the result of an expression:
 
 ```Clojure
-(defn ready-ship-cond-deep-merge
+(defn ready-ship-cond-merge
   [{class :ship-class :as ship-data
     {{engine-type :type} :engine} :main-systems}]
-  (cond-deep-merge
+  (cond-merge
    ship-data
    {:main-systems {:turret  {:type "Auto plasma incinerator"}
                    :engine  {:upgrade "Neutron spoils"
@@ -261,16 +261,16 @@ Effectively, we only assoc values to `m1` if the value is not nil, where value c
     :name (when (= engine-type "Flux") "Fluxmaster")}))
 ```
 
-Not only does the `ready-ship-cond-deep-merge` implementation produce the exact same result as `ready-ship-cond->`:
+Not only does the `ready-ship-cond-merge` implementation produce the exact same result as `ready-ship-cond->`:
 
 ```Clojure
 (= (ready-ship-cond->             heavy-ship-data)
-   (ready-ship-cond-deep-merge    heavy-ship-data))
+   (ready-ship-cond-merge    heavy-ship-data))
 
 => true
 
 (= (ready-ship-cond->             light-ship-data)
-   (ready-ship-cond-deep-merge    light-ship-data))
+   (ready-ship-cond-merge    light-ship-data))
 
 => true
 ```
@@ -278,7 +278,7 @@ Not only does the `ready-ship-cond-deep-merge` implementation produce the exact 
 It's also just as performant!
 
 ```Clojure
-(c/bench (ready-ship-cond-deep-merge    heavy-ship-data))
+(c/bench (ready-ship-cond-merge    heavy-ship-data))
 
 =>
 ...
