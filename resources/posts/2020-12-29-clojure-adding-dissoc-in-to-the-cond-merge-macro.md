@@ -29,7 +29,7 @@ Lets start with the code we had at the end of the previous post:
     `(let [~@let-bindings] (cond-> ~m1 ~@conditions))))
 ```
 
-Before we can add disassociation behaviour to our macro we need to implement a convenience function for `dissoc-in` as there isn't one that comes with Clojure. The semantics of `dissoc-in` are not as obvious as you first think once you take into account data structures other than maps (see this [commentary from Alex Miller](https://ask.clojure.org/index.php/730/missing-dissoc-in?start=0#a_list_title)).
+Before we can add disassociation behaviour to our macro we need to implement a convenience function for `dissoc-in` as there isn't one that comes with Clojure. The semantics of `dissoc-in` are not as obvious as you first think once you take into account data structures other than maps (see this [commentary from Alex Miller](https://ask.clojure.org/index.php/730/missing-dissoc-in?start=0#a_list_title)). Here's our first attempt:
 
 ```Clojure
 (defn dissoc-in [m ks]
@@ -50,7 +50,7 @@ But this leaves vestigial paths behind.
 {:k {:b {}}, :a 1}
 ```
 
-We can implement a recursive version that resolves this issue. This version is doesn't use any stack frame optimisation (recur/lazy-seq). `assoc-in` has a similar implementation and if it's good enough for `assoc-in` then it's good enough for `assoc-dissoc`. I imagine the reasoning is that in practice you will rarely encounter a map that has enough layers of nesting to overflow the stack.
+We can implement a recursive version that resolves this issue. This second version doesn't use any stack frame optimisation (recur/lazy-seq). `assoc-in` has a similar implementation and if it's good enough for `assoc-in` then it's probably good enough for `assoc-dissoc`. I imagine the reasoning is that in practice you will rarely encounter a map that has [enough layers of nesting to overflow the stack](https://andersmurphy.com/2019/11/30/clojure-flattening-key-paths.html).
 
 ```Clojure
 (defn dissoc-in
@@ -96,7 +96,7 @@ user/dissoc-in (form-init7710425534552485987.clj:10).
 class clojure.lang.PersistentVector cannot be cast to class clojure.lang.IPersistentMap (clojure.lang.PersistentVector and clojure.lang.IPersistentMap are in unnamed module of loader 'app')
 ```
 
-Thankfully, for this macro we are trying to follow merge semantics. In a `merge` vectors overwrite other vectors. But it something to keep in mind when implementing a macro as semantics can get confusing very quickly as you move away from prior art.
+Thankfully, for this macro we are trying to follow merge semantics. In a `merge` vectors overwrite other vectors. But it is something to keep in mind when implementing a macro as semantics can get confusing very quickly as you move away from prior art.
 
 ```Clojure
 (defn assoc-or-dissoc [m sym path]
