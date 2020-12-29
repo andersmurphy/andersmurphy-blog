@@ -101,7 +101,7 @@ We also need to implement a function that removes nil values. As the behaviour o
    m))
 ```
 
-Finally we van implement `deep-merge-no-nils` which should have the behaviour we desire:
+Finally we can implement `deep-merge-no-nils` which should have the behaviour we desire:
 
 ```Clojure
 (defn deep-merge-no-nils
@@ -156,7 +156,7 @@ This doesn't quite work as we expect as it leads to insertion of empty maps in s
 
 Before we look into ways of solving this edge case let's see what the performance of `ready-ship-deep-merge-no-nils` vs the original implementation `ready-ship-cond->`.
 
-To do this we use [criterium ](https://github.com/hugoduncan/criterium) a great library for doing performance benchmarks in clojure:
+To do this we use [criterium](https://github.com/hugoduncan/criterium) a great library for doing performance benchmarks in clojure:
 
 ```Clojure
 (require '[criterium.core :as c])
@@ -287,4 +287,35 @@ Execution time mean : 775.762294 ns
 
 ```
 
-In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance.
+Though it is worth pointing out that `cond-merge` macro does have some limitations/unexpected behaviour when it comes to nested condition and conditions that return maps. This can lead to overwriting data rather than merging. In the example below `:b` no longer contains `:e 3`. This is what `assoc-in` would do but not what a `deep-merge` would do.
+
+```Clojure
+(cond-merge {:a 1
+             :b {:e 3}}
+{:b (when true {:c 1 :d 2})
+ :c false})
+
+=>
+{:a 1
+ :b {:c 1 :d 2}
+ :c false}
+```
+
+If you separate out the conditions for each value then you do get the expected result.
+
+```Clojure
+(cond-merge {:a 1
+             :b {:e 3}}
+            {:b {:c (when true 1)
+                 :d (when true 2)}
+             :c false})
+
+=>
+{:a 1
+ :b {:e 3
+     :c 1
+     :d 2}
+ :c false}
+```
+
+In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance. We've also learnt that getting the semantics of macros right isn't always easy.
