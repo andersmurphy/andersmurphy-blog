@@ -21,7 +21,7 @@
                                                        `&#40;assoc-in &#126;path &#126;sym&#41;&#93;&#41;
                                  sym-pairs&#41;&#93;
     `&#40;let &#91;&#126;@let-bindings&#93; &#40;cond-&gt; &#126;m1 &#126;@conditions&#41;&#41;&#41;&#41;
-</code></pre><p>Before we can add disassociation behaviour to our macro we need to implement a convenience function for <code>dissoc-in</code> as there isn't one that comes with Clojure. The semantics of <code>dissoc-in</code> are not as obvious as you first think once you take into account data structures other than maps (see this <a href='https://ask.clojure.org/index.php/730/missing-dissoc-in?start=0#a_list_title'>commentary from Alex Miller</a>).</p><pre><code class="Clojure">&#40;defn dissoc-in &#91;m ks&#93;
+</code></pre><p>Before we can add disassociation behaviour to our macro we need to implement a convenience function for <code>dissoc-in</code> as there isn't one that comes with Clojure. The semantics of <code>dissoc-in</code> are not as obvious as you first think once you take into account data structures other than maps (see this <a href='https://ask.clojure.org/index.php/730/missing-dissoc-in?start=0#a_list_title'>commentary from Alex Miller</a>). Here's our first attempt:</p><pre><code class="Clojure">&#40;defn dissoc-in &#91;m ks&#93;
   &#40;let &#91;v    &#40;vec ks&#41;
         path &#40;pop v&#41;
         k    &#40;peek v&#41;&#93;
@@ -32,7 +32,7 @@
 
 =&gt;
 {:k {:b {}}, :a 1}
-</code></pre><p>We can implement a recursive version that resolves this issue. This version is doesn't use any stack frame optimisation (recur/lazy-seq). <code>assoc-in</code> has a similar implementation and if it's good enough for <code>assoc-in</code> then it's good enough for <code>assoc-dissoc</code>. I imagine the reasoning is that in practice you will rarely encounter a map that has enough layers of nesting to overflow the stack.</p><pre><code class="Clojure">&#40;defn dissoc-in
+</code></pre><p>We can implement a recursive version that resolves this issue. This second version doesn't use any stack frame optimisation (recur/lazy-seq). <code>assoc-in</code> has a similar implementation and if it's good enough for <code>assoc-in</code> then it's probably good enough for <code>assoc-dissoc</code>. I imagine the reasoning is that in practice you will rarely encounter a map that has <a href='https://andersmurphy.com/2019/11/30/clojure-flattening-key-paths.html'>enough layers of nesting to overflow the stack</a>.</p><pre><code class="Clojure">&#40;defn dissoc-in
   &#91;m &#91;k &amp; ks&#93;&#93;
   &#40;if ks
     &#40;if-let &#91;nextmap &#40;get m k&#41;&#93;
@@ -63,7 +63,7 @@
 Execution error &#40;ClassCastException&#41; at
 user/dissoc-in &#40;form-init7710425534552485987.clj:10&#41;.
 class clojure.lang.PersistentVector cannot be cast to class clojure.lang.IPersistentMap &#40;clojure.lang.PersistentVector and clojure.lang.IPersistentMap are in unnamed module of loader 'app'&#41;
-</code></pre><p>Thankfully, for this macro we are trying to follow merge semantics. In a <code>merge</code> vectors overwrite other vectors. But it something to keep in mind when implementing a macro as semantics can get confusing very quickly as you move away from prior art.</p><pre><code class="Clojure">&#40;defn assoc-or-dissoc &#91;m sym path&#93;
+</code></pre><p>Thankfully, for this macro we are trying to follow merge semantics. In a <code>merge</code> vectors overwrite other vectors. But it is something to keep in mind when implementing a macro as semantics can get confusing very quickly as you move away from prior art.</p><pre><code class="Clojure">&#40;defn assoc-or-dissoc &#91;m sym path&#93;
   &#40;if &#40;= sym :dissoc&#41;
     &#40;dissoc-in m path&#41;
     &#40;assoc-in  m path sym&#41;&#41;&#41;
