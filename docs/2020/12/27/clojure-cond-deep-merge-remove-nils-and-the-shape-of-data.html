@@ -61,7 +61,7 @@
             &#40;apply dissoc x&#41;&#41;
        x&#41;&#41;
    m&#41;&#41;
-</code></pre><p>Finally we van implement <code>deep-merge-no-nils</code> which should have the behaviour we desire:</p><pre><code class="Clojure">&#40;defn deep-merge-no-nils
+</code></pre><p>Finally we can implement <code>deep-merge-no-nils</code> which should have the behaviour we desire:</p><pre><code class="Clojure">&#40;defn deep-merge-no-nils
   &#91;&amp; maps&#93;
   &#40;apply deep-merge &#40;remove-nils maps&#41;&#41;&#41;
 </code></pre><p>Our new implementation of the ready-ship hydrator:</p><pre><code class="Clojure">&#40;defn ready-ship-deep-merge-no-nils
@@ -99,7 +99,7 @@
    {:type &quot;Flux&quot;, :fuel &quot;Fusion cells&quot;, :upgrade &quot;Neutron spoils&quot;}},
   :name &quot;Fluxmaster&quot;,
   :ship-class &quot;Light&quot;}&#41;
-</code></pre><p>Before we look into ways of solving this edge case let's see what the performance of <code>ready-ship-deep-merge-no-nils</code> vs the original implementation <code>ready-ship-cond-&gt;</code>.</p><p>To do this we use <a href='https://github.com/hugoduncan/criterium'>criterium </a> a great library for doing performance benchmarks in clojure:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
+</code></pre><p>Before we look into ways of solving this edge case let's see what the performance of <code>ready-ship-deep-merge-no-nils</code> vs the original implementation <code>ready-ship-cond-&gt;</code>.</p><p>To do this we use <a href='https://github.com/hugoduncan/criterium'>criterium</a> a great library for doing performance benchmarks in clojure:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
 
 &#40;c/bench &#40;ready-ship-cond-&gt; heavy-ship-data&#41;&#41;
 
@@ -185,4 +185,25 @@ Execution time mean : 16.707967 µs
 Execution time mean : 775.762294 ns
 ...
 
-</code></pre><p>In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance.</p></article></div></body></html>
+</code></pre><p>Though it is worth pointing out that <code>cond-merge</code> macro does have some limitations/unexpected behaviour when it comes to nested condition and conditions that return maps. This can lead to overwriting data rather than merging. In the example below <code>:b</code> no longer contains <code>:e 3</code>. This is what <code>assoc-in</code> would do but not what a <code>deep-merge</code> would do.</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+             :b {:e 3}}
+{:b &#40;when true {:c 1 :d 2}&#41;
+ :c false}&#41;
+
+=&gt;
+{:a 1
+ :b {:c 1 :d 2}
+ :c false}
+</code></pre><p>If you separate out the conditions for each value then you do get the expected result.</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+             :b {:e 3}}
+            {:b {:c &#40;when true 1&#41;
+                 :d &#40;when true 2&#41;}
+             :c false}&#41;
+
+=&gt;
+{:a 1
+ :b {:e 3
+     :c 1
+     :d 2}
+ :c false}
+</code></pre><p>In this post we've seen how to use code as data and macros to develop a more readable  data literal representation that captures the shape of our output data. Improving programmer ergonomics without sacrificing performance. We've also learnt that getting the semantics of macros right isn't always easy.</p></article></div></body></html>
