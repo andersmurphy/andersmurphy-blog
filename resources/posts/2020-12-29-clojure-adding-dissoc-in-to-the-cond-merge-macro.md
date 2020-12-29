@@ -1,6 +1,6 @@
 Title: Clojure: adding dissoc-in to our cond-merge macro
 
-In the previous post we created a macro called `cond-merge` to conditionally associate in values to a map. In this post we will cover adding disassociation (removal of items) to this macro.
+In [the previous post](https://andersmurphy.com/2020/12/27/clojure-cond-deep-merge-remove-nils-and-the-shape-of-data.html) we created a macro called `cond-merge` to conditionally associate in values to a map. In this post we will cover adding disassociation (removal of items) to this macro.
 
 Lets start with the code we had at the end of the previous post:
 
