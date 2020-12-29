@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: adding dissoc-in to our cond-merge macro</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: adding dissoc-in to our cond-merge macro</h1><time class="post-date" datetime="2020-12-29T00:00:00+00:00">29 Dec 2020</time><p>In the previous post we created a macro called <code>cond-merge</code> to conditionally associate in values to a map. In this post we will cover adding disassociation (removal of items) to this macro.</p><p>Lets start with the code we had at the end of the previous post:</p><pre><code class="Clojure">&#40;defn all-paths &#91;m&#93;
+  &#40;letfn &#91;&#40;all-paths &#91;m path&#93;
+            &#40;lazy-seq
+             &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
+               &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                     &#40;into &#40;all-paths v &#40;conj path k&#41;&#41;
+                           &#40;all-paths xs path&#41;&#41;
+                     :else
+                     &#40;cons &#91;&#40;conj path k&#41; v&#93;
+                           &#40;all-paths xs path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
+    &#40;all-paths m &#91;&#93;&#41;&#41;&#41;
+
+&#40;defmacro cond-merge
+  &#91;m1 m2&#93;
+  &#40;assert &#40;map? m2&#41;&#41;
+  &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
+        sym-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
+        let-bindings     &#40;mapcat &#40;fn &#91;&#91;sym &#91;&#95; v&#93;&#93;&#93; &#91;sym v&#93;&#41; sym-pairs&#41;
+        conditions       &#40;mapcat &#40;fn &#91;&#91;sym &#91;path &#95;&#93;&#93;&#93; &#91;`&#40;not &#40;nil? &#126;sym&#41;&#41;
+                                                       `&#40;assoc-in &#126;path &#126;sym&#41;&#93;&#41;
+                                 sym-pairs&#41;&#93;
+    `&#40;let &#91;&#126;@let-bindings&#93; &#40;cond-&gt; &#126;m1 &#126;@conditions&#41;&#41;&#41;&#41;
+</code></pre><p>Before we can add disassociation behaviour to our macro we need to implement a convenience function for <code>dissoc-in</code> as there isn't one that comes with Clojure. The semantics of <code>dissoc-in</code> are not as obvious as you first think once you take into account data structures other than maps (see this <a href='https://ask.clojure.org/index.php/730/missing-dissoc-in?start=0#a_list_title'>commentary from Alex Miller</a>).</p><pre><code class="Clojure">&#40;defn dissoc-in &#91;m ks&#93;
+  &#40;let &#91;v    &#40;vec ks&#41;
+        path &#40;pop v&#41;
+        k    &#40;peek v&#41;&#93;
+    &#40;update-in m path dissoc k&#41;&#41;&#41;
+</code></pre><p>But this leaves vestigial paths behind.</p><pre><code class="Clojure">&#40;dissoc-in {:k {:b {:c 1}}
+              :a 1}
+             &#91;:k :b :c&#93;&#41;
+
+=&gt;
+{:k {:b {}}, :a 1}
+</code></pre><p>We can implement a recursive version that resolves this issue. This version is doesn't use any stack frame optimisation (recur/lazy-seq). <code>assoc-in</code> has a similar implementation and if it's good enough for <code>assoc-in</code> then it's good enough for <code>assoc-dissoc</code>. I imagine the reasoning is that in practice you will rarely encounter a map that has enough layers of nesting to overflow the stack.</p><pre><code class="Clojure">&#40;defn dissoc-in
+  &#91;m &#91;k &amp; ks&#93;&#93;
+  &#40;if ks
+    &#40;if-let &#91;nextmap &#40;get m k&#41;&#93;
+      &#40;let &#91;newmap &#40;dissoc-in nextmap ks&#41;&#93;
+        &#40;if &#40;seq newmap&#41;
+          &#40;assoc m k newmap&#41;
+          &#40;dissoc m k&#41;&#41;&#41;
+      m&#41;
+    &#40;dissoc m k&#41;&#41;&#41;
+</code></pre><p>This implementation gives us a much cleaner result.</p><pre><code class="Clojure">&#40;dissoc-in {:k {:b {:c 1}}
+              :a 1}
+             &#91;:k :b :c&#93;&#41;
+
+=&gt;
+{:a 1}
+</code></pre><p>Technically, <code>dissoc-in</code> won't handle vectors like <code>assoc-in</code>:</p><pre><code class="Clojure">&#40;assoc-in {:k {:b {:c 1}
+               :a &#91;1 3&#93;}}
+          &#91;:k :a 0&#93; 39&#41;
+
+=&gt;
+{:k {:b {:c 1}, :a &#91;39 3&#93;}}
+
+&#40;dissoc-in {:k {:b {:c 1}
+                :a &#91;1 3&#93;}}
+             &#91;:k :a 0&#93;&#41;
+
+=&gt;
+Execution error &#40;ClassCastException&#41; at
+user/dissoc-in &#40;form-init7710425534552485987.clj:10&#41;.
+class clojure.lang.PersistentVector cannot be cast to class clojure.lang.IPersistentMap &#40;clojure.lang.PersistentVector and clojure.lang.IPersistentMap are in unnamed module of loader 'app'&#41;
+</code></pre><p>Thankfully, for this macro we are trying to follow merge semantics. In a <code>merge</code> vectors overwrite other vectors. But it something to keep in mind when implementing a macro as semantics can get confusing very quickly as you move away from prior art.</p><pre><code class="Clojure">&#40;defn assoc-or-dissoc &#91;m sym path&#93;
+  &#40;if &#40;= sym :dissoc&#41;
+    &#40;dissoc-in m path&#41;
+    &#40;assoc-in  m path sym&#41;&#41;&#41;
+
+&#40;defmacro cond-merge &#91;m1 m2&#93;
+  &#40;assert &#40;map? m2&#41;&#41;
+  &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
+        sym-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
+        let-bindings     &#40;mapcat &#40;fn &#91;&#91;sym &#91;&#95; v&#93;&#93;&#93; &#91;sym v&#93;&#41; sym-pairs&#41;
+        conditions       &#40;mapcat &#40;fn &#91;&#91;sym &#91;path &#95;&#93;&#93;&#93;
+                                   &#91;`&#40;not &#40;nil? &#126;sym&#41;&#41;
+                                    `&#40;assoc-or-dissoc &#126;sym &#126;path&#41;&#93;&#41;
+                                 sym-pairs&#41;&#93;
+    `&#40;let &#91;&#126;@let-bindings&#93;
+       &#40;cond-&gt; &#126;m1
+         &#126;@conditions&#41;&#41;&#41;&#41;
+</code></pre><p>We can now use the <code>:dissoc</code> keyword to remove items when we use <code>cond-merge</code>:</p><pre><code class="Clojure">&#40;def heavy-ship-data
+  {:ship-class &quot;Heavy&quot;
+   :name  &quot;Thunder&quot;
+   :main-systems {:engine {:type &quot;Ion&quot;}}}&#41;
+
+&#40;defn ready-ship-cond-merge
+  &#91;{class :ship-class :as ship-data
+    {{engine-type :type} :engine} :main-systems}&#93;
+  &#40;cond-merge
+   ship-data
+   {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
+                   :engine  {:type :dissoc
+                             :upgrade &quot;Neutron spoils&quot;
+                             :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
+                                        &quot;Fusion cells&quot;&#41;}
+                   :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
+                                     &quot;Heavy shield&quot;&#41;}}
+    :name &#40;if &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot; :dissoc&#41;}&#41;&#41;
+
+&#40;ready-ship-cond-merge heavy-ship-data&#41;
+
+=&gt;
+{:ship-class &quot;Heavy&quot;,
+ :main-systems
+ {:engine {:upgrade &quot;Neutron spoils&quot;},
+  :shield {:type &quot;Heavy shield&quot;},
+  :turret {:type &quot;Auto plasma incinerator&quot;}}}
+</code></pre><p>If you are concerned about a potential name collision with <code>:dissoc</code> (for example if your existing data has the <code>:dissoc</code> as a value) then you can use a namespace keywords:</p><pre><code class="Clojure">&#40;defn assoc-or-dissoc &#91;m sym path&#93;
+  &#40;if &#40;= sym ::dissoc&#41;
+    &#40;dissoc-in m path&#41;
+    &#40;assoc-in  m path sym&#41;&#41;&#41;
+</code></pre><p>This assumes that the macro will be implemented in its own namespace. You would then use it like this:</p><pre><code class="Clojure">&#40;require  '&#91;project-name.util-lib :as lib&#93;&#41;&#41;
+
+&#40;defn ready-ship-cond-merge
+  &#91;{class :ship-class :as ship-data
+    {{engine-type :type} :engine} :main-systems}&#93;
+  &#40;lib/cond-merge
+   ship-data
+   {:main-systems {:turret  {:type &quot;Auto plasma incinerator&quot;}
+                   :engine  {:type ::lib/dissoc
+                             :upgrade &quot;Neutron spoils&quot;
+                             :fuel    &#40;when &#40;= engine-type &quot;Flux&quot;&#41;
+                                        &quot;Fusion cells&quot;&#41;}
+                   :shield  {:type &#40;when &#40;= class &quot;Heavy&quot;&#41;
+                                     &quot;Heavy shield&quot;&#41;}}
+    :name &#40;if &#40;= engine-type &quot;Flux&quot;&#41; &quot;Fluxmaster&quot; ::lib/dissoc&#41;}&#41;&#41;
+</code></pre><p>In this post we've seen how to extend our <code>cond-merge</code> macro to support disassociation by using a keyword and rewriting it in a macro.</p></article></div></body></html>
