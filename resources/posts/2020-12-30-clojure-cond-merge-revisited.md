@@ -16,7 +16,7 @@ Here's an example of the problem:
  :c false}
 ```
 
-If we revisit our macro code:
+Let's revisit our macro code:
 
 ```Clojure
 (defn all-paths [m]
@@ -64,9 +64,9 @@ If we macroexpand the code we should be able to see why we are getting this over
   (clojure.core/assoc-in [:c] G__43629)))
 ```
 
-We can see that the value of `G__43628` is `(when true {:c 1, :d 2})` which means when that we will get `(assoc-in {:a 1, :b {:e 3}} [:b] {:c 1, :d 2})`. This explains why the pair `:e 3` get overwritten. To solve this at macroexpand time we would need to evaluate the expression `(when true {:c 1 :d 2})` at compile time to see whether it returns a map. While it would be possible to support a subset of functions like `when` and `if` and see whether they return map literals in their branches, it would not be possible to support complex functions with runtime input that may evaluate to maps.
+We can see that the value of `G__43628` is `(when true {:c 1, :d 2})` which will evaluate to `(assoc-in {:a 1, :b {:e 3}} [:b] {:c 1, :d 2})`. This explains why the pair `:e 3` gets overwritten. To solve this at macroexpand time we would need to evaluate the expression `(when true {:c 1 :d 2})` at compile time to see whether it returns a map. While it is possible to support a subset of functions like `when` and `if` and see whether they return map literals in their branches, it would  be impossible to support complex functions with runtime input that may evaluate to maps.
 
-Fundamentally this problem is much easier to solve at runtime, the realm of functions. So let's revisit our plain function solution by first looking at the source of `merge-with`.
+Fundamentally, this problem is much easier to solve at runtime, the realm of functions. So let's revisit our plain function solution by first looking at the source of `merge-with`.
 
 ```Clojure
 (clojure.repl/source merge-with)
@@ -91,7 +91,7 @@ Fundamentally this problem is much easier to solve at runtime, the realm of func
         (reduce1 merge2 maps))))
 ```
 
-In the previous post we found our function solution had a massive performance cost. Most likely because it used `clojure.walk/postwalk` which is expensive performance-wise. If we could write our own version of `merge-with` which handled `nil` values on the first pass we should be able get similar performance to `merge-with`.
+In the previous post we found our function solution had a large performance cost. Most likely because it used `clojure.walk/postwalk` which is expensive performance-wise. If we could write our own version of `merge-with` which handled `nil` values on the first pass we should be able get similar performance to `merge-with`.
 
 Here's our new function version of `cond-merge` which is effectively `merge-with` with some minor changes:
 
@@ -233,6 +233,6 @@ Execution time mean : 1.948614 µs
 ...
 ```
 
-Personally, I don't think the performance gain warrants the additional complexity of the macro. That being said it's nice to be able to fall back to it if need be. After all a 1.5-2x performance increase can make a big win if it's a bottleneck. Worth keeping in mind that the performance characteristics might be radically different with much larger data sets/nesting.
+Personally, I don't think the performance gain warrants the additional complexity of the macro. That being said it's nice to be able to fall back to it if need be. After all a 1.5-2x performance increase can be a big win if it's at a bottleneck. Worth keeping in mind that the performance characteristics might be radically different with much larger data sets/nesting.
 
-In this post we've seen that macros aren't always a straightforward solution and come with their own sets of trade offs.
+In this post we've seen that macros aren't always a straightforward solution and come with their own sets of trade-offs.
