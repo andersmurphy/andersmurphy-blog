@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: cond-merge revisited</title><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/nord.css" rel="stylesheet" /><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script><script>hljs.initHighlightingOnLoad();</script><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" src="https://andersmurphy.com/assets/anderspixel.png" /><h1><a href="https://andersmurphy.com">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav><p>© 2015-2020 Anders Murphy</p></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: cond-merge revisited</h1><time class="post-date" datetime="2020-12-30T00:00:00+00:00">30 Dec 2020</time><p>In <a href='https://andersmurphy.com/2020/12/27/clojure-cond-deep-merge-remove-nils-and-the-shape-of-data.html'>this post</a> we created a macro called <code>cond-merge</code> to conditionally associate in values to a map. In this post we will revisit some of the limitations of <code>cond-merge</code> when it comes to nested conditionals and conditionals that return maps that can lead to overwriting data rather than merging data.</p><p>Here's an example of the problem:</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+             :b {:e 3}}
+            {:b &#40;when true {:c 1 :d 2}&#41;
+             :c false}&#41;
+
+=&gt;
+{:a 1
+ :b {:c 1 :d 2}
+ :c false}
+</code></pre><p>If we revisit our macro code:</p><pre><code class="Clojure">&#40;defn all-paths &#91;m&#93;
+  &#40;letfn &#91;&#40;all-paths &#91;m path&#93;
+            &#40;lazy-seq
+             &#40;when-let &#91;&#91;&#91;k v&#93; &amp; xs&#93; &#40;seq m&#41;&#93;
+               &#40;cond &#40;and &#40;map? v&#41; &#40;not-empty v&#41;&#41;
+                     &#40;into &#40;all-paths v &#40;conj path k&#41;&#41;
+                           &#40;all-paths xs path&#41;&#41;
+                     :else
+                     &#40;cons &#91;&#40;conj path k&#41; v&#93;
+                           &#40;all-paths xs path&#41;&#41;&#41;&#41;&#41;&#41;&#93;
+    &#40;all-paths m &#91;&#93;&#41;&#41;&#41;
+
+&#40;defmacro cond-merge &#91;m1 m2&#93;
+    &#40;assert &#40;map? m2&#41;&#41;
+    &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
+          sym-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
+          let-bindings  &#40;mapcat &#40;fn &#91;&#91;sym &#91;&#95; v&#93;&#93;&#93; &#91;sym v&#93;&#41; sym-pairs&#41;
+          conditions    &#40;mapcat &#40;fn &#91;&#91;sym &#91;path &#95;&#93;&#93;&#93;
+                                  &#91;`&#40;not &#40;nil? &#126;sym&#41;&#41; `&#40;assoc-in &#126;path &#126;sym&#41;&#93;&#41;
+                                sym-pairs&#41;&#93;
+      `&#40;let &#91;&#126;@let-bindings&#93;
+         &#40;cond-&gt; &#126;m1
+           &#126;@conditions&#41;&#41;&#41;&#41;
+</code></pre><p>If we macroexpand the code we should be able to see why we are getting this overwrite behaviour:</p><pre><code class="Clojure">&#40;macroexpand-1
+   '&#40;cond-merge {:a 1
+                 :b {:e 3}}
+                {:b &#40;when true {:c 1 :d 2}&#41;
+                 :c false}&#41;&#41;
+
+=&gt;
+&#40;clojure.core/let
+ &#91;G&#95;&#95;43628 &#40;when true {:c 1, :d 2}&#41; G&#95;&#95;43629 false&#93;
+ &#40;clojure.core/cond-&gt;
+  {:a 1, :b {:e 3}}
+  &#40;clojure.core/not &#40;clojure.core/nil? G&#95;&#95;43628&#41;&#41;
+  &#40;clojure.core/assoc-in &#91;:b&#93; G&#95;&#95;43628&#41;
+  &#40;clojure.core/not &#40;clojure.core/nil? G&#95;&#95;43629&#41;&#41;
+  &#40;clojure.core/assoc-in &#91;:c&#93; G&#95;&#95;43629&#41;&#41;&#41;
+</code></pre><p>We can see that the value of <code>G&#95;&#95;43628</code> is <code>&#40;when true {:c 1, :d 2}&#41;</code> which means when that we will get <code>&#40;assoc-in {:a 1, :b {:e 3}} &#91;:b&#93; {:c 1, :d 2}&#41;</code>. This explains why the pair <code>:e 3</code> get overwritten. To solve this at macroexpand time we would need to evaluate the expression <code>&#40;when true {:c 1 :d 2}&#41;</code> at compile time to see whether it returns a map. While it would be possible to support a subset of functions like <code>when</code> and <code>if</code> and see whether they return map literals in their branches, it would not be possible to support complex functions with runtime input that may evaluate to maps.</p><p>Fundamentally this problem is much easier to solve at runtime, the realm of functions. So let's revisit our plain function solution by first looking at the source of <code>merge-with</code>.</p><pre><code class="Clojure">&#40;clojure.repl/source merge-with&#41;
+
+=&gt;
+  &#40;defn merge-with
+    &quot;Returns a map that consists of the rest of the maps conj-ed onto
+  the first.  If a key occurs in more than one map, the mapping&#40;s&#41;
+  from the latter &#40;left-to-right&#41; will be combined with the mapping in
+  the result by calling &#40;f val-in-result val-in-latter&#41;.&quot;
+    {:added &quot;1.0&quot;
+     :static true}
+    &#91;f &amp; maps&#93;
+    &#40;when &#40;some identity maps&#41;
+      &#40;let &#91;merge-entry &#40;fn &#91;m e&#93;
+                                &#40;let &#91;k &#40;key e&#41; v &#40;val e&#41;&#93;
+                                  &#40;if &#40;contains? m k&#41;
+                                    &#40;assoc m k &#40;f &#40;get m k&#41; v&#41;&#41;
+                                    &#40;assoc m k v&#41;&#41;&#41;&#41;
+            merge2 &#40;fn &#91;m1 m2&#93;
+                         &#40;reduce1 merge-entry &#40;or m1 {}&#41; &#40;seq m2&#41;&#41;&#41;&#93;
+        &#40;reduce1 merge2 maps&#41;&#41;&#41;&#41;
+</code></pre><p>In the previous post we found our function solution had a massive performance cost. Most likely because it used <code>clojure.walk/postwalk</code> which is expensive performance-wise. If we could write our own version of <code>merge-with</code> which handled <code>nil</code> values on the first pass we should be able get similar performance to <code>merge-with</code>.</p><p>Here's our new function version of <code>cond-merge</code> which is effectively <code>merge-with</code> with some minor changes:</p><pre><code class="Clojure">&#40;defn cond-merge
+  &#91;&amp; maps&#93;
+  &#40;when &#40;some identity maps&#41;
+    &#40;letfn &#91;&#40;merge-e &#91;m e&#93;
+              &#40;let &#91;k &#40;key e&#41; v &#40;val e&#41;&#93;
+                &#40;cond
+                  &#40;nil? v&#41; m
+                  &#40;map? v&#41; &#40;let &#91;v &#40;cond-merge &#40;k m&#41; v&#41;&#93;
+                             &#40;if &#40;seq v&#41;
+                               &#40;assoc m k v&#41;
+                               m&#41;&#41;
+                  :else    &#40;assoc m k v&#41;&#41;&#41;&#41;
+            &#40;merge2 &#91;m1 m2&#93;
+              &#40;reduce merge-e &#40;or m1 {}&#41; m2&#41;&#41;&#93;
+      &#40;reduce merge2 maps&#41;&#41;&#41;&#41;
+</code></pre><p>Our new function produces the expected results:</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+             :b {:e 3}
+             :d {:e {:f 2}}}
+            {:b &#40;when true {:c 1 :d 2}&#41;
+             :c false
+             :d {:e {:f &#40;when false 1&#41;}}
+             :e {:a &#40;when false 1&#41;}
+             :a &#40;when false 1&#41;}&#41;
+
+=&gt;
+{:a 1
+ :b {:e 3 :c 1 :d 2}
+ :c false}
+</code></pre><p>It also handles empty maps and overwriting vectors:</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+             :b {:e 3}
+             :d {:e {:f 2}}
+             :x &#91;1&#93;}
+            {:b &#40;when true {:c 1 :d 2}&#41;
+             :c false
+             :d {:e {:f &#40;when false 1&#41;}}
+             :e {:a &#40;when false 1&#41;}
+             :a &#40;when false 1&#41;
+             :y {:a 1
+                 :b {:e 3}
+                 :d {:e {:f 2}}}
+             :z &#91;&#93;
+             :n {}
+             :x &#91;&#93;}&#41;
+
+=&gt;
+{:a 1,
+ :b {:e 3, :c 1, :d 2},
+ :d {:e {:f 2}},
+ :x &#91;&#93;,
+ :y {:a 1, :b {:e 3}, :d {:e {:f 2}}},
+ :z &#91;&#93;,
+ :c false}
+</code></pre><p>The performance is not bad:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
+
+&#40;c/bench
+ &#40;cond-merge-old {:a 1
+                  :b {:e 3}
+                  :d {:e {:f 2}}
+                  :x &#91;1&#93;}
+                 {:b {:c &#40;when true 1&#41;
+                      :d &#40;when true 2&#41;}
+                  :c false
+                  :d {:e {:f &#40;when false 1&#41;}}
+                  :e {:a &#40;when false 1&#41;}
+                  :a &#40;when false 1&#41;
+                  :y {:a 1
+                      :b {:e 3}
+                      :d {:e {:f 2}}}
+                  :z &#91;&#93;
+                  :n {}
+                  :x &#91;&#93;}&#41;&#41;
+
+=&gt;
+...
+Execution time mean : 3.950938 µs
+...
+</code></pre><p>We can improve performance by moving to a hybrid approach:</p><pre><code class="Clojure">&#40;defn if-map-cond-merge &#91;m path s&#93;
+  &#40;if &#40;map? s&#41;
+    &#40;cond-merge m &#40;assoc-in {} path s&#41;&#41;
+    &#40;assoc-in m path s&#41;&#41;&#41;
+
+&#40;defmacro cond-merge-hybrid
+  &#91;m1 m2&#93;
+  &#40;assert &#40;map? m2&#41;&#41;
+  &#40;let &#91;path-value-pairs &#40;all-paths m2&#41;
+        symbol-pairs     &#40;map &#40;fn &#91;pair&#93; &#91;&#40;gensym&#41; pair&#93;&#41; path-value-pairs&#41;
+        let-bindings     &#40;mapcat &#40;fn &#91;&#91;s &#91;&#95; v&#93;&#93;&#93; &#91;s v&#93;&#41; symbol-pairs&#41;
+        conditions       &#40;mapcat &#40;fn &#91;&#91;s &#91;path &#95;&#93;&#93;&#93; &#91;`&#40;not &#40;nil? &#126;s&#41;&#41;
+                                                     `&#40;if-map-cond-merge &#126;path &#126;s&#41;&#93;&#41;
+                                 symbol-pairs&#41;&#93;
+    `&#40;let &#91;&#126;@let-bindings&#93; &#40;cond-&gt; &#126;m1 &#126;@conditions&#41;&#41;&#41;&#41;
+
+&#40;c/bench
+ &#40;cond-merge-hybrid {:a 1
+                     :b {:e 3}
+                     :d {:e {:f 2}}
+                     :x &#91;1&#93;}
+                    {:b {:c &#40;when true 1&#41;
+                         :d &#40;when true 2&#41;}
+                     :c false
+                     :d {:e {:f &#40;when false 1&#41;}}
+                     :e {:a &#40;when false 1&#41;}
+                     :a &#40;when false 1&#41;
+                     :y {:a 1
+                         :b {:e 3}
+                         :d {:e {:f 2}}}
+                     :z &#91;&#93;
+                     :n {}
+                     :x &#91;&#93;}&#41;&#41;
+
+=&gt;
+...
+Execution time mean : 1.948614 µs
+...
+</code></pre><p>Personally, I don't think the performance gain warrants the additional complexity of the macro. That being said it's nice to be able to fall back to it if need be. After all a 1.5-2x performance increase can make a big win if it's a bottleneck. Worth keeping in mind that the performance characteristics might be radically different with much larger data sets/nesting.</p><p>In this post we've seen that macros aren't always a straightforward solution and come with their own sets of trade offs.</p></article></div></body></html>

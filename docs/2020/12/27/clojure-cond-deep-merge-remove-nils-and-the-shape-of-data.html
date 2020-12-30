@@ -185,10 +185,10 @@ Execution time mean : 16.707967 µs
 Execution time mean : 775.762294 ns
 ...
 
-</code></pre><p>Though it is worth pointing out that <code>cond-merge</code> macro does have some limitations/unexpected behaviour when it comes to nested condition and conditions that return maps. This can lead to overwriting data rather than merging. In the example below <code>:b</code> no longer contains <code>:e 3</code>. This is what <code>assoc-in</code> would do but not what a <code>deep-merge</code> would do.</p><pre><code class="Clojure">&#40;cond-merge {:a 1
+</code></pre><p>Though it is worth pointing out that <code>cond-merge</code> macro does have some limitations/unexpected behaviour when it comes to nested conditionals and conditionals that return maps. This can lead to overwriting data rather than merging data. In the example below <code>:b</code> no longer contains <code>:e 3</code>. This is what <code>assoc-in</code> would do but not what a <code>deep-merge</code> would do.</p><pre><code class="Clojure">&#40;cond-merge {:a 1
              :b {:e 3}}
-{:b &#40;when true {:c 1 :d 2}&#41;
- :c false}&#41;
+            {:b &#40;when true {:c 1 :d 2}&#41;
+             :c false}&#41;
 
 =&gt;
 {:a 1
