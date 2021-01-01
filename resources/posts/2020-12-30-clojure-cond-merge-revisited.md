@@ -98,20 +98,17 @@ Here's our new function version of `cond-merge` which is effectively `merge-with
 
 ```Clojure
 (defn cond-merge
-  [& maps]
-  (when (some identity maps)
-    (letfn [(merge-e [m e]
-              (let [k (key e) v (val e)]
-                (cond
-                  (nil? v) m
-                  (map? v) (let [v (cond-merge (k m) v)]
-                             (if (seq v)
-                               (assoc m k v)
-                               m))
-                  :else    (assoc m k v))))
-            (merge2 [m1 m2]
-              (reduce merge-e (or m1 {}) m2))]
-      (reduce merge2 maps))))
+    [m1 m2]
+    (when (or m1 m2)
+      (letfn [(merge-e [m e]
+                (let [k (key e) v (val e)]
+                  (cond (nil? v)      m
+                        (map? v)      (let [v (cond-merge (k m) v)]
+                                        (if (seq v)
+                                          (assoc m k v)
+                                          m))
+                        :else         (assoc m k v))))]
+        (reduce merge-e (or m1 {}) m2))))
 ```
 
 Our new function produces the expected results:
@@ -167,26 +164,26 @@ The performance is not bad:
 (require '[criterium.core :as c])
 
 (c/bench
- (cond-merge-old {:a 1
-                  :b {:e 3}
-                  :d {:e {:f 2}}
-                  :x [1]}
-                 {:b {:c (when true 1)
-                      :d (when true 2)}
-                  :c false
-                  :d {:e {:f (when false 1)}}
-                  :e {:a (when false 1)}
-                  :a (when false 1)
-                  :y {:a 1
-                      :b {:e 3}
-                      :d {:e {:f 2}}}
-                  :z []
-                  :n {}
-                  :x []}))
+ (cond-merge {:a 1
+               :b {:e 3}
+               :d {:e {:f 2}}
+               :x [1]}
+              {:b {:c (when true 1)
+                   :d (when true 2)}
+               :c false
+               :d {:e {:f (when false 1)}}
+               :e {:a (when false 1)}
+               :a (when false 1)
+               :y {:a 1
+                   :b {:e 3}
+                   :d {:e {:f 2}}}
+               :z []
+               :n {}
+               :x []}))
 
 =>
 ...
-Execution time mean : 3.950938 µs
+Execution time mean : 3.286627 µs
 ...
 ```
 
@@ -229,7 +226,7 @@ We can improve performance by moving to a hybrid approach:
 
 =>
 ...
-Execution time mean : 1.948614 µs
+Execution time mean : 1.477918 µs
 ...
 ```
 
