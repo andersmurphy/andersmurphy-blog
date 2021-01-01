@@ -118,22 +118,22 @@
 </code></pre><p>The performance is not bad:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
 
 &#40;c/bench
- &#40;cond-merge {:a 1
-               :b {:e 3}
-               :d {:e {:f 2}}
-               :x &#91;1&#93;}
-              {:b {:c &#40;when true 1&#41;
-                   :d &#40;when true 2&#41;}
-               :c false
-               :d {:e {:f &#40;when false 1&#41;}}
-               :e {:a &#40;when false 1&#41;}
-               :a &#40;when false 1&#41;
-               :y {:a 1
-                   :b {:e 3}
-                   :d {:e {:f 2}}}
-               :z &#91;&#93;
-               :n {}
-               :x &#91;&#93;}&#41;&#41;
+   &#40;cond-merge
+    {:a 1
+     :b {:e 3}
+     :d {:e {:f 2}}
+     :x &#91;1&#93;}
+    {:b &#40;when true {:c 1 :d 2}&#41;
+     :c false
+     :d {:e {:f &#40;when false 1&#41;}}
+     :e {:a &#40;when false 1&#41;}
+     :a &#40;when false 1&#41;
+     :y {:a 1
+         :b {:e 3}
+         :d {:e {:f 2}}}
+     :z &#91;&#93;
+     :n {}
+     :x &#91;&#93;}&#41;&#41;
 
 =&gt;
 ...
@@ -156,22 +156,22 @@ Execution time mean : 3.286627 µs
     `&#40;let &#91;&#126;@let-bindings&#93; &#40;cond-&gt; &#126;m1 &#126;@conditions&#41;&#41;&#41;&#41;
 
 &#40;c/bench
- &#40;cond-merge-hybrid {:a 1
-                     :b {:e 3}
-                     :d {:e {:f 2}}
-                     :x &#91;1&#93;}
-                    {:b {:c &#40;when true 1&#41;
-                         :d &#40;when true 2&#41;}
-                     :c false
-                     :d {:e {:f &#40;when false 1&#41;}}
-                     :e {:a &#40;when false 1&#41;}
-                     :a &#40;when false 1&#41;
-                     :y {:a 1
-                         :b {:e 3}
-                         :d {:e {:f 2}}}
-                     :z &#91;&#93;
-                     :n {}
-                     :x &#91;&#93;}&#41;&#41;
+   &#40;cond-merge-hybrid
+    {:a 1
+     :b {:e 3}
+     :d {:e {:f 2}}
+     :x &#91;1&#93;}
+    {:b &#40;when true {:c 1 :d 2}&#41;
+     :c false
+     :d {:e {:f &#40;when false 1&#41;}}
+     :e {:a &#40;when false 1&#41;}
+     :a &#40;when false 1&#41;
+     :y {:a 1
+         :b {:e 3}
+         :d {:e {:f 2}}}
+     :z &#91;&#93;
+     :n {}
+     :x &#91;&#93;}&#41;&#41;
 
 =&gt;
 ...
