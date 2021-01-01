@@ -164,22 +164,22 @@ The performance is not bad:
 (require '[criterium.core :as c])
 
 (c/bench
- (cond-merge {:a 1
-               :b {:e 3}
-               :d {:e {:f 2}}
-               :x [1]}
-              {:b {:c (when true 1)
-                   :d (when true 2)}
-               :c false
-               :d {:e {:f (when false 1)}}
-               :e {:a (when false 1)}
-               :a (when false 1)
-               :y {:a 1
-                   :b {:e 3}
-                   :d {:e {:f 2}}}
-               :z []
-               :n {}
-               :x []}))
+   (cond-merge
+    {:a 1
+     :b {:e 3}
+     :d {:e {:f 2}}
+     :x [1]}
+    {:b (when true {:c 1 :d 2})
+     :c false
+     :d {:e {:f (when false 1)}}
+     :e {:a (when false 1)}
+     :a (when false 1)
+     :y {:a 1
+         :b {:e 3}
+         :d {:e {:f 2}}}
+     :z []
+     :n {}
+     :x []}))
 
 =>
 ...
@@ -207,22 +207,22 @@ We can improve performance by moving to a hybrid approach:
     `(let [~@let-bindings] (cond-> ~m1 ~@conditions))))
 
 (c/bench
- (cond-merge-hybrid {:a 1
-                     :b {:e 3}
-                     :d {:e {:f 2}}
-                     :x [1]}
-                    {:b {:c (when true 1)
-                         :d (when true 2)}
-                     :c false
-                     :d {:e {:f (when false 1)}}
-                     :e {:a (when false 1)}
-                     :a (when false 1)
-                     :y {:a 1
-                         :b {:e 3}
-                         :d {:e {:f 2}}}
-                     :z []
-                     :n {}
-                     :x []}))
+   (cond-merge-hybrid
+    {:a 1
+     :b {:e 3}
+     :d {:e {:f 2}}
+     :x [1]}
+    {:b (when true {:c 1 :d 2})
+     :c false
+     :d {:e {:f (when false 1)}}
+     :e {:a (when false 1)}
+     :a (when false 1)
+     :y {:a 1
+         :b {:e 3}
+         :d {:e {:f 2}}}
+     :z []
+     :n {}
+     :x []}))
 
 =>
 ...
