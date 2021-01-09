@@ -104,9 +104,9 @@ Here's our new function version of `cond-merge` which is effectively `merge-with
                 (let [k (key e) v (val e)]
                   (cond (nil? v)      m
                         (map? v)      (let [v (cond-merge (k m) v)]
-                                        (if (seq v)
-                                          (assoc m k v)
-                                          m))
+                                        (if (or (nil? v) (= v {}))
+                                              (dissoc m k v)
+                                          (assoc m k v)))
                         :else         (assoc m k v))))]
         (reduce merge-e (or m1 {}) m2))))
 ```
@@ -126,6 +126,7 @@ Our new function produces the expected results:
 =>
 {:a 1
  :b {:e 3 :c 1 :d 2}
+ :d {:e {:f 2}}
  :c false}
 ```
 
@@ -135,6 +136,7 @@ It also handles empty maps and overwriting vectors:
 (cond-merge {:a 1
              :b {:e 3}
              :d {:e {:f 2}}
+             :m 2
              :x [1]}
             {:b (when true {:c 1 :d 2})
              :c false
@@ -145,16 +147,18 @@ It also handles empty maps and overwriting vectors:
                  :b {:e 3}
                  :d {:e {:f 2}}}
              :z []
+             :m [1 3 4]
              :n {}
              :x []})
 
 =>
-{:a 1,
- :b {:e 3, :c 1, :d 2},
- :d {:e {:f 2}},
- :x [],
- :y {:a 1, :b {:e 3}, :d {:e {:f 2}}},
- :z [],
+{:a 1
+ :b {:e 3 :c 1 :d 2}
+ :d {:e {:f 2}}
+ :m [1 3 4]
+ :x []
+ :y {:a 1 :b {:e 3} :d {:e {:f 2}}}
+ :z []
  :c false}
 ```
 
