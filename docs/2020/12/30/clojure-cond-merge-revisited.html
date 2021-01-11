@@ -73,9 +73,9 @@
                 &#40;let &#91;k &#40;key e&#41; v &#40;val e&#41;&#93;
                   &#40;cond &#40;nil? v&#41;      m
                         &#40;map? v&#41;      &#40;let &#91;v &#40;cond-merge &#40;k m&#41; v&#41;&#93;
-                                        &#40;if &#40;seq v&#41;
-                                          &#40;assoc m k v&#41;
-                                          m&#41;&#41;
+                                        &#40;if &#40;or &#40;nil? v&#41; &#40;= v {}&#41;&#41;
+                                              &#40;dissoc m k v&#41;
+                                          &#40;assoc m k v&#41;&#41;&#41;
                         :else         &#40;assoc m k v&#41;&#41;&#41;&#41;&#93;
         &#40;reduce merge-e &#40;or m1 {}&#41; m2&#41;&#41;&#41;&#41;
 </code></pre><p>Our new function produces the expected results:</p><pre><code class="Clojure">&#40;cond-merge {:a 1
@@ -90,10 +90,12 @@
 =&gt;
 {:a 1
  :b {:e 3 :c 1 :d 2}
+ :d {:e {:f 2}}
  :c false}
 </code></pre><p>It also handles empty maps and overwriting vectors:</p><pre><code class="Clojure">&#40;cond-merge {:a 1
              :b {:e 3}
              :d {:e {:f 2}}
+             :m 2
              :x &#91;1&#93;}
             {:b &#40;when true {:c 1 :d 2}&#41;
              :c false
@@ -104,16 +106,18 @@
                  :b {:e 3}
                  :d {:e {:f 2}}}
              :z &#91;&#93;
+             :m &#91;1 3 4&#93;
              :n {}
              :x &#91;&#93;}&#41;
 
 =&gt;
-{:a 1,
- :b {:e 3, :c 1, :d 2},
- :d {:e {:f 2}},
- :x &#91;&#93;,
- :y {:a 1, :b {:e 3}, :d {:e {:f 2}}},
- :z &#91;&#93;,
+{:a 1
+ :b {:e 3 :c 1 :d 2}
+ :d {:e {:f 2}}
+ :m &#91;1 3 4&#93;
+ :x &#91;&#93;
+ :y {:a 1 :b {:e 3} :d {:e {:f 2}}}
+ :z &#91;&#93;
  :c false}
 </code></pre><p>The performance is not bad:</p><pre><code class="Clojure">&#40;require '&#91;criterium.core :as c&#93;&#41;
 
