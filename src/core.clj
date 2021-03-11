@@ -94,11 +94,11 @@
        (name k)
        " "
        (cond
-         (vector? v) (->> (map (fn [x]
-                                 (str " '" (name x) "'")) v)
-                          (apply str))
+         (vector? v)  (->> (map (fn [x]
+                                  (str " '" (name x) "'")) v)
+                           (apply str))
          (keyword? v) (str "'" (name v) "'")
-         :else (str v))
+         :else        (str "'" v "'"))
        ";")) m)
    (apply str)))
 
