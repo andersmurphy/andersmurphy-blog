@@ -106,7 +106,7 @@
   [title]
   [:head [:meta {:charset "UTF-8"}] [:title title]
    [:meta
-    {:http-quiv "Content-Security-Policy"
+    {:http-equiv "Content-Security-Policy"
      :content (->csp-string
                {:base-uri                :self
                 :form-action             :self
