@@ -85,9 +85,40 @@
       (str/split #"</p>")
       first))
 
+(defn ->csp-string [m]
+  (->>
+   (map
+    (fn [[k v]]
+      (str
+       " "
+       (name k)
+       " "
+       (cond
+         (vector? v) (->> (map (fn [x]
+                                 (str " '" (name x) "'")) v)
+                          (apply str))
+         (keyword? v) (str "'" (name v) "'")
+         :else (str v))
+       ";")) m)
+   (apply str)))
+
 (defn head
   [title]
   [:head [:meta {:charset "UTF-8"}] [:title title]
+   [:meta
+    {:http-quiv "Content-Security-Policy"
+     :content (->csp-string
+               {:base-uri                :self
+                :form-action             :self
+                :default-src             :none
+                :script-src              [:self]
+                :img-src                 [:self]
+                :font-src                [:self
+                                          "https://fonts.googleapis.com"
+                                          "https://fonts.gstatic.com"]
+                :style-src               [:self]
+                :frame-ancestors         :none
+                :block-all-mixed-content true})}]
    ;; styles
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
