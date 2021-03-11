@@ -107,7 +107,7 @@
    [:meta
     {:http-equiv "Content-Security-Policy"
      :content (->csp-string
-               {:frame-ancestors         :none
+               {:frame-ancestors         :self
                 :base-uri                :self
                 :form-action             :self
                 :default-src             :none
