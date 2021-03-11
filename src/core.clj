@@ -117,6 +117,9 @@
                                           "https://fonts.googleapis.com"
                                           "https://fonts.gstatic.com"]
                 :style-src               [:self]})}]
+   [:meta
+    {:http-equiv "X-Content-Type-Options"
+     :content    "nosniff"}]
    ;; styles
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
