@@ -90,7 +90,6 @@
    (map
     (fn [[k v]]
       (str
-       " "
        (name k)
        " "
        (cond
@@ -98,8 +97,8 @@
                                   (str " '" (name x) "'")) v)
                            (apply str))
          (keyword? v) (str "'" (name v) "'")
-         :else        (str "'" v "'"))
-       ";")) m)
+         :else        (str "'" v "'")))) m)
+   (interpose ";")
    (apply str)))
 
 (defn head
@@ -108,7 +107,8 @@
    [:meta
     {:http-equiv "Content-Security-Policy"
      :content (->csp-string
-               {:base-uri                :self
+               {:frame-ancestors         :none
+                :base-uri                :self
                 :form-action             :self
                 :default-src             :none
                 :script-src              [:self]
@@ -116,9 +116,7 @@
                 :font-src                [:self
                                           "https://fonts.googleapis.com"
                                           "https://fonts.gstatic.com"]
-                :style-src               [:self]
-                :frame-ancestors         :none
-                :block-all-mixed-content true})}]
+                :style-src               [:self]})}]
    ;; styles
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
