@@ -85,38 +85,21 @@
       (str/split #"</p>")
       first))
 
-(defn ->csp-string [m]
-  (->>
-   (map
-    (fn [[k v]]
-      (str
-       (name k)
-       " "
-       (cond
-         (vector? v)  (->> (map (fn [x]
-                                  (str " '" (name x) "'")) v)
-                           (apply str))
-         (keyword? v) (str "'" (name v) "'")
-         :else        (str "'" v "'")))) m)
-   (interpose ";")
-   (apply str)))
-
 (defn head
   [title]
   [:head [:meta {:charset "UTF-8"}] [:title title]
    [:meta
     {:http-equiv "Content-Security-Policy"
-     :content (->csp-string
-               {:frame-ancestors         :self
-                :base-uri                :self
-                :form-action             :self
-                :default-src             :none
-                :script-src              [:self]
-                :img-src                 [:self]
-                :font-src                [:self
-                                          "https://fonts.googleapis.com"
-                                          "https://fonts.gstatic.com"]
-                :style-src               [:self]})}]
+     :content
+     "
+base-uri    'self';
+form-action 'self';
+default-src 'none';
+script-src  'self' https://cdnjs.cloudflare.com/ajax/libs/highlight.js;
+img-src     'self';
+font-src    'self';
+style-src   'self'
+"}]
    [:meta
     {:http-equiv "content-type"
      :content    "text/html; charset=UTF-8"}]
