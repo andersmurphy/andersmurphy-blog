@@ -118,8 +118,8 @@
                                           "https://fonts.gstatic.com"]
                 :style-src               [:self]})}]
    [:meta
-    {:http-equiv "X-Content-Type-Options"
-     :content    "nosniff"}]
+    {:http-equiv "content-type"
+     :content    "text/html; charset=UTF-8"}]
    ;; styles
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
