@@ -100,6 +100,7 @@ https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/
 'sha256-nP0EI9B9ad8IoFUti2q7EQBabcE5MS5v0nkvRfUbYnM=';
 img-src     'self';
 font-src    'self';
+connect-src 'self';
 style-src   'self'
 "}]
    [:meta
