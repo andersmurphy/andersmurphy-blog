@@ -4,10 +4,10 @@ Clojure has this nifty function called `re-seq` that returns a lazy sequence of 
 
 ```Clojure
 (defn get-first-8-posts-from-HN []
-    (->> (slurp "https://news.ycombinator.com/news?p=1")
-         (re-seq #"<td class=\"title\"><a href=\"(.*?)\" class=\"storylink\">(.*?)</a>")
-         (map (fn [[_ link title]] title))
-         (take 8)))
+  (->> (slurp "https://news.ycombinator.com/news?p=1")
+       (re-seq #"<td class=\"title\"><a href=\"(.*?)\" class=\"storylink\">(.*?)</a>")
+       (map (fn [[_ link title]] title))
+       (take 8)))
 ```
 
 `slurp` to gets the first page of Hacker News. `re-seq` matches on the regex pulling out the `title` of each post.
@@ -34,15 +34,15 @@ We can easily extend this function to find posts on Rust in the first five pages
 
 ```Clojure
 (defn get-posts-about-rust-from-HN []
-    (->> (map #(do
-                 (Thread/sleep 50)
-                 (slurp (str "https://news.ycombinator.com/news?p=" %)))
-              (range 1 6))
-         (apply str)
-         (re-seq #"<td class=\"title\"><a href=\"(.*?)\" class=\"storylink\">(.*?)</a>")
-         (map (fn [[_ link title]] {:title title :link link}))
-         (filter (fn [{:keys [title]}]
-                   (re-find #"Rust" title)))))
+  (->> (map #(do
+               (Thread/sleep 50)
+               (slurp (str "https://news.ycombinator.com/news?p=" %)))
+            (range 1 6))
+       (apply str)
+       (re-seq #"<td class=\"title\"><a href=\"(.*?)\" class=\"storylink\">(.*?)</a>")
+       (map (fn [[_ link title]] {:title title :link link}))
+       (filter (fn [{:keys [title]}]
+                 (re-find #"Rust" title)))))
 ```
 
 Request the first 5 pages and then filter the results. Simple.
