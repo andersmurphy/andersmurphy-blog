@@ -167,6 +167,6 @@ What about with lists?
 
 Magic.
 
-In this post we've seen how to use `destructure` write a quick macro that supports destructuring and does something useful with the bindings.
+In this post we've seen how to use `destructure` to write a macro that supports destructuring and does something useful with the bindings.
 
 That being said. I'd probably think twice before using `let->map` everywhere as it's implementation is somewhat fragile (`filter` depending on collections starting with "map__" or "vec__") and is unlikely to cover all edge cases. The gains are also pretty minimal.
