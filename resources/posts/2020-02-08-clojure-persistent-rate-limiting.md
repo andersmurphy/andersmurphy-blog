@@ -111,4 +111,4 @@ Or just a plain old function that takes data:
 10
 ```
 
-That covers this approach to persistent rate limiting in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/rate-limiting/do-once).
+That covers this approach to persistent rate limiting in Clojure. The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/rate-limiting/do-once).

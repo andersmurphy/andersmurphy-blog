@@ -86,5 +86,4 @@ chmod +x git-hooks/pre-commit
 
 This pre-commit hook will now run before each commit. The first time it runs it will be a bit slower as it will need to download and cache the zprint library.
 
-The full example project can be found
-[here](https://github.com/andersmurphy/clj-cookbook/blob/master/README.md).
+The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/blob/master/README.md).

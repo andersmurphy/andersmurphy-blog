@@ -216,4 +216,4 @@ Putting it all together. We read the XML feed, filter the items we care about, c
               hiccup/html))))
 ```
 
-This concludes this guide to manipulating HTML/XML in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/zippers/manipulating-html-and-xml-example).
+This concludes this guide to manipulating HTML/XML in Clojure. The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/zippers/manipulating-html-and-xml-example).

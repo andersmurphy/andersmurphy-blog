@@ -176,4 +176,4 @@ Reading prints literals.
      :log_date #time/ld "2019-08-03"})
 ```
 
-This concludes this guide to using `java.time` with `clojure.java.jdbc` as well as a brief introduction to reader literals. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/database-type-conversion/jdbc-java-time-example).
+This concludes this guide to using `java.time` with `clojure.java.jdbc` as well as a brief introduction to reader literals. The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/database-type-conversion/jdbc-java-time-example).

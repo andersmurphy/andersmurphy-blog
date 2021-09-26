@@ -151,5 +151,4 @@ This also supports different homogeneous array types automatically:
 [#:user_info{:pid 1, :name "Bob"} #:user_info{:pid 2, :name "Jane"}]
 ```
 
-The full example project can be found
-[here](https://github.com/andersmurphy/clj-cookbook/tree/master/sql/in-any-all).
+The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sql/in-any-all).

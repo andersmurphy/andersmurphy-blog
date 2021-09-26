@@ -55,5 +55,4 @@ To uninstall the package we can run:
 brew uninstall clj-zprint
 ```
 
-The full example project can be found
-[here](https://github.com/andersmurphy/clj-cookbook/blob/master/brew-formulae/README.md).
+The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/blob/master/brew-formulae/README.md).

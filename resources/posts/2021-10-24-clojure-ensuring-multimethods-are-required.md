@@ -94,4 +94,4 @@ nil
 
 This trick helps avoid unexpected behaviour caused by missing multimethod implementations.
 
-The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/multimethods/ensuring-multimethods-are-required).
+The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/multimethods/ensuring-multimethods-are-required).

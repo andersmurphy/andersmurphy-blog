@@ -155,4 +155,4 @@ The generated output file `feed.xml` has the following content. Note that I have
 </rss>
 ```
 
-This concludes this guide to generating HTML and XML in Clojure. The full example project can be found [here](https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example).
+This concludes this guide to generating HTML and XML in Clojure. The full [example project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example).
