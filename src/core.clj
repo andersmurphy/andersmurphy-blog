@@ -16,7 +16,6 @@
 (def site-twitter "https://twitter.com/anders_murphy")
 (def site-rss (str site-url "/feed.xml"))
 (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
-(def highlight-url "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0")
 (def directory (io/file "resources/posts"))
 (defn desc [a b] (compare b a))
 (defn files [] (sort desc (drop 1 (file-seq directory))))
@@ -111,11 +110,6 @@ style-src   'self'
     {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "/theme.css")}]
-   ;; code highlights
-   [:link {:rel "stylesheet" :href (str site-url "/nord.css")}]
-   [:script {:src (str highlight-url "/highlight.min.js")}]
-   [:script {:src (str highlight-url "/languages/clojure.min.js")}]
-   [:script "hljs.initHighlightingOnLoad();"]
    ;; icons
    [:link
     {:rel   "apple-touch-icon-precomposed"

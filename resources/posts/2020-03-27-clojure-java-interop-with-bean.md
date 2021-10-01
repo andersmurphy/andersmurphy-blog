@@ -2,8 +2,6 @@ Title: Clojure: java interop with bean
 
 One of the great things with Clojure is that it has fantastic java interop. In this article we explore the `bean` function and how it makes working with java objects more idiomatic.
 
-## Some Java to interop with
-
 First, we import a java library. For this example we use  [googlei18n/libphonenumber](https://github.com/googlei18n/libphonenumber/tree/master/java/libphonenumber/src/com/google/i18n/phonenumbers) a google library for processing phone numbers. We want to use it to split a phone number into  different parts (country code and national number):
 
 ```Clojure
