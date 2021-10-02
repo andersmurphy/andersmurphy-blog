@@ -13,7 +13,8 @@ html{
     line-height:1.5
 }
 code{
-    color: #b48ead
+    color:#515151;
+    background-color:#fff;
 }
 @media (min-width: 38em){
     html{
