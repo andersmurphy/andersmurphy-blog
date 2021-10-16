@@ -5,7 +5,7 @@
 
 }
 ::-webkit-scrollbar {
-  width: 10em;
+  width: 1em;
 }
 ::-webkit-scrollbar-track {
   background: #32302f;
@@ -27,7 +27,7 @@ code{
     font: 1em monospace;
 }
 pre code{
-    overflow-wrap: normal
+    white-space: pre-wrap;
     display: block;
     padding: 10px;
 }
