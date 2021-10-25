@@ -1,6 +1,6 @@
 Title: Clojure: ensuring multimethods are required
 
-Multimethods are fantastic. They give you polymorphism without objects or classes (the best part of Object Oriented without the baggage), multiple dispatch, dynamic dispatch and strong decoupling that allows you to extend code without modifying it ([open closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)), this even extends to third party code. This decoupling is so good that it's not unheard of to deploy your system without all your the `defmethod` extensions being required! This post will teach you how to prevent this.
+Multimethods are fantastic. They give you polymorphism without objects or classes (the best part of Object Oriented without the baggage), multiple dispatch, dynamic dispatch and strong decoupling that allows you to extend code without modifying it ([open closed principle](https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle)), this even extends to third party code. This decoupling is so good that it's not unheard of to deploy your system without all the `defmethod` extensions being required! This post will teach you how to prevent this.
 
 The `printer` namespace defines the print multimethod which dispatches on the `:type` of it's input.
 
