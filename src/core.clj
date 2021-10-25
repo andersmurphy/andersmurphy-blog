@@ -135,6 +135,8 @@ style-src   'self'
     [:div {:class "sidebar-about"}
      [:img
       {:class "portrait"
+       :width  "60"
+       :height "120"
        :src   (str site-url "/assets/anderspixel.png")
        :alt   "portrait"}] [:h1 [:a {:href site-url} site-title]]
      [:p {:class "lead"} site-tagline]]
