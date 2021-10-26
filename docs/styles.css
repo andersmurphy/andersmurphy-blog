@@ -5,7 +5,7 @@
 
 }
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
 }
 ::-webkit-scrollbar-track {
   background: #32302f;
@@ -30,6 +30,15 @@ pre code{
     overflow: auto;
     display: block;
     padding: 10px;
+}
+pre code::-webkit-scrollbar {
+  width: 10px;
+}
+pre code::-webkit-scrollbar-track {
+  background: #32302f;
+}
+pre code::-webkit-scrollbar-thumb {
+  background: #f5dfbc;
 }
 @media (min-width: 38em){
     html{
