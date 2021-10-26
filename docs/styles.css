@@ -12,10 +12,12 @@ html{
     font-size:16px;
     line-height:1.5
 }
+.scrollable-element {
+  scrollbar-color: #f5dfbc #32302f;
+}
 code{
     font: 1em monospace;
 }
-
 pre code{
     overflow: auto;
     display: block;
