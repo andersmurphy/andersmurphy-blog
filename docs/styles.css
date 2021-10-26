@@ -4,6 +4,7 @@
     box-sizing:border-box
 }
 html,body{
+    scrollbar-color: #f5dfbc #32302f;
     margin:0;
     padding:0
 }
@@ -12,14 +13,13 @@ html{
     font-size:16px;
     line-height:1.5
 }
-.scrollable-element {
-  scrollbar-color: #f5dfbc #32302f;
-}
+
 code{
     font: 1em monospace;
 }
 pre code{
     overflow: auto;
+    scrollbar-color: #f5dfbc #32302f;
     display: block;
     padding: 10px;
 }
