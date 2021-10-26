@@ -13,11 +13,12 @@ html{
     line-height:1.5
 }
 code{
-    color: #fff;
-    background-color:#515151;
+    font: 1em monospace;
 }
 
 pre code{
+    background-color: #2E3440;
+    color: #fff;
     overflow: scroll;
     display: block;
     padding: 10px;
