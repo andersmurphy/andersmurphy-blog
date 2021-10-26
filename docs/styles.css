@@ -15,7 +15,6 @@ html{
 code{
     color:#515151;
     background-color:#fff;
-    overflow: scroll;
 }
 @media (min-width: 38em){
     html{

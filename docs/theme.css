@@ -12,7 +12,7 @@ html {
 .sidebar {
     text-align: center;
     padding: 2rem 1rem;
-    color: rgba(255,255,255,.5);
+    color: #D3D3D3;
     background-color: #2E3440;
 }
 @media (min-width: 76em) {
