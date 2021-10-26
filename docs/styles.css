@@ -19,7 +19,7 @@ code{
 pre code{
     background-color: #2E3440;
     color: #fff;
-    overflow: scroll;
+    overflow: auto;
     display: block;
     padding: 10px;
 }
