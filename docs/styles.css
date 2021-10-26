@@ -17,8 +17,6 @@ code{
 }
 
 pre code{
-    background-color: #32302f;
-    color: #f5dfbc;
     overflow: auto;
     display: block;
     padding: 10px;
@@ -29,8 +27,8 @@ pre code{
     }
 }
 body{
-    color:#;
-    background-color:#f5dfbc;
+    color:#f5dfbc;
+    background-color:#32302f;
     -webkit-text-size-adjust:100%;
     -ms-text-size-adjust:100%
 }
@@ -71,7 +69,7 @@ h1,h2,h3,h4,h5,h6{
     margin-bottom:.5rem;
     font-weight:bold;
     line-height:1.25;
-    color:#32302f;
+    color:#f5dfbc;
     text-rendering:optimizeLegibility
 }
 h1{
@@ -94,7 +92,7 @@ p{
     margin-bottom:1rem
 }
 strong{
-    color:#32302f
+    color:#f5dfbc
 }
 ul,ol,dl{
     margin-top:0;
@@ -168,7 +166,7 @@ footer{
     display:block;
     margin-top:-.5rem;
     margin-bottom:1rem;
-    color:#32302f
+    color:#f5dfbc
 }
 .related{
     padding-top:2rem;
@@ -187,7 +185,7 @@ footer{
     color:#999
 }
 .related-posts li a:hover{
-    color:#32302f;
+    color:#7daea3;
     text-decoration:none
 }
 .related-posts li a:hover small{

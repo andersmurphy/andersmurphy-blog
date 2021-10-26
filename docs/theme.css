@@ -12,8 +12,8 @@ html {
 .sidebar {
     text-align: center;
     padding: 2rem 1rem;
-    color: #f5dfbc;
-    background-color: #32302f;
+    color: #32302f;
+    background-color: #f5dfbc;
 }
 @media (min-width: 76em) {
   .sidebar {
@@ -28,12 +28,12 @@ html {
 
 /* Sidebar links */
 .sidebar a {
-  color: #7daea3;
+  color: #32302f;
 }
 
 /* About section */
 .sidebar-about h1 {
-  color: #f5dfbc;
+  color: #32302f;
   margin-top: 0;
   font-size: 3.25rem;
 }
