@@ -13,8 +13,10 @@ html{
     line-height:1.5
 }
 code{
-    color:#515151;
-    background-color:#fff;
+    color: #fff;
+    background-color:#515151;
+    overflow: scroll;
+    display: block;
 }
 @media (min-width: 38em){
     html{
