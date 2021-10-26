@@ -15,8 +15,12 @@ html{
 code{
     color: #fff;
     background-color:#515151;
+}
+
+pre code{
     overflow: scroll;
     display: block;
+    padding: 10px;
 }
 @media (min-width: 38em){
     html{
