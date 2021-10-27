@@ -20,17 +20,29 @@ html,body{
 }
 html{
     font-family: Open Sans, sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     line-height:1.5
 }
 code{
     font: 16px monospace;
 }
 pre code{
+    font: 14px monospace;
     white-space: pre-wrap;
     word-break: break-word;
     display: block;
     padding: 10px;
+}
+@media (min-width: 38em){
+    html{
+        font-size:18px
+    }
+    pre code {
+        font-size:18px
+    }
+    pre code {
+        font-size:16px
+    }
 }
 body{
     color:#f5dfbc;
