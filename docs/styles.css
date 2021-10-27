@@ -20,11 +20,11 @@ html,body{
 }
 html{
     font-family: Open Sans, sans-serif;
-    font-size: 4vw;
+    font-size: 18px;
     line-height:1.5
 }
 code{
-    font: 4vw monospace;
+    font: 16px monospace;
 }
 pre code{
     white-space: pre-wrap;
