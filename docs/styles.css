@@ -28,6 +28,7 @@ code{
 }
 pre code{
     white-space: pre-wrap;
+    word-break: break-word;
     display: block;
     padding: 10px;
 }
