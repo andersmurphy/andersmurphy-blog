@@ -24,18 +24,13 @@ html{
     line-height:1.5
 }
 code{
-    font: 1em monospace;
+    font: monospace;
 }
 pre code{
     white-space: pre-wrap;
     word-break: break-word;
     display: block;
     padding: 10px;
-}
-@media (min-width: 38em){
-    html{
-        font-size:18px
-    }
 }
 body{
     color:#f5dfbc;
