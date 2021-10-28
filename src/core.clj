@@ -9,12 +9,12 @@
            [java.time ZoneId]
            [java.time.format DateTimeFormatter]))
 
-(def site-url "https://andersmurphy.com")
+(def site-url "https://andersmurphy.com/")
 (def site-title "Anders Murphy")
 (def site-tagline "A blog mostly about functional programming")
 (def site-github "https://github.com/andersmurphy")
 (def site-twitter "https://twitter.com/anders_murphy")
-(def site-rss (str site-url "/feed.xml"))
+(def site-rss (str site-url "feed.xml"))
 (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
 (def directory (io/file "resources/posts"))
 (defn desc [a b] (compare b a))
@@ -94,9 +94,7 @@
 base-uri    'self';
 form-action 'self';
 default-src 'none';
-script-src  'self'
-https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/
-'sha256-nP0EI9B9ad8IoFUti2q7EQBabcE5MS5v0nkvRfUbYnM=';
+script-src  'self';
 img-src     'self';
 font-src    'self';
 connect-src 'self';
@@ -107,15 +105,15 @@ style-src   'self'
      :content    "text/html; charset=UTF-8"}]
    ;; styles
    [:link
-    {:rel "stylesheet" :type "text/css" :href (str site-url "/styles.css")}]
+    {:rel "stylesheet" :type "text/css" :href (str site-url "styles.css")}]
    [:link
-    {:rel "stylesheet" :type "text/css" :href (str site-url "/theme.css")}]
+    {:rel "stylesheet" :type "text/css" :href (str site-url "theme.css")}]
    ;; icons
    [:link
     {:rel   "apple-touch-icon-precomposed"
      :sizes "144x144"
-     :href  (str site-url "/assets/apple-touch-icon-precomposed.png")}]
-   [:link {:rel "shortcut icon" :href (str site-url "/assets/favicon.ico")}]
+     :href  (str site-url "assets/apple-touch-icon-precomposed.png")}]
+   [:link {:rel "shortcut icon" :href (str site-url "assets/favicon.ico")}]
    ;; enables responsiveness on mobile devices
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; google description
@@ -131,7 +129,7 @@ style-src   'self'
       {:class "portrait"
        :width  "60"
        :height "120"
-       :src   (str site-url "/assets/anderspixel.png")
+       :src   (str site-url "assets/anderspixel.png")
        :alt   "portrait"}] [:h1 [:a {:href site-url} site-title]]
      [:p {:class "lead"} site-tagline]]
     [:nav {:class "sidebar-nav"}
@@ -155,8 +153,8 @@ style-src   'self'
 (defn prepend-doctype-header [html] (str "<!DOCTYPE html>\n" html))
 
 (defn add-post-page
-  [{:keys [post-name post-content date] :as m}]
-  (->> (html [:html {:lang "en"} (head post-name)
+  [{:keys [post-name post-content date post-path-name] :as m}]
+  (->> (html [:html {:lang "en"} (head post-path-name)
               [:body sidebar
                [:div {:class "content container"}
                 [:article {:class "post"} [:h1 {:class "post-title"} post-name]
@@ -176,17 +174,17 @@ style-src   'self'
         (map (fn [{:keys [post-name date post-path-name post-content]}]
                [:article {:class "post"}
                 [:h1 {:class "post-title"}
-                 [:a {:href (str site-url "/" post-path-name)} post-name]]
+                 [:a {:href (str site-url post-path-name)} post-name]]
                 [:time {:class "post-date" :datetime (date->datetime date)}
                  (date->post-date date)] [:p (first-paragraph post-content)]])
              page-content)]
        [:div {:class "pagination"}
         (when previous-page-url
           [:div {:class "pagination-item"}
-           [:a {:href (str site-url "/" previous-page-url)} "<-"]])
+           [:a {:href (str site-url previous-page-url)} "<-"]])
         (when next-page-url
           [:div {:class "pagination-item"}
-           [:a {:href (str site-url "/" next-page-url)} "->"]])]]]])
+           [:a {:href (str site-url next-page-url)} "->"]])]]]])
    prepend-doctype-header
    (assoc m :page-html)))
 
@@ -268,7 +266,7 @@ style-src   'self'
     [:channel [:title site-title] [:description site-tagline] [:link site-url]
      [:atom:link {:href site-rss :rel "self" :type "application/rss+xml"}]
      (map (fn [{:keys [post-name date post-path-name]}]
-            (let [post-url (str site-url "/" post-path-name)]
+            (let [post-url (str site-url post-path-name)]
               [:item [:title post-name] [:pubDate (date->rfc822 date)]
                [:link post-url] [:guid {:isPermaLink "true"} post-url]]))
           posts)]]))
@@ -283,7 +281,7 @@ style-src   'self'
   (xml/sexp-as-element
    [:urlset {:xmlns "https://www.sitemaps.org/schemas/sitemap/0.9"}
     (map (fn [{:keys [date post-path-name]}]
-           [:url [:loc (str site-url "/" post-path-name)]
+           [:url [:loc (str site-url post-path-name)]
             [:lastmod (or (seq (interpose "-" date)) (today))]])
          (conj posts {:post-path-name ""}))]))
 
