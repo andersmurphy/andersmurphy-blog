@@ -118,11 +118,8 @@ a[href^="#fn:"],a[href^="#fnref:"]{
     margin-left:auto;
     margin-right:auto
 }
-footer{
-    margin-bottom:2rem
-}
 .post{
-    margin-bottom:4em
+    margin-bottom:3em;
 }
 .post-date{
     display:block;

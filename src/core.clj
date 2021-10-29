@@ -136,8 +136,7 @@ style-src   'self'
      [:a {:class "sidebar-nav-item" :href site-github} "Github"]
      [:a {:class "sidebar-nav-item" :href site-twitter} "Twitter"]
      [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]
-     [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]
-    [:p (str "© 2015-" (current-year) " Anders Murphy")]]])
+     [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]]])
 
 (defn add-post-content
   [{:keys [file] :as m}]
@@ -152,6 +151,10 @@ style-src   'self'
 
 (defn prepend-doctype-header [html] (str "<!DOCTYPE html>\n" html))
 
+(def footer
+  [:div {:class "footer"}
+   [:p (str "© 2015-" (current-year) " Anders Murphy")]])
+
 (defn add-post-page
   [{:keys [post-name post-content date post-path-name] :as m}]
   (->> (html [:html {:lang "en"} (head post-path-name)
@@ -159,7 +162,8 @@ style-src   'self'
                [:div {:class "content container"}
                 [:article {:class "post"} [:h1 {:class "post-title"} post-name]
                  [:time {:class "post-date" :datetime (date->datetime date)}
-                  (date->post-date date)] post-content]]]])
+                  (date->post-date date)] post-content]
+                footer]]])
        prepend-doctype-header
        (assoc m :post-html)))
 
@@ -184,7 +188,8 @@ style-src   'self'
            [:a {:href (str site-url previous-page-url)} "<-"]])
         (when next-page-url
           [:div {:class "pagination-item"}
-           [:a {:href (str site-url next-page-url)} "->"]])]]]])
+           [:a {:href (str site-url next-page-url)} "->"]])]
+       footer]]])
    prepend-doctype-header
    (assoc m :page-html)))
 
