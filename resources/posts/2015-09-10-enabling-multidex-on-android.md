@@ -50,3 +50,5 @@ dependencies {
 
 ## Step 3: Sync
 Sync the project with the gradle files and MultiDex will now be enabled. No more 65k limit for your app!
+
+Check out [this project](https://github.com/andersmurphy/demo-app/commit/4462327da5849f6ac7c4a41e290d84dc6f016b21) for an example of how to set up MultiDex.

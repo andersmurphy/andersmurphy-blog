@@ -69,3 +69,5 @@ Change the values of the `storeFile` , `storePassword`, `keyAlias` and `keyPassw
 
 ### Step 4: Update .gitignore
 Add  **gradle.properties** to your projects **.gitignore** file. So that it doesn't get tracked by git. This ensures that your signing credentials will only be stored locally on your machine.
+
+Check out [this project](https://github.com/andersmurphy/demo-app/commit/531597724d68cf27d6e9fdd2e88f54fe4082c841) for an example of how to sign your app's release build.

@@ -48,3 +48,5 @@ buildTypes {
 ```
 
 The release build uses the release header file and the debug build uses the debug header file. We have also set `minifyEnabled true` in both builds. This means that regardless of which build we are using ProGuard will strip out any unused method references. This should keep your app bellow "The 65k limit" even if you are using large third party libraries. More importantly, if set up in this way, ProGuard will have little to no negative [impact on your build times](https://image.slidesharecdn.com/jackandjilldroidconlondon2015-160314154239/95/eric-lafortune-the-jack-and-jill-build-system-16-638.jpg?cb=1457972343) (unlike MultiDex), keeping your development feedback loop tight.
+
+Check out [this project](https://github.com/andersmurphy/demo-app/commit/9d2241a2a6d2571696a1d3ad5ba37e521d8641f5) for an example of how to set up ProGuard in your app.
