@@ -27,7 +27,7 @@ pipe&#40;map&#40;x =&gt; x - 2&#41;, map&#40;x =&gt; x &#42; 2&#41;&#41;&#40;&#9
 const map = mapFunc =&gt; coll =&gt; coll.map&#40;mapFunc&#41;
 
 compose&#40;map&#40;x =&gt; x - 2&#41;, map&#40;x =&gt; x &#42; 2&#41;&#41;&#40;&#91;1, 2, 3&#93;&#41; // &#91;0,2,4&#93;
-</code></pre><h2>Bonus: Reduce Right</h2><p>We saw how to write our own implementation of reduce in <a href='https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter/'>this post</a>. But how would we implement reduce right? Reduce right is almost identical to reduce except it loops over the collection backwards.</p><p>Here's one way we could implement it:</p><pre><code class="javascript">const reduceRight = &#40;reduceFunc, startingValue, coll&#41; =&gt; {
+</code></pre><h2>Bonus: Reduce Right</h2><p>We saw how to write our own implementation of reduce in <a href='https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter'>this post</a>. But how would we implement reduce right? Reduce right is almost identical to reduce except it loops over the collection backwards.</p><p>Here's one way we could implement it:</p><pre><code class="javascript">const reduceRight = &#40;reduceFunc, startingValue, coll&#41; =&gt; {
   let accumulator = startingValue
   for&#40;let i = coll.length - 1; i &gt;= 0; i--&#41; {
     accumulator = reduceFunc&#40;accumulator, coll&#91;i&#93;&#41;
