@@ -66,7 +66,7 @@ The `lazy-seq` takes a body of expressions that returns an `ISeq` or `nil` and y
 is called. It will cache the result and return it on all subsequent
 seq calls. The caching of the body is what allows the `lazy-seq` macro to call itself recursively without consuming more stackframes the way a normal recursive call would.
 
-We use the `lazy-seq` to define a function that recursively builds a list of the flattened key paths. The use of `(when-let [[x & xs] (seq s)] ...)` is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail. It's also worth noting that to combine the output of the head and the tail operations we use `into` (strict) rather than `concat` (lazy). For more details check out [this article](https://stuartsierra.com/2015/04/26/clojure-donts-concat).
+We use `lazy-seq` to define a function that recursively builds a list of the flattened key paths. The use of `(when-let [[x & xs] (seq s)] ...)` is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail. It's also worth noting that to combine the output of the head and the tail operations we use `into` (strict) rather than `concat` (lazy). For more details check out [this article](https://stuartsierra.com/2015/04/26/clojure-donts-concat).
 
 ```clojure
 (defn flatten-paths [m separator]

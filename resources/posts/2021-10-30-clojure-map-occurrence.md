@@ -53,7 +53,7 @@ Personally, I find the `reduce` implementation quite dense and prefer a recursiv
               (map-occurrence f xs x-count)))))))
 ```
 
-We use the `lazy-seq` to define a function that recursively builds a list of items that are the result of `(f (x-count x) x)` where `x-count` is the current count of `x`. The use of `(when-let [[x & xs] (seq s)] ...)` is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail.
+We use `lazy-seq` to define a function that recursively builds a list of items that are the result of `(f (x-count x) x)` where `x-count` is the current count of `x`. The use of `(when-let [[x & xs] (seq s)] ...)` is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail.
 
 ```Clojure
 (map-occurrence
