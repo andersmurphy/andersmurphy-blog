@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2021/10/30/clojure-map-occurrence.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: map-occurrence</h1><time class="post-date" datetime="2021-10-30T00:00:00+00:00">30 Oct 2021</time><p>Sometimes you want behaviour that differs based on the number of times an item has been seen in a sequence. Clojure doesn't come with a function that does this. Before you say "What about <code>frequencies</code>?", <code>frequencies</code> gives you the total number of occurrences in a sequence of items, not the occurrence count.</p><p>Say we have the following sequence:</p><pre><code class="Clojure">&#91;:chest :dirt :chest :chest :dirt :chest :dirt&#93;
+</code></pre><p>We want to do different transformations based on which occurrence of the <code>:chest</code> keyword we are mapping over. For example: transforming the first occurrence into <code>:diamond</code> and the second into <code>:ruby</code> etc.</p><pre><code class="Clojure">&#91;:diamond :dirt :ruby :gold :dirt :grail :dirt&#93;
+</code></pre><p>Let's consider <code>map-indexed</code> for a minute.</p><pre><code class="Clojure">&#40;map-indexed &#40;fn &#91;i x&#93; &#40;if &#40;= i 3&#41; &#41;&#41; &#91;7 8 9 10 4 9&#93;&#41;
+
+=&gt;
+&#40;7 8 9 100 4 9&#41;
+</code></pre><p>It maps over a sequence passing the current index of item and the item into a function. In the example above we want to square the item at index 3 in the sequence.</p><p>We want to make a similar function except instead of the index we want to pass the occurrence of the item.</p><p>We can write a function with reduce that achieves this:</p><pre><code class="Clojure">&#40;defn map-occurrence &#91;f s&#93;
+  &#40;:result
+   &#40;reduce &#40;fn &#91;{:keys &#91;result x-count&#93; :as acc} x&#93;
+             &#40;let &#91;x-count &#40;assoc x-count x &#40;inc &#40;get x-count x 0&#41;&#41;&#41;&#93;
+               &#40;-&gt; &#40;update acc :result conj &#40;f &#40;x-count x&#41; x&#41;&#41;
+                   &#40;assoc :x-count x-count&#41;&#41;&#41;&#41;
+           {:result &#91;&#93; :x-count {}}
+           s&#41;&#41;&#41;
+</code></pre><p>Personally, I find the <code>reduce</code> implementation quite dense and prefer the a recursive solution.</p><pre><code class="Clojure">&#40;defn map-occurrence
+  &#40;&#91;f s&#93; &#40;map-occurrence f s {}&#41;&#41;
+  &#40;&#91;f s x-count&#93;
+   &#40;lazy-seq
+    &#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93;
+      &#40;let &#91;x-count &#40;assoc x-count x &#40;inc &#40;get x-count x 0&#41;&#41;&#41;&#93;
+        &#40;cons &#40;f &#40;x-count x&#41; x&#41;
+              &#40;map-occurrence f xs x-count&#41;&#41;&#41;&#41;&#41;&#41;&#41;
+</code></pre><p>We use the <code>lazy-seq</code> to define a function that recursively builds a list of items that are the result of <code>&#40;f &#40;x-count x&#41; x&#41;</code> where <code>x-count</code> is the current count of <code>x</code>. The use of <code>&#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93; ...&#41;</code> is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail.</p><pre><code class="Clojure">&#40;map-occurrence
+   &#40;fn &#91;occ item&#93;
+     &#40;if &#40;= item :chest&#41;
+       &#40;{1 :diamond 2 :ruby 3 :gold 4 :grail} occ&#41;
+       item&#41;&#41;
+   &#91;:chest :dirt :chest :chest :dirt :chest :dirt&#93;&#41;
+
+=&gt;
+&#40;:diamond :dirt :ruby :gold :dirt :grail :dirt&#41;
+</code></pre><p>Honestly, the need for <code>map-occurrence</code> doesn't come up often but when it does it can be particularly useful tool.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
