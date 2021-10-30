@@ -40,7 +40,7 @@ We can write a function with reduce that achieves this:
            s)))
 ```
 
-Personally, I find the `reduce` implementation quite dense and prefer the a recursive solution.
+Personally, I find the `reduce` implementation quite dense and prefer a recursive solution.
 
 ```Clojure
 (defn map-occurrence
