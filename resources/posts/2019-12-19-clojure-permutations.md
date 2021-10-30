@@ -127,4 +127,4 @@ This works as intended assuming it is desirable for the function to handle dupli
 
 This implementation also has a performance advantage over the previous version with `remove`. This is because `disj` has `O(log32N)` (almost `O(1)`) performance compared to `remove` which has `O(N)` performance.
 
-A more comprehensive collection of functions for generating permutations and combinations can be found in the [clojure.math.combinatorics](https://github.com/clojure/math.combinatoricsh/) library.
+A more comprehensive collection of functions for generating permutations and combinations can be found in the [clojure.math.combinatorics](https://github.com/clojure/math.combinatorics/) library.

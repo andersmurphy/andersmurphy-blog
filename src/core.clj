@@ -203,7 +203,7 @@ style-src   'self'
         [:h1 {:class "post-title"} "404: Page not found"]
         [:p
          "Sorry, we've misplaced that URL or it's
-                 pointing to something that doesn't exist."
+                 pointing to something that doesn't exist. "
          [:a {:href site-url} "Head back home"]
          " to try finding it again."]]]]])
    prepend-doctype-header))

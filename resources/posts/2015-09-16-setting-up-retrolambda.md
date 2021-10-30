@@ -78,7 +78,7 @@ Although the source compatibility of the project has been set to Java 8, you won
 
 ![Android Studio Inspections](/assets/retrolambda_inspections.jpg)
 
-At this point you will be able to use lambda expression in your java source files. The additional steps bellow are helpful if you use [ProGuard](http://proguard.sourceforge.net/) or a CI server like [Jenkins](https://jenkins-ci.org/).
+At this point you will be able to use lambda expression in your java source files. The additional steps bellow are helpful if you use [ProGuard](https://www.guardsquare.com/proguard) or a CI server like [Jenkins](https://jenkins-ci.org/).
 
 ### Step 9 (Bonus): Update proguard-rules.txt
 If you are using ProGuard make sure to update the apps **proguard-rules.txt** file with the following to prevent it from failing:

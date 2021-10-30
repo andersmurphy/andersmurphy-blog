@@ -22,7 +22,7 @@ public final class a {
 }
 ```
 
-If you use [ProGuard](https://proguard.sourceforge.net/) to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. The stack trace will look something like this:
+If you use [ProGuard](https://www.guardsquare.com/proguard) to obfuscate the code in your project you have most likely had your app crash when it needs to use reflection. The stack trace will look something like this:
 
 ```java
 java.lang.NullPointerException: Attempt to read from field 'java.util.List com.example.a.b' on a null object reference

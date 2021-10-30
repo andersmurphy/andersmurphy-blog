@@ -1,7 +1,7 @@
 Title: Using Proguard instead of multidex
 
 One of the downsides of using MultiDex to overcome "The 65k limit" is that build times can increase significantly.
-Another option is to use [ProGuard](http://proguard.sourceforge.net/). ProGuard overcomes "The 65k limit" by removing unused method references,
+Another option is to use [ProGuard](https://www.guardsquare.com/proguard). ProGuard overcomes "The 65k limit" by removing unused method references,
 this can make a big difference if you are using large third party libraries like [Guava](https://github.com/google/guava). If configured
 correctly (disabling optimization/obfuscation) ProGuard can have little to no negative [impact on your build times](https://image.slidesharecdn.com/jackandjilldroidconlondon2015-160314154239/95/eric-lafortune-the-jack-and-jill-build-system-16-638.jpg?cb=1457972343) (in the case of larger project it can even decrease build time).
 

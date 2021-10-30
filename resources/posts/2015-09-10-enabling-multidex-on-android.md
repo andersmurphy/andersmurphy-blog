@@ -14,7 +14,7 @@ You may try using --multi-dex option.
 
 What pushes most apps over "The 65k limit" is the inclusion of external libraries. Often when importing external library, only a few methods are actually used. However, all the unused methods in that library will still count to "The 65k limit".
 
-The majority of apps can still be built as long as a code shrinking tool like [ProGuard](http://proguard.sourceforge.net/) is used. ProGuard removes any unused method references, meaning they don't end up counting towards the limit.
+The majority of apps can still be built as long as a code shrinking tool like [ProGuard](https://www.guardsquare.com/proguard) is used. ProGuard removes any unused method references, meaning they don't end up counting towards the limit.
 
 The other option, and the only option for apps that exceed the limit even after using tools like ProGuard, is MultiDex. MultiDex monkey patches the application context class loader in order to allow the loading of classes from more than one dex file. This allows the app to overcome "The 65k limit" by splitting it into multiple dex files.
 
@@ -50,5 +50,3 @@ dependencies {
 
 ## Step 3: Sync
 Sync the project with the gradle files and MultiDex will now be enabled. No more 65k limit for your app!
-
-Check out [this project](https://github.com/andersmurphy/chain/commit/4462327da5849f6ac7c4a41e290d84dc6f016b21) for an example of how to set up MultiDex.

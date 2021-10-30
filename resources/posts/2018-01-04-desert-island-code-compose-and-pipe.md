@@ -77,7 +77,7 @@ compose(map(x => x - 2), map(x => x * 2))([1, 2, 3]) // [0,2,4]
 
 ## Bonus: Reduce Right
 
-We saw how to write our own implementation of reduce in [this post](https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter/).
+We saw how to write our own implementation of reduce in [this post](https://andersmurphy.com/2017/12/28/desert-island-code-reduce-map-and-filter).
 But how would we implement reduce right? Reduce right is almost identical
 to reduce except it loops over the collection backwards.
 
