@@ -50,7 +50,7 @@ can call the function with the accumulated arguments.
 
 In javascript, we can use `functionName.length` to find out how many arguments a
 function takes. Then the spread syntax `...` can be used to expand an array in
-place into multiple arguments for a function. This gives us the start of a [recursive](https://en.wikipedia.org/wiki/Recursion_(computer_science).html)
+place into multiple arguments for a function. This gives us the start of a [recursive](https://en.wikipedia.org/wiki/Recursion_%28computer_science%29)
 function whose base case (a condition in which the function doesn't recur) would
 look like this:
 
