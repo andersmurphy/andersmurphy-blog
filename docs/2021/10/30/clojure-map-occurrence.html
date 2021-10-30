@@ -22,7 +22,7 @@ style-src   &apos;self&apos;
                    &#40;assoc :x-count x-count&#41;&#41;&#41;&#41;
            {:result &#91;&#93; :x-count {}}
            s&#41;&#41;&#41;
-</code></pre><p>Personally, I find the <code>reduce</code> implementation quite dense and prefer the a recursive solution.</p><pre><code class="Clojure">&#40;defn map-occurrence
+</code></pre><p>Personally, I find the <code>reduce</code> implementation quite dense and prefer a recursive solution.</p><pre><code class="Clojure">&#40;defn map-occurrence
   &#40;&#91;f s&#93; &#40;map-occurrence f s {}&#41;&#41;
   &#40;&#91;f s x-count&#93;
    &#40;lazy-seq
@@ -30,7 +30,7 @@ style-src   &apos;self&apos;
       &#40;let &#91;x-count &#40;assoc x-count x &#40;inc &#40;get x-count x 0&#41;&#41;&#41;&#93;
         &#40;cons &#40;f &#40;x-count x&#41; x&#41;
               &#40;map-occurrence f xs x-count&#41;&#41;&#41;&#41;&#41;&#41;&#41;
-</code></pre><p>We use the <code>lazy-seq</code> to define a function that recursively builds a list of items that are the result of <code>&#40;f &#40;x-count x&#41; x&#41;</code> where <code>x-count</code> is the current count of <code>x</code>. The use of <code>&#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93; ...&#41;</code> is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail.</p><pre><code class="Clojure">&#40;map-occurrence
+</code></pre><p>We use <code>lazy-seq</code> to define a function that recursively builds a list of items that are the result of <code>&#40;f &#40;x-count x&#41; x&#41;</code> where <code>x-count</code> is the current count of <code>x</code>. The use of <code>&#40;when-let &#91;&#91;x &amp; xs&#93; &#40;seq s&#41;&#93; ...&#41;</code> is a common pattern when building lazy sequences, allowing you to apply a function to the head of the sequence and then call it recursively on the tail.</p><pre><code class="Clojure">&#40;map-occurrence
    &#40;fn &#91;occ item&#93;
      &#40;if &#40;= item :chest&#41;
        &#40;{1 :diamond 2 :ruby 3 :gold 4 :grail} occ&#41;
