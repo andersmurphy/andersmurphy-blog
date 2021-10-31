@@ -1,7 +1,7 @@
 *{
-    -webkit-box-sizing:border-box;
-    -moz-box-sizing:border-box;
-    box-sizing:border-box
+  -webkit-box-sizing:border-box;
+  -moz-box-sizing:border-box;
+  box-sizing:border-box
 
 }
 ::-webkit-scrollbar {
@@ -14,139 +14,139 @@
   background: #f5dfbc;
 }
 html,body{
-    scrollbar-color: #f5dfbc #32302f;
-    margin:0;
-    padding:0
+  scrollbar-color: #f5dfbc #32302f;
+  margin:0;
+  padding:0
 }
 html{
-    font-family: Open Sans, sans-serif;
-    font-size: 16px;
-    line-height:1.5
+  font-family: Open Sans, sans-serif;
+  font-size: 16px;
+  line-height:1.5
 }
 code{
-    font: 16px monospace;
+  font: 16px monospace;
 }
 pre code{
-    font: 14px monospace;
-    white-space: pre-wrap;
-    word-break: break-word;
-    display: block;
-    padding: 10px;
+  font: 14px monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: block;
+  padding: 10px;
 }
 @media (min-width: 38em){
-    html{
-        font-size:18px
-    }
-    pre code {
-        font-size:18px
-    }
-    pre code {
-        font-size:16px
-    }
+  html{
+    font-size:18px
+  }
+  pre code {
+    font-size:18px
+  }
+  pre code {
+    font-size:16px
+  }
 }
 body{
-    color:#f5dfbc;
-    background-color:#32302f;
-    -webkit-text-size-adjust:100%;
-    -ms-text-size-adjust:100%
+  color:#f5dfbc;
+  background-color:#32302f;
+  -webkit-text-size-adjust:100%;
+  -ms-text-size-adjust:100%
 }
 a{
-    color:#7daea3;
-    text-decoration:none
+  color:#7daea3;
+  text-decoration:none
 }
 a:hover,a:focus{
-    text-decoration:underline
+  text-decoration:underline
 }
 a strong{
-    color:inherit
+  color:inherit
 }
 img{
-    display:block;
-    max-width:100%;
-    margin:0 0 1rem;
-    border-radius:5px
+  display:block;
+  max-width:100%;
+  margin:0 0 1rem;
+  border-radius:5px
 }
 h1,h2,h3,h4,h5,h6{
-    margin-bottom:.5rem;
-    font-weight:bold;
-    line-height:1.25;
-    color:#f5dfbc;
-    text-rendering:optimizeLegibility
+  margin-bottom:.5rem;
+  font-weight:bold;
+  line-height:1.25;
+  color:#f5dfbc;
+  text-rendering:optimizeLegibility
 }
 h1{
-    font-size:2rem
+  font-size:2rem
 }
 h2{
-    margin-top:1rem;
-    font-size:1.25rem
+  margin-top:1rem;
+  font-size:1.25rem
 }
 h3{
-    margin-top:1rem;
-    font-size:1rem
+  margin-top:1rem;
+  font-size:1rem
 }
 h4,h5,h6{
-    margin-top:1rem;
-    font-size:1rem
+  margin-top:1rem;
+  font-size:1rem
 }
 p{
-    margin-top:0;
-    margin-bottom:1rem
+  margin-top:0;
+  margin-bottom:1rem
 }
 strong{
-    color:#f5dfbc
+  color:#f5dfbc
 }
 ul,ol,dl{
-    margin-top:0;
-    margin-bottom:1rem
+  margin-top:0;
+  margin-bottom:1rem
 }
 
 @media (min-width: 30em){
-    blockquote{
-        padding-right:5rem;
-        padding-left:1.25rem
-    }
+  blockquote{
+    padding-right:5rem;
+    padding-left:1.25rem
+  }
 }
 a[href^="#fn:"],a[href^="#fnref:"]{
-    display:inline-block;
-    margin-left:.1rem;
-    font-weight:bold
+  display:inline-block;
+  margin-left:.1rem;
+  font-weight:bold
 }
 .container{
-    max-width:38rem;
-    padding-left:1.5rem;
-    padding-right:1.5rem;
-    margin-left:auto;
-    margin-right:auto
+  max-width:38rem;
+  padding-left:1.5rem;
+  padding-right:1.5rem;
+  margin-left:auto;
+  margin-right:auto
 }
 .post{
-    margin-bottom:3em;
+  margin-bottom:3em;
 }
 .post-date{
-    display:block;
-    margin-top:-.5rem;
-    margin-bottom:1rem;
-    color:#f5dfbc
+  display:block;
+  margin-top:-.5rem;
+  margin-bottom:1rem;
+  color:#f5dfbc
 }
 .related{
-    padding-top:2rem;
-    padding-bottom:2rem;
-    border-top:1px solid #eee
+  padding-top:2rem;
+  padding-bottom:2rem;
+  border-top:1px solid #eee
 }
 .related-posts{
-    padding-left:0;
-    list-style:none
+  padding-left:0;
+  list-style:none
 }
 .related-posts h3{
-    margin-top:0
+  margin-top:0
 }
 .related-posts li small{
-    font-size:75%;
-    color:#999
+  font-size:75%;
+  color:#999
 }
 .related-posts li a:hover{
-    color:#7daea3;
-    text-decoration:none
+  color:#7daea3;
+  text-decoration:none
 }
 .related-posts li a:hover small{
-    color:inherit
+  color:inherit
 }
