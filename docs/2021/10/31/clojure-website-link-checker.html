@@ -21,6 +21,7 @@ style-src   &apos;self&apos;
      &#40;let &#91;seen &#40;into seen links&#41;&#93;
        &#40;-&gt;&gt; &#40;get-all-links-on-pages domain links&#41;
             &#40;remove seen&#41;
+            distinct
             &#40;recur domain seen&#41;&#41;&#41;
      seen&#41;&#41;&#41;
 </code></pre><p>If we call this function we get a set of all the links on this domain (note this won't find orphaned pages).</p><pre><code class="Clojure">&#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;
