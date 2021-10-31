@@ -25,6 +25,7 @@ Next we write a recursive function to visit all links on a domain and continue f
      (let [seen (into seen links)]
        (->> (get-all-links-on-pages domain links)
             (remove seen)
+            distinct
             (recur domain seen)))
      seen)))
 ```
