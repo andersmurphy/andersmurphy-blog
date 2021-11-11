@@ -8,25 +8,25 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: ensuring multimethods are required</h1><time class="post-date" datetime="2021-10-24T00:00:00+00:00">24 Oct 2021</time><p>Multimethods are fantastic. They give you polymorphism without objects or classes (the best part of Object Oriented without the baggage), multiple dispatch, dynamic dispatch and strong decoupling that allows you to extend code without modifying it (<a href='https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle'>open closed principle</a>), this even extends to third party code. This decoupling is so good that it's not unheard of to deploy your system without all the <code>defmethod</code> extensions being required! This post will teach you how to prevent this.</p><p>The <code>printer</code> namespace defines the print multimethod which dispatches on the <code>:type</code> of it's input.</p><pre><code class="Clojure">&#40;ns ensuring-multimethods-are-required.printer
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: ensuring multimethods are required</h1><time class="post-date" datetime="2021-10-24T00:00:00+00:00">24 Oct 2021</time><p>Multimethods are fantastic. They give you polymorphism without objects or classes (the best part of Object Oriented without the baggage), multiple dispatch, dynamic dispatch and strong decoupling that allows you to extend code without modifying it (<a href='https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle'>open closed principle</a>), this even extends to third party code. This decoupling is so good that it's not unheard of to deploy your system without all the <code>defmethod</code> extensions being required! This post will teach you how to prevent this.</p><p>The <code>printer</code> namespace defines the print multimethod which dispatches on the <code>:type</code> of it's input.</p><pre>&#40;ns <strong>ensuring-multimethods-are-required.printer</strong>
   &#40;:refer-clojure :exclude &#91;print&#93;&#41;&#41;
 
-&#40;defmulti print :type&#41;
+&#40;defmulti <strong>print</strong> :type&#41;
 
-&#40;defmethod print :default &#91;{:keys &#91;text&#93;}&#93; &#40;println text&#41;&#41;
-</code></pre><p>A namespace, called <code>shout</code>, defines a <code>p/print</code> method that upper cases <code>:text</code> before printing.</p><pre><code class="Clojure">&#40;ns ensuring-multimethods-are-required.shout
+&#40;defmethod <strong>print</strong> :default &#91;{:keys &#91;text&#93;}&#93; &#40;println text&#41;&#41;
+</pre><p>A namespace, called <code>shout</code>, defines a <code>p/print</code> method that upper cases <code>:text</code> before printing.</p><pre>&#40;ns <strong>ensuring-multimethods-are-required.shout</strong>
   &#40;:require &#91;ensuring-multimethods-are-required.printer :as p&#93;
             &#91;clojure.string :as str&#93;&#41;&#41;
 
-&#40;defmethod p/print :shout &#91;{:keys &#91;text&#93;}&#93;
+&#40;defmethod <strong>p/print</strong> :shout &#91;{:keys &#91;text&#93;}&#93;
   &#40;println &#40;str/upper-case text&#41;&#41;&#41;
-</code></pre><p>Another namespace, called <code>whisper</code>, defines a <code>p/print</code> method that lower cases <code>:text</code> before printing.</p><pre><code class="Clojure">&#40;ns ensuring-multimethods-are-required.whisper
+</pre><p>Another namespace, called <code>whisper</code>, defines a <code>p/print</code> method that lower cases <code>:text</code> before printing.</p><pre>&#40;ns <strong>ensuring-multimethods-are-required.whisper</strong>
   &#40;:require &#91;ensuring-multimethods-are-required.printer :as p&#93;
             &#91;clojure.string :as str&#93;&#41;&#41;
 
-&#40;defmethod p/print :whisper &#91;{:keys &#91;text&#93;}&#93;
+&#40;defmethod <strong>p/print</strong> :whisper &#91;{:keys &#91;text&#93;}&#93;
   &#40;println &#40;str/lower-case text&#41;&#41;&#41;
-</code></pre><p>In the <code>core</code> namespace the <code>p/print</code> multimethod is called with a series of data.</p><p>At the top of the file (after the namespace declaration) an assertion checks that the <code>p/print</code> multimethod has the expected multimethods implementation registered to it.</p><pre><code class="Clojure">&#40;ns ensuring-multimethods-are-required.core
+</pre><p>In the <code>core</code> namespace the <code>p/print</code> multimethod is called with a series of data.</p><p>At the top of the file (after the namespace declaration) an assertion checks that the <code>p/print</code> multimethod has the expected multimethods implementation registered to it.</p><pre>&#40;ns <strong>ensuring-multimethods-are-required.core</strong>
   &#40;:require
    &#91;ensuring-multimethods-are-required.printer :as p&#93;&#41;&#41;
 
@@ -38,10 +38,10 @@ style-src   &apos;self&apos;
 &#40;run! p/print &#91;{:text &quot;Hello&quot;}
                {:type :shout :text &quot;Hello&quot;}
                {:type :whisper :text &quot;Hello&quot;}&#93;&#41;
-</code></pre><p>In this case two of the desired implementations are missing and an error is thrown when trying to compile the namespace.</p><pre><code class="Clojure">Syntax error &#40;AssertionError&#41; compiling at &#40;ensuring&#95;multimethods&#95;are&#95;required/core.clj:5:1&#41;.
+</pre><p>In this case two of the desired implementations are missing and an error is thrown when trying to compile the namespace.</p><pre>Syntax error &#40;AssertionError&#41; compiling at &#40;ensuring&#95;multimethods&#95;are&#95;required/core.clj:5:1&#41;.
 Assert failed: #{:shout :default :whisper} =/= #{:default}
 &#40;= expected-methods loaded-methods&#41;
-</code></pre><p>The missing <code>shout</code> and <code>whisper</code> namespaces are added to the namespace deceleration.</p><pre><code class="Clojure">&#40;ns ensuring-multimethods-are-required.core
+</pre><p>The missing <code>shout</code> and <code>whisper</code> namespaces are added to the namespace deceleration.</p><pre>&#40;ns <strong>ensuring-multimethods-are-required.core</strong>
   &#40;:require
    &#91;ensuring-multimethods-are-required.whisper&#93;
    &#91;ensuring-multimethods-are-required.shout&#93;
@@ -56,9 +56,9 @@ Assert failed: #{:shout :default :whisper} =/= #{:default}
                {:type :shout :text &quot;Hello&quot;}
                {:type :whisper :text &quot;Hello&quot;}&#93;&#41;
 
-</code></pre><p>Everything now works as expected.</p><pre><code class="Clojure">Hello
+</pre><p>Everything now works as expected.</p><pre>Hello
 HELLO
 hello
 
 nil
-</code></pre><p>This trick helps avoid unexpected behaviour caused by missing multimethod implementations.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/multimethods/ensuring-multimethods-are-required'>project can be found here</a>.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
+</pre><p>This trick helps avoid unexpected behaviour caused by missing multimethod implementations.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/multimethods/ensuring-multimethods-are-required'>project can be found here</a>.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>

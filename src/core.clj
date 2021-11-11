@@ -138,11 +138,22 @@ style-src   'self'
      [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]
      [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]]])
 
+(defn clojure-bold-defs [html]
+  (str/replace html
+               #"<code class=\"[Cc]lojure\">([\s\S]+?)</code>"
+               (fn [[_ code]]
+                 (str/replace
+                  code
+                  #"(&#40;def[a-z]* |ns )(\S+)"
+                  "$1<strong>$2</strong>"))))
+
 (defn add-post-content
   [{:keys [file] :as m}]
-  (let [{:keys [html metadata]} (-> file
-                                    slurp
-                                    (md-to-html-string-with-meta))]
+  (let [{:keys [html metadata]}
+        (-> file
+            slurp
+            md-to-html-string-with-meta
+            (update :html clojure-bold-defs))]
     (assoc m
            :post-content html
            :post-name    (-> metadata

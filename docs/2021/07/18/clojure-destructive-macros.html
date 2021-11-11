@@ -8,7 +8,7 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: destructive macros</h1><time class="post-date" datetime="2021-07-18T00:00:00+00:00">18 Jul 2021</time><p>In this post we'll cover writing a macro that supports destructuring and does something with the bindings. More specifically we will write a macro that makes building maps from arbitrary data less verbose.</p><p>Consider the following code:</p><pre><code class="Clojure">&#40;let &#91;{{:keys &#91;year&#93;}    :meta
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: destructive macros</h1><time class="post-date" datetime="2021-07-18T00:00:00+00:00">18 Jul 2021</time><p>In this post we'll cover writing a macro that supports destructuring and does something with the bindings. More specifically we will write a macro that makes building maps from arbitrary data less verbose.</p><p>Consider the following code:</p><pre>&#40;let &#91;{{:keys &#91;year&#93;}    :meta
        &#91;{:keys &#91;titles&#93;}&#93; :people}
       {:meta    {:year &quot;1249&quot;
                  :region &quot;Estiria&quot;}
@@ -22,7 +22,7 @@ style-src   &apos;self&apos;
 
 =&gt;
 {:year &quot;1249&quot;, :titles &#91;&quot;Duke&quot; &quot;Silver Tongue&quot;&#93;}
-</code></pre><p>This is fine. But, what we really want is to create a map with the keys that match the symbols we bind when destructuring. This will do away with the ceremony of building the map by hand <code>{:year year :titles titles}</code>.</p><p><code>defmacro</code> and <code>destructure</code> to the rescue.</p><pre><code class="Clojure">&#40;destructure
+</pre><p>This is fine. But, what we really want is to create a map with the keys that match the symbols we bind when destructuring. This will do away with the ceremony of building the map by hand <code>{:year year :titles titles}</code>.</p><p><code>defmacro</code> and <code>destructure</code> to the rescue.</p><pre>&#40;destructure
  '&#91;{{:keys &#91;year&#93;}    :meta
     &#91;{:keys &#91;titles&#93;}&#93; :people}
    {:meta    {:year &quot;1249&quot;
@@ -65,7 +65,7 @@ style-src   &apos;self&apos;
   map&#95;&#95;41585&#41;
  titles
  &#40;clojure.core/get map&#95;&#95;41585 :titles&#41;&#93;
-</code></pre><p>Despite the noise we can see that <code>destructure</code> outputs a list of bindings and values. Some of theses are bindings that we care about <code>year</code> and <code>titles</code>. The others, which have generated names like <code>vec&#95;&#95;41582</code> and <code>map&#95;&#95;41585</code>, are references to the collections being destructured.</p><p>We can filter these out to get the bindings we care about for building our map.</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;destructure
+</pre><p>Despite the noise we can see that <code>destructure</code> outputs a list of bindings and values. Some of theses are bindings that we care about <code>year</code> and <code>titles</code>. The others, which have generated names like <code>vec&#95;&#95;41582</code> and <code>map&#95;&#95;41585</code>, are references to the collections being destructured.</p><p>We can filter these out to get the bindings we care about for building our map.</p><pre>&#40;-&gt;&gt; &#40;destructure
       '&#91;{{:keys &#91;year&#93;}    :meta
          &#91;{:keys &#91;titles&#93;}&#93; :people}
         {:meta    {:year &quot;1249&quot;
@@ -82,7 +82,7 @@ style-src   &apos;self&apos;
 =&gt;
 &#40;&#40;year   &#40;clojure.core/get map&#95;&#95;41611 :year&#41;&#41;
  &#40;titles &#40;clojure.core/get map&#95;&#95;41615 :titles&#41;&#41;&#41;
-</code></pre><p>We can define a macro that uses a <code>map</code> and <code>into</code> to build a map with keys that match the bound symbols.</p><pre><code class="Clojure">&#40;defmacro let-&gt;map &#91;bindings&#93;
+</pre><p>We can define a macro that uses a <code>map</code> and <code>into</code> to build a map with keys that match the bound symbols.</p><pre>&#40;defmacro <strong>let-&gt;map</strong> &#91;bindings&#93;
   &#40;let &#91;dest-bindings &#40;destructure bindings&#41;&#93;
     &#40;-&gt;&gt; &#40;partition 2 dest-bindings&#41;
          &#40;remove &#40;fn &#91;&#91;k&#93;&#93;
@@ -94,7 +94,7 @@ style-src   &apos;self&apos;
 =&gt;
 Syntax error compiling at &#40;/private/var/folders/ms/x72d2hr9487980y4&#95;dpy7gym0000gn/T/form-init17784029688269253732.clj:1:1&#41;.
 Unable to resolve symbol: map&#95;&#95;41669 in this context
-</code></pre><p>Looks like this error is caused because the compiler can't find <code>map&#95;&#95;41669</code>. This is one of the bindings <code>destructure</code> generates. As we haven't bound <code>map&#95;&#95;41669</code> when <code>&#40;clojure.core/get map&#95;&#95;41669 :year&#41;</code> is called it throws an error.</p><p>We can fix this by binding all the of bindings outputed by <code>destructure</code>.</p><pre><code class="Clojure">&#40;defmacro let-&gt;map &#91;bindings&#93;
+</pre><p>Looks like this error is caused because the compiler can't find <code>map&#95;&#95;41669</code>. This is one of the bindings <code>destructure</code> generates. As we haven't bound <code>map&#95;&#95;41669</code> when <code>&#40;clojure.core/get map&#95;&#95;41669 :year&#41;</code> is called it throws an error.</p><p>We can fix this by binding all the of bindings outputed by <code>destructure</code>.</p><pre>&#40;defmacro <strong>let-&gt;map</strong> &#91;bindings&#93;
   &#40;let &#91;dest-bindings &#40;destructure bindings&#41;&#93;
     `&#40;let &#126;dest-bindings
        &#126;&#40;-&gt;&gt; &#40;partition 2 dest-bindings&#41;
@@ -103,7 +103,7 @@ Unable to resolve symbol: map&#95;&#95;41669 in this context
                            &#40;re-find #&quot;&#94;&#40;vec&#95;&#95;|map&#95;&#95;&#41;&quot; &#40;name k&#41;&#41;&#41;&#41;&#41;
              &#40;mapv &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;keyword k&#41; v&#93;&#41;&#41;
              &#40;into {}&#41;&#41;&#41;&#41;&#41;
-</code></pre><p>Let's give it another go.</p><pre><code class="Clojure">&#40;let-&gt;map &#91;{{:keys &#91;year&#93;}    :meta
+</pre><p>Let's give it another go.</p><pre>&#40;let-&gt;map &#91;{{:keys &#91;year&#93;}    :meta
               &#91;{:keys &#91;titles&#93;}&#93; :people}
              {:meta    {:year &quot;1249&quot;
                         :region &quot;Estiria&quot;}
@@ -116,7 +116,7 @@ Unable to resolve symbol: map&#95;&#95;41669 in this context
 
 =&gt;
 {:year &quot;1249&quot;, :titles &#91;&quot;Duke&quot; &quot;Silver Tongue&quot;&#93;}
-</code></pre><p>It works!</p><p>What about with lists?</p><pre><code class="Clojure">&#40;map #&#40;let-&gt;map &#91;{name :name &#91;first-title&#93; :titles} %&#93;&#41;
+</pre><p>It works!</p><p>What about with lists?</p><pre>&#40;map #&#40;let-&gt;map &#91;{name :name &#91;first-title&#93; :titles} %&#93;&#41;
        &#91;{:titles &#91;&quot;Duke&quot; &quot;Silver Tongue&quot;&#93;
          :name &quot;John&quot;}
         {:titles &#91;&quot;Queen&quot; &quot;Sun&quot;&#93;
@@ -128,4 +128,4 @@ Unable to resolve symbol: map&#95;&#95;41669 in this context
 &#40;{:name &quot;John&quot;, :first-title &quot;Duke&quot;}
  {:name &quot;Jill&quot;, :first-title &quot;Queen&quot;}
  {:name &quot;Vigo&quot;, :first-title &quot;Jarl&quot;}&#41;
-</code></pre><p>Magic.</p><p>In this post we've seen how to use <code>destructure</code> to write a macro that supports destructuring and does something useful with the bindings.</p><p>That being said. I'd probably think twice before using <code>let-&gt;map</code> everywhere as it's implementation is somewhat fragile (<code>filter</code> depending on collections starting with "map<b>" or "vec</b>") and is unlikely to cover all edge cases. The gains are also pretty minimal.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
+</pre><p>Magic.</p><p>In this post we've seen how to use <code>destructure</code> to write a macro that supports destructuring and does something useful with the bindings.</p><p>That being said. I'd probably think twice before using <code>let-&gt;map</code> everywhere as it's implementation is somewhat fragile (<code>filter</code> depending on collections starting with "map<b>" or "vec</b>") and is unlikely to cover all edge cases. The gains are also pretty minimal.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>

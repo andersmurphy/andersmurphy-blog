@@ -6,7 +6,7 @@ Sorting collections of items is something that comes up frequently in software d
 
 To sort numbers we use the `sort` function.
 
-```clojure
+```Clojure
 (sort [9 3 2 8 1 9])
 
 => (1 2 3 8 9 9)
@@ -14,7 +14,7 @@ To sort numbers we use the `sort` function.
 
 To reverse the sort order we pass the `>` function into the `sort` function.
 
-```clojure
+```Clojure
 (sort > [9 3 2 8 1 9])
 
 => (9 9 8 3 2 1)
@@ -24,7 +24,7 @@ To reverse the sort order we pass the `>` function into the `sort` function.
 
 Sorting strings and dates in ascending order is exactly the same as sorting numbers.
 
-```clojure
+```Clojure
 (sort ["b" "a" "f" "c" "x"])
 
 => ("a" "b" "c" "f" "x")
@@ -40,7 +40,7 @@ Sorting strings and dates in ascending order is exactly the same as sorting numb
 
 However, passing the `>` function into the `sort` function gives us an error.
 
-```clojure
+```Clojure
 (sort > ["b" "a" "f" "c" "x"])
 
 =>
@@ -58,7 +58,7 @@ java.util.Date cannot be cast to java.lang.Number
 
 To reverse the sort we need to make our own [comparator](https://clojure.org/guides/comparators). The easiest way to do this is with the `compare` function. By changing the argument order to the compare function we can change the order of the sort.
 
-```clojure
+```Clojure
 (defn desc [a b]
   (compare b a))
 
@@ -79,7 +79,7 @@ To reverse the sort we need to make our own [comparator](https://clojure.org/gui
 
 The `sort` function moves `nil` values to the front.
 
-```clojure
+```Clojure
 (sort [2 6 nil 7 4])
 
 => (nil 2 4 6 7)
@@ -87,7 +87,7 @@ The `sort` function moves `nil` values to the front.
 
 We can reverse this sort with the `desc` comparator we defined earlier. This, will move `nil` to the back but also reverse the sort.
 
-```clojure
+```Clojure
 (sort desc [2 6 nil 7 4])
 
 => (7 6 4 2 nil)
@@ -95,7 +95,7 @@ We can reverse this sort with the `desc` comparator we defined earlier. This, wi
 
 If we want `nil` values to be at the back without changing the sort order, we can use the `juxt`, `nil?` and `identity` functions (for more on `juxt` check out [this post](https://andersmurphy.com/2018/11/18/clojure-juxt-and-separate.html)).
 
-```clojure
+```Clojure
 (sort-by (juxt nil? identity) [2 6 nil 7 6])
 
 => (2 6 6 7 nil)
@@ -103,7 +103,7 @@ If we want `nil` values to be at the back without changing the sort order, we ca
 
 If we want to reverse the order but keep `nil` values at the front, we can pass in the `desc` comparator we defined earlier.
 
-```clojure
+```Clojure
 (sort-by (juxt nil? identity) desc [2 6 nil 7 6])
 
 => (nil 7 6 6 2)
@@ -113,7 +113,7 @@ If we want to reverse the order but keep `nil` values at the front, we can pass 
 
 To sort maps by key we use the `sort-by` function, passing in the key we want to sort by as an argument.
 
-```clojure
+```Clojure
 (sort-by :a [{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}])
 
 => ({:a 1, :b 2} {:a 2, :b 1} {:a 3, :b 1})
@@ -121,7 +121,7 @@ To sort maps by key we use the `sort-by` function, passing in the key we want to
 
 Like `sort`, the `sort-by` function can also take a comparator to change the order of the sort.
 
-```clojure
+```Clojure
 (sort-by :a > [{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}])
 
 => ({:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2})
@@ -129,7 +129,7 @@ Like `sort`, the `sort-by` function can also take a comparator to change the ord
 
 You can also use `comp` and `-` to change the sort order.
 
-```clojure
+```Clojure
 (sort-by (comp - :a) [{:a 2 :b 1} {:a 3 :b 1} {:a 1 :b 2}])
 
 => ({:a 3, :b 1} {:a 2, :b 1} {:a 1, :b 2})
@@ -139,7 +139,7 @@ You can also use `comp` and `-` to change the sort order.
 
 Secondary sorts can be achieved using the `juxt` function.
 
-```clojure
+```Clojure
 (sort-by (juxt :a :b) [{:a 2 :b 1} {:a 1 :b 3} {:a 1 :b 2}])
 
 => ({:a 1, :b 2} {:a 1, :b 3} {:a 2, :b 1})
@@ -149,7 +149,7 @@ Secondary sorts can be achieved using the `juxt` function.
 
 If you want to sort by count, just pass the count function to `sort-by` (note: we pass it as the key function not the comparator).
 
-```clojure
+```Clojure
 (sort-by count ["car" "airplane" "bike"])
 
 => ("car" "bike" "airplane")
@@ -159,7 +159,7 @@ If you want to sort by count, just pass the count function to `sort-by` (note: w
 
 Both `sort` and `sort-by` are stable, meaning equal elements will not be reordered.
 
-```clojure
+```Clojure
 clojure.core/sort
 ([coll] [comp coll])
   Returns a sorted sequence of the items in coll. If no comparator is
@@ -180,7 +180,7 @@ clojure.core/sort-by
 
 This is useful as it means it doesn't matter what order you apply your sorts to a collection. You can sort by the secondary sort and then sort by your primary sort and you won't lose the secondary sort order.
 
-```clojure
+```Clojure
 (sort-by :b [{:a 2 :b 1} {:a 1 :b 3} {:a 1 :b 2}])
 
 => ({:a 2, :b 1} {:a 1, :b 2} {:a 1, :b 3})
