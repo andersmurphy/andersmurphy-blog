@@ -141,9 +141,9 @@ style-src   'self'
 (defn clojure-bold-defs [html]
   (str/replace html
                #"<code class=\"[Cc]lojure\">([\s\S]+?)</code>"
-               (fn [[_ code]]
+               (fn [[full-capture]]
                  (str/replace
-                  code
+                  full-capture
                   #"(&#40;def[a-z]* |ns )(\S+)"
                   "$1<strong>$2</strong>"))))
 
