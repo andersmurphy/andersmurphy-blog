@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2021/11/11/clojure-code-highlights-for-this-website.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: code highlights for this website</h1><time class="post-date" datetime="2021-11-11T00:00:00+00:00">11 Nov 2021</time><p>When I changed the styling of this website I removed code highlights as part of an exercise in minimalism. Anyway, I recently read this awesome article about writing a <a href='https://blog.michielborkent.nl/writing-clojure-highlighter.html'>Clojure highlighter from scratch in 160 lines</a> which inspired me to add some very basic highlights back to this site. This post is about implementing my own Clojure highlighter from scratch in only 8 lines (and a fraction of the functionality).</p><p>I currently use monochrome highlights in my editor. I find it less distracting and it means I can use colour where I feel it matters (error, linter warnings etc). Thankfully this also greatly simplifies what this highlighter needs to support. All it needs to do make the symbol after def/defn/defmacro/ns etc bold.</p><p>Without further fanfare here's the highlighter:</p><pre><code class="Clojure">&#40;defn <strong>clojure-bold-defs</strong> &#91;html&#93;
+  &#40;str/replace html
+               #&quot;&lt;code class=\&quot;&#91;Cc&#93;lojure\&quot;&gt;&#40;&#91;\s\S&#93;+?&#41;&lt;/code&gt;&quot;
+               &#40;fn &#91;&#91;full-capture&#93;&#93;
+                 &#40;str/replace
+                  full-capture
+                  #&quot;&#40;&amp;#40;def&#91;a-z&#93;&#42; |ns <strong>&#41;&#40;\S+&#41;&quot;</strong>
+                  &quot;$1&lt;strong&gt;$2&lt;/strong&gt;&quot;&#41;&#41;&#41;&#41;
+</code></pre><p>Lets break this code down. First we need to find the html code blocks that have a class <code>&quot;clojure&quot;</code>:</p><pre><code class="Clojure">&#40;defn <strong>clojure-bold-defs</strong> &#91;html&#93;
+  &#40;str/replace html
+               #&quot;&lt;code class=\&quot;&#91;Cc&#93;lojure\&quot;&gt;&#40;&#91;\s\S&#93;+?&#41;&lt;/code&gt;&quot;
+               ...&#41;&#41;
+</code></pre><p>Then we need to replace any code that starts with <code>&#40;def foo ..</code> with <code>&#40;def &lt;strong&gt;foo&lt;/strong&gt; ..</code>:</p><pre><code class="Clojure">&#40;fn &#91;&#91;full-capture&#93;&#93;
+                 &#40;str/replace
+                  full-capture
+                  #&quot;&#40;&amp;#40;def&#91;a-z&#93;&#42; |ns <strong>&#41;&#40;\S+&#41;&quot;</strong>
+                  &quot;$1&lt;strong&gt;$2&lt;/strong&gt;&quot;&#41;&#41;
+</code></pre><p>We use <code>&amp;#40;</code> which is the HTML coded character for <code>&#40;</code> as that what our markdown to html converter returns.</p><p>That's all there is to it. That very same code generates the minimalist code highlights on this website.</p><p>The <a href='https://github.com/andersmurphy/andersmurphy-blog/blob/a98909a62c8f452667588c589e1af30a5291d951/src/core.clj#L141-L148'>full example can be found here</a>.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
