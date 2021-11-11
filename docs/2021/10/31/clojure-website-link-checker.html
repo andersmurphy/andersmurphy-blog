@@ -8,13 +8,13 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: website link checker</h1><time class="post-date" datetime="2021-10-31T00:00:00+00:00">31 Oct 2021</time><p>Writing a simple website link checker in Clojure for fun and profit. Clojure has this nifty function called <code>re-seq</code> that returns a lazy sequence of successive matches of a pattern in a string we can combine this with recursion to write a primitive website link checker.</p><p>First we write a function to find all the links on a given set of pages for a domain.</p><pre>&#40;defn <strong>get-all-links-on-pages</strong> &#91;domain pages&#93;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: website link checker</h1><time class="post-date" datetime="2021-10-31T00:00:00+00:00">31 Oct 2021</time><p>Writing a simple website link checker in Clojure for fun and profit. Clojure has this nifty function called <code>re-seq</code> that returns a lazy sequence of successive matches of a pattern in a string we can combine this with recursion to write a primitive website link checker.</p><p>First we write a function to find all the links on a given set of pages for a domain.</p><pre><code class="Clojure">&#40;defn <strong>get-all-links-on-pages</strong> &#91;domain pages&#93;
   &#40;-&gt;&gt; &#40;filter #&#40;clojure.string/includes? % domain&#41; pages&#41;
        &#40;mapcat &#40;fn &#91;page&#93;
                  &#40;-&gt;&gt; &#40;try &#40;slurp page&#41; &#40;catch Exception e &quot;&quot;&#41;&#41;
                       &#40;re-seq #&quot;href=&#91;\&quot;'&#93;&#40;.&#42;?&#41;&#91;\&quot;'&#93;&quot;&#41;
                       &#40;map second&#41;&#41;&#41;&#41;&#41;&#41;
-</pre><p><code>&#40;filter #&#40;clojure.string/includes? % domain&#41; pages&#41;</code> prevents us slurping pages outside our domain (so that we don't end up crawling the whole internet). Because this function is only for gathering all the links on a page we don't care if a <code>slurp</code> fails so we guard against this with a <code>try ... catch</code>.</p><p>Next we write a recursive function to visit all links on a domain and continue following links within that domain until all have been <code>seen</code>.</p><pre>&#40;defn <strong>get-all-links-on-domain</strong>
+</code></pre><p><code>&#40;filter #&#40;clojure.string/includes? % domain&#41; pages&#41;</code> prevents us slurping pages outside our domain (so that we don't end up crawling the whole internet). Because this function is only for gathering all the links on a page we don't care if a <code>slurp</code> fails so we guard against this with a <code>try ... catch</code>.</p><p>Next we write a recursive function to visit all links on a domain and continue following links within that domain until all have been <code>seen</code>.</p><pre><code class="Clojure">&#40;defn <strong>get-all-links-on-domain</strong>
   &#40;&#91;domain&#93; &#40;get-all-links-on-domain domain #{} &#91;domain&#93;&#41;&#41;
   &#40;&#91;domain seen links&#93;
    &#40;if &#40;seq links&#41;
@@ -24,7 +24,7 @@ style-src   &apos;self&apos;
             distinct
             &#40;recur domain seen&#41;&#41;&#41;
      seen&#41;&#41;&#41;
-</pre><p>If we call this function we get a set of all the links on this domain (note this won't find orphaned pages).</p><pre>&#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;
+</code></pre><p>If we call this function we get a set of all the links on this domain (note this won't find orphaned pages).</p><pre><code class="Clojure">&#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;
 
 =&gt;
 #{&quot;https://github.com/andersmurphy/clj-cookbook/tree/master/generating-files/html-and-xml-example&quot;
@@ -33,33 +33,33 @@ style-src   &apos;self&apos;
   &quot;https://en.wikipedia.org/wiki/Open%E2%80%93closed&#95;principle&quot;
   &quot;https://brew.sh/&quot;
   ...}
-</pre><p>This function takes just under 2 seconds to find all 149 links on this website.</p><pre>&#40;time &#40;count &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;&#41;
+</code></pre><p>This function takes just under 2 seconds to find all 149 links on this website.</p><pre><code class="Clojure">&#40;time &#40;count &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;&#41;
 
 =&gt;
 &quot;Elapsed time: 1753.119164 msecs&quot;
 
 149
-</pre><p>Not particularly slow, but we can make it faster by using <code>pmap</code>.</p><pre>&#40;defn <strong>get-all-links-on-pages</strong> &#91;domain pages&#93;
+</code></pre><p>Not particularly slow, but we can make it faster by using <code>pmap</code>.</p><pre><code class="Clojure">&#40;defn <strong>get-all-links-on-pages</strong> &#91;domain pages&#93;
   &#40;-&gt;&gt; &#40;filter #&#40;clojure.string/includes? % domain&#41; pages&#41;
        &#40;pmap &#40;fn &#91;page&#93;
                &#40;-&gt;&gt; &#40;try &#40;slurp page&#41; &#40;catch Exception e &quot;&quot;&#41;&#41;
                     &#40;re-seq #&quot;href=&#91;\&quot;'&#93;&#40;.&#42;?&#41;&#91;\&quot;'&#93;&quot;&#41;
                     &#40;map second&#41;&#41;&#41;&#41;
        flatten&#41;&#41;
-</pre><p>This is a simple way of processing each link in parallel.</p><pre>&#40;time &#40;count &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;&#41;
+</code></pre><p>This is a simple way of processing each link in parallel.</p><pre><code class="Clojure">&#40;time &#40;count &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;&#41;
 
 =&gt;
 &quot;Elapsed time: 873.775003 msecs&quot;
 
 149
-</pre><p>To check the links we write a function that connects to the url and checks the response code (that way we don't do any additional processing of the data).</p><pre>&#40;defn <strong>check-link</strong> &#91;link&#93;
+</code></pre><p>To check the links we write a function that connects to the url and checks the response code (that way we don't do any additional processing of the data).</p><pre><code class="Clojure">&#40;defn <strong>check-link</strong> &#91;link&#93;
   &#40;when-not &#40;= &#40;try &#40;-&gt; &#40;clojure.java.io/as-url link&#41;
                         .openConnection
                         .getResponseCode&#41;
                     &#40;catch Exception e 404&#41;&#41;
                200&#41;
     link&#41;&#41;
-</pre><p>Weaving all this together we get a primitive program for checking links on a domain.</p><pre>&#40;-&gt;&gt; &#40;map check-link &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;
+</code></pre><p>Weaving all this together we get a primitive program for checking links on a domain.</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;map check-link &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;
        &#40;remove nil?&#41;&#41;
 
 =&gt;
@@ -74,7 +74,7 @@ style-src   &apos;self&apos;
  &quot;https://proguard.sourceforge.net/&quot;
  &quot;https://github.com/andersmurphy/chain/commit/4462327da5849f6ac7c4a41e290d84dc6f016b21&quot;
  &quot;https://github.com/andersmurphy/chain/commit/531597724d68cf27d6e9fdd2e88f54fe4082c841&quot;&#41;
-</pre><p>Turns out there were broken links on this website!</p><p>This program is pretty slow and takes 40s to run. This is partly due to some of the external links having long load times.</p><pre>&#40;time
+</code></pre><p>Turns out there were broken links on this website!</p><p>This program is pretty slow and takes 40s to run. This is partly due to some of the external links having long load times.</p><pre><code class="Clojure">&#40;time
  &#40;-&gt;&gt; &#40;map check-link &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;
       &#40;remove nil?&#41;
       doall&#41;&#41;
@@ -82,7 +82,7 @@ style-src   &apos;self&apos;
 &quot;Elapsed time: 39476.81269 msecs&quot;
 
 ...
-</pre><p>Again using <code>pmap</code> we can get some quick performance gains. Reducing our run time to 10s.</p><pre>&#40;time
+</code></pre><p>Again using <code>pmap</code> we can get some quick performance gains. Reducing our run time to 10s.</p><pre><code class="Clojure">&#40;time
  &#40;-&gt;&gt; &#40;pmap
        check-link
        &#40;get-all-links-on-domain &quot;https://andersmurphy.com&quot;&#41;&#41;
@@ -93,4 +93,4 @@ style-src   &apos;self&apos;
 &quot;Elapsed time: 10484.143708 msecs&quot;
 
 ...
-</pre><p>There are plenty of ways to improve the performance of this program. For example currently it performs two passes: gathering all the links and then checking them. There are also functional improvements like handling relative links etc. But they will be left as an exercise for the reader.</p><p>In this post we've seen how to use <code>slurp</code>, <code>re-seq</code>, <code>pmap</code> and recursion to write a basic link checker.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
+</code></pre><p>There are plenty of ways to improve the performance of this program. For example currently it performs two passes: gathering all the links and then checking them. There are also functional improvements like handling relative links etc. But they will be left as an exercise for the reader.</p><p>In this post we've seen how to use <code>slurp</code>, <code>re-seq</code>, <code>pmap</code> and recursion to write a basic link checker.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
