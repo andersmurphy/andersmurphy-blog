@@ -27,9 +27,10 @@ git checkout emacs-28
 ./configure --with-cairo --with-imagemagick --with-xwidgets --with-native-compilation
 ```
 
-Start the build. Worth pointing out building emacs from source does take some time.
+Start the build. Worth pointing out building emacs from source does take some time `-j$(nproc)` ensures you are at least using all your system's cores.
 
 ```bash
+make -j$(nproc)
 make clean install
 ```
 
