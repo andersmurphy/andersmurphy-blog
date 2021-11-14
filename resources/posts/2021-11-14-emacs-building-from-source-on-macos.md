@@ -41,4 +41,4 @@ mv nextSteps/Emacs.app /Applications
 
 The only problem I ran into was Emacs not being able to find `libgccjit` this was solved by making sure `exec-path-from-shell` was the first package that loaded by use package in my `init.el`.
 
-You now know how to build any version of Emacs with any options you want to try. Liberating.
+With this knowledge you can now build a specific version of Emacs with options you want to try. Liberating.
