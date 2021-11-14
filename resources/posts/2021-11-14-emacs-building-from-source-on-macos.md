@@ -1,6 +1,6 @@
 Title: Emacs: building from source on macOS
 
-I've always wanted to build Emacs from source as it lets you try then latest features. One of those features is native compilation which leverages `libgccjit` to compile Emacs lisp code to native code making Emacs very snappy.
+I've always wanted to build Emacs from source as it lets you try new features. Native compilation in particular was something I wanted to explore. Native compilation leverages `libgccjit` to compile Emacs lisp code to native code making Emacs very snappy.
 
 Why not use Homebrew? Homebrew is great and I still use it for installing dependencies like `libgccjit` but recently Homebrew has started removing options on their code formulae which makes it a lot less convenient for messing around with emacs.
 
