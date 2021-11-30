@@ -1,6 +1,6 @@
 Title: Emacs: the joy of reducing workflow friction with elisp
 
-Emacs is an interactive, self-documenting and extensible elisp interpreter. This makes it surprisingly enjoyable to extend. It goes something like this: you notice some friction when using a command, you use Emacs' self-documenting features to learn about the command, you investigate the source, you write some elisp, you evaluate it and you try the new and improved command out without needing to restart Emacs.
+Emacs is an interactive, self-documenting and extensible elisp interpreter. This makes it surprisingly enjoyable to extend. It goes something like this: you notice some friction when using a command, you use Emacs' self-documenting features to learn about the command, you investigate the source, you write some elisp, you evaluate it and you try the new and improved command out (all without even needing to restart Emacs).
 
 Over time you get more adventurous as your knowledge of Emacs and elisp grows. Your write commands that reach further, you put up with less and less friction after all this is your development environment why not make yourself at home? You've also somehow become surprisingly good at elisp. For me this is the magic of Emacs.
 
@@ -86,7 +86,7 @@ To bind the function to a key write the following elisp code and evaluate it lik
 (global-set-key (kbd "C-y") 'yank++)
 ```
 
-Now try pasting something with `C-y` and see what happens when you press it multiple times. You should see it cycle through all the things you have copied.
+Now try pasting something with `C-y` and see what happens when you press it multiple times. You should see it cycle through all the things you have previously copied.
 
 Once you are happy with the results you can persist these changes by adding both the `yank++` function and the key-binding to your `init.el` file.
 
