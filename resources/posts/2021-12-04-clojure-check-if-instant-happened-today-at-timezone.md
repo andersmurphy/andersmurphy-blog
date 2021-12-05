@@ -1,8 +1,8 @@
-Title: Clojure: check if instant happened today at timezone?
+Title: Clojure: check if instant happened today at timezone
 
-Say you are making a digital advent calendar app. You want users to get a special reward on the days that they open your app. But only once per day and only on the days they open the app. This sounds straight forward. What about time zones? What about users who open the app on the 1st of December at 23:55 and then on the second of December at 00:03? Time is hard.
+Say you are making a digital advent calendar app. You want users to get a special reward on the days that they open your app. But only once per day and only on the days they open the app. This sounds straight forward. What about time zones? What about users who open the app on the 1st of December at 23:55 and then on the 2nd of December at 00:03? Time is tricky.
 
-We will be using `java.time` as it comes with Clojure out of the box. Unfortunately, there are no built in reader literals for `java.time.Instant` ([checkout this post for how to add them](https://andersmurphy.com/2019/08/03/clojure-using-java-time-with-jdbc#reader-literals)). So throughout this example we will use the following code to create a `java.time.Instant` from a `java.util.Date` literal:
+We will be using `java.time` as it comes with Clojure out of the box. Unfortunately, there are no built in reader literals for `java.time.Instant` ([checkout this post for how to add them](https://andersmurphy.com/2019/08/03/clojure-using-java-time-with-jdbc#reader-literals)). Throughout this example we will use the code below to create a `java.time.Instant` from a `java.util.Date` literal:
 
 ```Clojure
 (.toInstant #inst "2021-12-04T00:00:00Z")
@@ -56,7 +56,7 @@ This can easily be fixed by adding the `^java.time.Instant` type hint:
        (.toLocalDate)))
 ```
 
-You won't see the any more warnings. So let's set `*warn-on-reflection*` back to `nil`:
+You won't see any more warnings. So let's set `*warn-on-reflection*` back to `nil`:
 
 ```Clojure
 (set! *warn-on-reflection* nil)
@@ -83,7 +83,7 @@ Let's find some more time zones to test this function on. I can never remember t
  ...)
 ```
 
-Looks like we get the right result for Fiji (the 2021-12-05 rather than the 2021-12-04):
+Testing the function with  `"Pacific/Fiji"` gives us the correct date (2021-12-05) rather than the 2021-12-04):
 
 ```Clojure
 (instant->localDate-at-timezone
@@ -93,7 +93,7 @@ Looks like we get the right result for Fiji (the 2021-12-05 rather than the 2021
 [java.time.LocalDate 0x9fec931 "2021-12-05"]
 ```
 
-Let's wrap this up by writing a function to check a UTC instant and timezone against the date in that current time zone:
+We wrap this up by writing a function to check a UTC instant and timezone against the date in that current time zone:
 
 ```Clojure
 (defn instant-today-at-tz? [instant tz]
@@ -129,4 +129,4 @@ true
 true
 ```
 
-Looks like everything is working. We can now ensure our users get their daily digital advent content regardless of where they are in the world.
+Everything is working as expected. We can now ensure our users get their daily digital advent content regardless of where they are in the world.
