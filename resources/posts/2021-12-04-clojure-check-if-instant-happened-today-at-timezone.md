@@ -2,7 +2,7 @@ Title: Clojure: check if instant happened today at timezone
 
 Say you are making a digital advent calendar app. You want users to get a special reward on the days that they open your app. But only once per day and only on the days they open the app. This sounds straight forward. What about time zones? What about users who open the app on the 1st of December at 23:55 and then on the 2nd of December at 00:03? Time is tricky.
 
-We will be using `java.time` as it comes with Clojure out of the box. Unfortunately, there are no built in reader literals for `java.time.Instant` ([checkout this post for how to add them](https://andersmurphy.com/2019/08/03/clojure-using-java-time-with-jdbc#reader-literals)). Throughout this example we will use the code below to create a `java.time.Instant` from a `java.util.Date` literal:
+We will be using `java.time` as it comes with Clojure out of the box. Unfortunately, there are no built in reader literals for `java.time.Instant` ([checkout this post for how to add them](https://andersmurphy.com/2019/08/03/clojure-using-java-time-with-jdbc#reader_literals)). Throughout this example we will use the code below to create a `java.time.Instant` from a `java.util.Date` literal:
 
 ```Clojure
 (.toInstant #inst "2021-12-04T00:00:00Z")
