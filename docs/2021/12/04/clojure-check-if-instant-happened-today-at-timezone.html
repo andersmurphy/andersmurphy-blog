@@ -22,12 +22,13 @@ style-src   &apos;self&apos;
 #object&#91;java.time.LocalDate 0x73ad4ecc &quot;2021-12-04&quot;&#93;
 </code></pre><p>Whenever you I use Java interop I like to make sure I'm not inadvertently doing any reflection. Reflection is expensive and can easily be avoided in most cases by adding some type hints. Thankfully, Clojure can warn us on reflection use by setting <code>&#42;warn-on-reflection&#42;</code> to <code>true</code>:</p><pre><code class="Clojure">&#40;set! &#42;warn-on-reflection&#42; true&#41;
 </code></pre><p>If we evaluate the <code>instant-&gt;localDate-at-timezone</code> definition again we will get the following warning:</p><pre><code class="Clojure">Reflection warning ...
-<ul><li>call to method atZone can't be resolved&#40;target class is unknown&#41;
-</code></pre>This can easily be fixed by adding the <code>&#94;java.time.Instant</code> type hint:<pre><code class="Clojure">&#40;defn <strong>instant-&gt;localDate-at-timezone</strong> &#91;instant tz&#93;
+- call to method atZone can't be resolved
+&#40;target class is unknown&#41;
+</code></pre><p>This can easily be fixed by adding the <code>&#94;java.time.Instant</code> type hint:</p><pre><code class="Clojure">&#40;defn <strong>instant-&gt;localDate-at-timezone</strong> &#91;instant tz&#93;
   &#40;-&gt;&gt; &#40;java.time.ZoneId/of tz&#41;
        &#40;.atZone &#94;java.time.Instant instant&#41;
        &#40;.toLocalDate&#41;&#41;&#41;
-</code></pre></li></ul><p>You won't see any more warnings. So let's set <code>&#42;warn-on-reflection&#42;</code> back to <code>nil</code>:</p><pre><code class="Clojure">&#40;set! &#42;warn-on-reflection&#42; nil&#41;
+</code></pre><p>You won't see any more warnings. So let's set <code>&#42;warn-on-reflection&#42;</code> back to <code>nil</code>:</p><pre><code class="Clojure">&#40;set! &#42;warn-on-reflection&#42; nil&#41;
 </code></pre><p>Let's find some more time zones to test this function on. I can never remember the exact ids, but that's fine as we can just ask Java:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;java.time.ZoneId/getAvailableZoneIds&#41;
      &#40;filter #&#40;clojure.string/includes? % &quot;Pacific&quot;&#41;&#41;&#41;
 

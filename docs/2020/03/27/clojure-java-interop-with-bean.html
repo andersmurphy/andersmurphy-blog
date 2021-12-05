@@ -13,7 +13,7 @@ style-src   &apos;self&apos;
 
 =&gt;
 #object&#91;com.google.i18n.phonenumbers.Phonenumber$PhoneNumber 0x57762fc2 &quot;Country Code: 41 National Number: 446681800&quot;&#93;
-</code></pre><p>We get an object back. The string name of the object implies that it might contain what we are interested in (country code and national number).</p><h2>Without Bean</h2><p>Let's see if the object contains a method for extracting the country code:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;.getDeclaredMethods com.google.i18n.phonenumbers.Phonenumber$PhoneNumber&#41;
+</code></pre><p>We get an object back. The string name of the object implies that it might contain what we are interested in (country code and national number).</p><h2 id="without&#95;bean">Without Bean</h2><p>Let's see if the object contains a method for extracting the country code:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;.getDeclaredMethods com.google.i18n.phonenumbers.Phonenumber$PhoneNumber&#41;
      &#40;map #&#40;.getName %&#41;&#41;
      &#40;filter #&#40;clojure.string/includes? % &quot;Code&quot;&#41;&#41;&#41;
 
@@ -55,7 +55,7 @@ style-src   &apos;self&apos;
 #:phone{:full-number      &quot;+41446681800&quot;,
         :prefix           &quot;+41&quot;,
         :number-no-prefix &quot;446681800&quot;}
-</code></pre><h2>With Bean</h2><p>The <code>bean</code> function converts a java object into a clojure map:</p><pre><code class="Clojure">&#40;bean &#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;&#41;
+</code></pre><h2 id="with&#95;bean">With Bean</h2><p>The <code>bean</code> function converts a java object into a clojure map:</p><pre><code class="Clojure">&#40;bean &#40;.parse &#40;PhoneNumberUtil/getInstance&#41; &quot;+41446681800&quot; &quot;&quot;&#41;&#41;
 
 =&gt;
 {:numberOfLeadingZeros         1,
