@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2021/12/04/clojure-check-if-instant-happened-today-at-timezone.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: check if instant happened today at timezone?</h1><time class="post-date" datetime="2021-12-04T00:00:00+00:00">04 Dec 2021</time><p>Say you are making a digital advent calendar app. You want users to get a special reward on the days that they open your app. But only once per day and only on the days they open the app. This sounds straight forward. What about time zones? What about users who open the app on the 1st of December at 23:55 and then on the second of December at 00:03? Time is hard.</p><p>We will be using <code>java.time</code> as it comes with Clojure out of the box. Unfortunately, there are no built in reader literals for <code>java.time.Instant</code> (<a href='https://andersmurphy.com/2019/08/03/clojure-using-java-time-with-jdbc#reader-literals'>checkout this post for how to add them</a>). So throughout this example we will use the following code to create a <code>java.time.Instant</code> from a <code>java.util.Date</code> literal:</p><pre><code class="Clojure">&#40;.toInstant #inst &quot;2021-12-04T00:00:00Z&quot;&#41;
+</code></pre><p>First lets open some javadoc from the repl. The <code>javadoc</code> function opens your default browser and points it to the relevant documentation:</p><pre><code class="Clojure">&#40;clojure.java.javadoc/javadoc java.time.Instant&#41;
+&#40;clojure.java.javadoc/javadoc java.time.ZoneId&#41;
+</code></pre><p>Looking over the <code>java.time</code> documentation we can piece together the following function:</p><pre><code class="Clojure">&#40;defn <strong>instant-&gt;localDate-at-timezone</strong> &#91;instant tz&#93;
+  &#40;-&gt;&gt; &#40;java.time.ZoneId/of tz&#41;
+       &#40;.atZone instant&#41;
+       &#40;.toLocalDate&#41;&#41;&#41;
+</code></pre><p>This seems to work:</p><pre><code class="Clojure">&#40;instant-&gt;localDate-at-timezone
+ &#40;.toInstant #inst &quot;2021-12-04T00:00:00Z&quot;&#41; &quot;UTC&quot;&#41;
+
+=&gt;
+#object&#91;java.time.LocalDate 0x73ad4ecc &quot;2021-12-04&quot;&#93;
+</code></pre><p>Whenever you I use Java interop I like to make sure I'm not inadvertently doing any reflection. Reflection is expensive and can easily be avoided in most cases by adding some type hints. Thankfully, Clojure can warn us on reflection use by setting <code>&#42;warn-on-reflection&#42;</code> to <code>true</code>:</p><pre><code class="Clojure">&#40;set! &#42;warn-on-reflection&#42; true&#41;
+</code></pre><p>If we evaluate the <code>instant-&gt;localDate-at-timezone</code> definition again we will get the following warning:</p><pre><code class="Clojure">Reflection warning ...
+<ul><li>call to method atZone can't be resolved&#40;target class is unknown&#41;
+</code></pre>This can easily be fixed by adding the <code>&#94;java.time.Instant</code> type hint:<pre><code class="Clojure">&#40;defn <strong>instant-&gt;localDate-at-timezone</strong> &#91;instant tz&#93;
+  &#40;-&gt;&gt; &#40;java.time.ZoneId/of tz&#41;
+       &#40;.atZone &#94;java.time.Instant instant&#41;
+       &#40;.toLocalDate&#41;&#41;&#41;
+</code></pre></li></ul><p>You won't see the any more warnings. So let's set <code>&#42;warn-on-reflection&#42;</code> back to <code>nil</code>:</p><pre><code class="Clojure">&#40;set! &#42;warn-on-reflection&#42; nil&#41;
+</code></pre><p>Let's find some more time zones to test this function on. I can never remember the exact ids, but that's fine as we can just ask Java:</p><pre><code class="Clojure">&#40;-&gt;&gt; &#40;java.time.ZoneId/getAvailableZoneIds&#41;
+     &#40;filter #&#40;clojure.string/includes? % &quot;Pacific&quot;&#41;&#41;&#41;
+
+=&gt;
+&#40;&quot;Canada/Pacific&quot;
+ &quot;Pacific/Apia&quot;
+ &quot;Pacific/Auckland&quot;
+ &quot;Pacific/Bougainville&quot;
+ &quot;Pacific/Chatham&quot;
+ &quot;Pacific/Chuuk&quot;
+ &quot;Pacific/Easter&quot;
+ &quot;Pacific/Efate&quot;
+ &quot;Pacific/Enderbury&quot;
+ &quot;Pacific/Fakaofo&quot;
+ &quot;Pacific/Fiji&quot;
+ ...&#41;
+</code></pre><p>Looks like we get the right result for Fiji (the 2021-12-05 rather than the 2021-12-04):</p><pre><code class="Clojure">&#40;instant-&gt;localDate-at-timezone
+ &#40;.toInstant #inst &quot;2021-12-04T00:00:00Z&quot;&#41; &quot;Pacific/Fiji&quot;&#41;
+
+=&gt;
+&#91;java.time.LocalDate 0x9fec931 &quot;2021-12-05&quot;&#93;
+</code></pre><p>Let's wrap this up by writing a function to check a UTC instant and timezone against the date in that current time zone:</p><pre><code class="Clojure">&#40;defn <strong>instant-today-at-tz?</strong> &#91;instant tz&#93;
+  &#40;= &#40;-&gt;&gt; &#40;java.time.ZoneId/of tz&#41;
+          &#40;.atZone &#94;java.time.Instant instant&#41;
+          &#40;.toLocalDate&#41;&#41;
+     &#40;java.time.LocalDate/now
+      &#40;java.time.ZoneId/of tz&#41;&#41;&#41;&#41;
+</code></pre><p>One last test:</p><pre><code class="Clojure">&#40;instant-today-at-tz?
+ &#40;.toInstant #inst &quot;2021-12-04T00:00:00Z&quot;&#41;
+ &quot;Pacific/Fiji&quot;&#41;
+
+=&gt;
+false
+
+&#40;instant-today-at-tz?
+ &#40;.toInstant #inst &quot;2021-12-04T23:00:00Z&quot;&#41;
+ &quot;Pacific/Fiji&quot;&#41;
+
+=&gt;
+true
+
+&#40;instant-today-at-tz?
+ &#40;.toInstant #inst &quot;2021-12-05T00:00:00Z&quot;&#41;
+ &quot;Pacific/Fiji&quot;&#41;
+
+=&gt;
+true
+</code></pre><p>Looks like everything is working. We can now ensure our users get their daily digital advent content regardless of where they are in the world.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
