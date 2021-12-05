@@ -152,7 +152,7 @@ style-src   'self'
   (let [{:keys [html metadata]}
         (-> file
             slurp
-            md-to-html-string-with-meta
+            (md-to-html-string-with-meta :heading-anchors true)
             (update :html clojure-bold-defs))]
     (assoc m
            :post-content html
