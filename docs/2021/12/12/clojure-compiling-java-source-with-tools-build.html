@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2021/12/12/clojure-compiling-java-source-with-tools-build.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: compiling java source with tools.build</h1><time class="post-date" datetime="2021-12-12T00:00:00+00:00">12 Dec 2021</time><p>Recently I stumbled over an old Java project from 2011. I wanted to see if I could get it to run. However, the original program had a bunch of IDE related build files that I no longer understood. What if I used Clojure to build the project? The fruit of that journey is covered in this blog post.</p><p>Lets start with a top level overview of the project structure.</p><pre><code>├── README.md
+├── build.clj
+├── deps.edn
+├── java
+│   └── greatings
+│       └── Greater.java
+└── src
+    └── compiling&#95;java
+        └── core.clj
+</code></pre><h2 id="java&#95;code">Java code</h2><p>The Java source lives in the  <code>java</code> directory.</p><pre><code class="Java">package greatings;
+
+public class Greater {
+  public void great&#40;&#41; {
+      System.out.println&#40;&quot;Hello, world!&quot;&#41;;
+  }
+}
+</code></pre><h2 id="clojure&#95;code">Clojure code</h2><p>The Clojure source lives in <code>src</code>.</p><pre><code class="Clojure">&#40;ns <strong>compiling-java.core</strong>
+  &#40;:gen-class&#41;
+  &#40;:import &#91;greatings Greater&#93;&#41;&#41;
+
+&#40;defn <strong>-main</strong> &#91;&#93;
+  &#40;.great &#40;Greater.&#41;&#41;&#41;
+</code></pre><p>Worth pointing out  <code>&#40;:gen-class&#41;</code> this will be important later when it comes to building an uberjar. When compiling, this generates .class file with a given package-qualified name. This will ensure we can reference this class as the main entry point for our uberjar.</p><h2 id="deps.edn">deps.edn</h2><p>We will be using <code>tools.build</code> to compile our java code. To do this we need to add it as a dependency.</p><pre><code class="Clojure">{:paths &#91;&quot;src&quot;&#93;
+ :deps {org.clojure/clojure {:mvn/version &quot;1.10.3&quot;}}
+ :aliases
+ {:build {:deps {io.github.clojure/tools.build
+                 {:git/tag &quot;v0.6.8&quot;
+                  :git/sha &quot;d79ae84&quot;}}
+          :ns-default build}
+  :dev {:paths &#91;&quot;src&quot; &quot;target/classes&quot;&#93;}}}
+</code></pre><p>We add <code>target/classes</code> as a <code>:dev</code> dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure">&#40;ns <strong>build</strong>
+  &#40;:require &#91;clojure.tools.build.api :as b&#93;&#41;&#41;
+
+&#40;def <strong>lib</strong> 'compiling-java&#41;
+&#40;def <strong>version</strong> &quot;0.1.1&quot;&#41;
+&#40;def <strong>class-dir</strong> &quot;target/classes&quot;&#41;
+&#40;def <strong>basis</strong> &#40;b/create-basis {:project &quot;deps.edn&quot;}&#41;&#41;
+
+&#40;defn <strong>clean</strong> &#91;&#95;&#93;
+  &#40;b/delete {:path &quot;target&quot;}&#41;&#41;
+
+&#40;defn <strong>jcompile</strong> &#91;&#95;&#93;
+  &#40;clean nil&#41;
+  &#40;b/javac {:src-dirs &#91;&quot;java&quot;&#93;
+            :class-dir class-dir
+            :basis basis
+            :javac-opts &#91;&quot;-source&quot; &quot;8&quot; &quot;-target&quot; &quot;8&quot;&#93;}&#41;&#41;
+</code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build jcompile
+</code></pre><h2 id="calling&#95;our&#95;java&#95;code&#95;at&#95;the&#95;relp">Calling our java code at the relp</h2><p>Start the repl using the deb profile:</p><pre><code>clj -M:dev
+</code></pre><p>Load the namespace and test the Java code:</p><pre><code class="Clojure">&#40;require 'compiling-java.core&#41;
+&#40;in-ns <strong>'compiling-java.core&#41;</strong>
+
+&#40;.great &#40;Greater.&#41;&#41;
+
+=&gt;
+Hello, world!
+
+nil
+</code></pre><p>Everything is working as expected.</p><h2 id="building&#95;and&#95;running&#95;an&#95;uberjar">Building and running an uberjar</h2><p>Clojure/Java projects are often shipped/deployed as an uberjar. An uberjar is the program and all its dependencies compiled into a single executable. With <code>tools.build</code> making uberjars is trivial.</p><p>First we add the following uber task to our <code>build.clj</code> file:</p><pre><code class="Clojure">&#40;def <strong>uber-file</strong> &#40;format &quot;target/%s-%s.jar&quot; &#40;name lib&#41; version&#41;&#41;
+
+&#40;defn <strong>uber</strong> &#91;&#95;&#93;
+  &#40;clean nil&#41;
+  &#40;jcompile nil&#41;
+  &#40;b/copy-dir {:src-dirs &#91;&quot;src&quot; &quot;resources&quot;&#93;
+               :target-dir class-dir}&#41;
+  &#40;b/compile-clj {:basis basis
+                  :src-dirs &#91;&quot;src&quot;&#93;
+                  :class-dir class-dir}&#41;
+  &#40;b/uber {:class-dir class-dir
+           :uber-file uber-file
+           :basis basis
+           :main 'compiling-java.core}&#41;&#41;
+</code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build uber
+</code></pre><p>The resulting uberjar file can be run with:</p><pre><code class="Bash">java -jar target/compiling-java-0.1.1.jar
+
+=&gt;
+Hello, world!
+</code></pre><p>That's all there is to it.</p><p><code>tools.build</code> is really simple to use. It's philosophy, that the project build is inherently a program, is really powerful. I'll be using it as my build tool for both Clojure and Java projects going forward.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/compiling-java'>project can be found here</a>.</p></article><div class="footer"><p>© 2015-2021 Anders Murphy</p></div></div></body></html>
