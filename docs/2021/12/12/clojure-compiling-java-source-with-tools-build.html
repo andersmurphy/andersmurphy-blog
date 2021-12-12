@@ -38,7 +38,7 @@ public class Greater {
                   :git/sha &quot;d79ae84&quot;}}
           :ns-default build}
   :dev {:paths &#91;&quot;src&quot; &quot;target/classes&quot;&#93;}}}
-</code></pre><p>We add <code>target/classes</code> as a <code>:dev</code> dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure">&#40;ns <strong>build</strong>
+</code></pre><p>We add <code>target/classes</code> as a dev dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure">&#40;ns <strong>build</strong>
   &#40;:require &#91;clojure.tools.build.api :as b&#93;&#41;&#41;
 
 &#40;def <strong>lib</strong> 'compiling-java&#41;
@@ -56,7 +56,7 @@ public class Greater {
             :basis basis
             :javac-opts &#91;&quot;-source&quot; &quot;8&quot; &quot;-target&quot; &quot;8&quot;&#93;}&#41;&#41;
 </code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build jcompile
-</code></pre><h2 id="calling&#95;our&#95;java&#95;code&#95;at&#95;the&#95;relp">Calling our java code at the relp</h2><p>Start the repl using the deb profile:</p><pre><code>clj -M:dev
+</code></pre><h2 id="calling&#95;our&#95;java&#95;code&#95;at&#95;the&#95;relp">Calling our java code at the relp</h2><p>Start the repl using the dev profile:</p><pre><code>clj -M:dev
 </code></pre><p>Load the namespace and test the Java code:</p><pre><code class="Clojure">&#40;require 'compiling-java.core&#41;
 &#40;in-ns <strong>'compiling-java.core&#41;</strong>
 
