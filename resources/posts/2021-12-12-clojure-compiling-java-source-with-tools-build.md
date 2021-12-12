@@ -60,7 +60,7 @@ We will be using `tools.build` to compile our java code. To do this we need to a
   :dev {:paths ["src" "target/classes"]}}}
 ```
 
-We add `target/classes` as a `:dev` dependency so that when using the repl the Java classes will be available.
+We add `target/classes` as a dev dependency so that when using the repl the Java classes will be available.
 
 ## Compiling Java with tools.build
 
@@ -94,7 +94,7 @@ clj -T:build jcompile
 
 ## Calling our java code at the relp
 
-Start the repl using the deb profile:
+Start the repl using the dev profile:
 
 ```
 clj -M:dev
