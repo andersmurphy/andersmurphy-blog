@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2022/03/19/heroku-buildpack-for-clojure-tools.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Heroku: buildpack for Clojure tools</h1><time class="post-date" datetime="2022-03-19T00:00:00+00:00">19 Mar 2022</time><p>Over the past 4 years I've had the fortune of working full time in Clojure. The backend for the <a href='https://apps.apple.com/US/app/id1436692125?mt=8'>Relish</a> mobile app is entirely built in Clojure. It runs on <a href='https://www.heroku.com/home'>Heroku</a> and we use <a href='https://leiningen.org/'>lein</a> as our build tool. This has been a great development experience. For the next Clojure project I wanted to use <a href='https://clojure.org/guides/deps_and_cli'>tools.deps</a> and <a href='https://clojure.org/guides/tools_build'>tools.build</a>. Unfortunately, there isn't an official Heroku build pack for tools.deps and tools.build. So, I decided to roll my own to get comfortable with Heroku's build pack API and remind myself of the joys of writing bash.</p><h2 id="to&#95;use&#95;this&#95;build&#95;pack">To use this build pack</h2><p>Set your heroku app to use this build pack:</p><pre><code>heroku buildpacks:set https://github.com/andersmurphy/heroku-buildpack-clojure-tools.git -a my-app
+</code></pre><p>Make sure your project root contains the following files:</p><p>A <code>Procfile</code> file:</p><pre><code>web: java -jar target/my-app.jar -m my-app.app
+</code></pre><p>A <code>bin/build</code> file (make this file executable with <code>chmod +x bin/build</code>):</p><pre><code>clojure -T:build uber
+</code></pre><p>A <code>deps.edn</code> file:</p><pre><code>{:paths   &#91;&quot;src&quot; &quot;resources&quot;&#93;
+ :deps    {org.clojure/clojure {:mvn/version &quot;1.11.0-alpha3&quot;}}
+ :aliases {:build
+           {:deps       {io.github.clojure/tools.build {:git/tag &quot;v0.6.8&quot;
+                                                        :git/sha
+                                                        &quot;d79ae84&quot;}}
+            :ns-default build}}}
+</code></pre><p>A <code>build.clj</code> file:</p><pre><code>&#40;ns build
+  &#40;:require &#91;clojure.tools.build.api :as b&#93;&#41;&#41;
+
+&#40;def lib 'my-app&#41;
+&#40;def class-dir &quot;target/classes&quot;&#41;
+&#40;def basis &#40;b/create-basis {:project &quot;deps.edn&quot;}&#41;&#41;
+&#40;def uber-file &#40;format &quot;target/%s.jar&quot; &#40;name lib&#41;&#41;&#41;
+
+&#40;defn clean &#91;&#95;&#93; &#40;b/delete {:path &quot;target&quot;}&#41;&#41;
+
+&#40;defn uber
+  &#91;&#95;&#93;
+  &#40;clean nil&#41;
+  &#40;b/copy-dir {:src-dirs &#91;&quot;src&quot; &quot;resources&quot;&#93; :target-dir class-dir}&#41;
+  &#40;b/compile-clj {:basis basis :src-dirs &#91;&quot;src&quot;&#93; :class-dir class-dir}&#41;
+  &#40;b/uber {:class-dir class-dir
+           :uber-file uber-file
+           :basis     basis
+           :main      'my-app.app}&#41;&#41;
+</code></pre><p>For the full repo check out <a href='https://github.com/andersmurphy/heroku-buildpack-clojure-tools'>Heroku buildpack for clojure tools</a>.</p></article><div class="footer"><p>© 2015-2022 Anders Murphy</p></div></div></body></html>
