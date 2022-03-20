@@ -1,6 +1,6 @@
 Title: Heroku: buildpack for Clojure tools
 
-Over the past 4 years I've had the fortune of working full time in Clojure. The backend for the [Relish](https://apps.apple.com/US/app/id1436692125?mt=8) mobile app is entirely built in Clojure. It runs on [Heroku](https://www.heroku.com/home) and we use [lein](https://leiningen.org/) as our build tool. This has been a great development experience. For the next Clojure project I wanted to use [tools.deps](https://clojure.org/guides/deps_and_cli) and [tools.build](https://clojure.org/guides/tools_build). Unfortunately, there isn't an official Heroku build pack for tools.deps and tools.build. So, I decided to roll my own to get comfortable with Heroku's build pack API and remind myself of the joys of writing bash.
+Over the past 4 years I've had the fortune of working full time in Clojure. The backend for the [Relish](https://apps.apple.com/US/app/id1436692125?mt=8) mobile app is built in Clojure. It runs on [Heroku](https://www.heroku.com/home) and we use [lein](https://leiningen.org/) as our build tool. This has been a great development experience. But, for the next Clojure project I wanted to try [tools.deps](https://clojure.org/guides/deps_and_cli) and [tools.build](https://clojure.org/guides/tools_build). Unfortunately, there isn't an official Heroku buildpack and none of the unofficial alternatives were quite what I was looking for. In the end I decided to roll my own to get comfortable with Heroku's build pack API.
 
 ## To use this build pack
 
