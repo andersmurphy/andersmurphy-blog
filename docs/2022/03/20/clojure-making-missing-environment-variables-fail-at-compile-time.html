@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2022/03/20/clojure-making-missing-environment-variables-fail-at-compile-time.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: making missing environment variables fail at compile time</h1><time class="post-date" datetime="2022-03-20T00:00:00+00:00">20 Mar 2022</time><p>Have you ever deployed something to production only to have it break because of a missing environment variable? You can eliminate this risk with a simple macro.</p><p>First we write a regular function that throws an exception if <code>System/getenv</code> can't find an environment variable. This gives us a runtime check.</p><pre><code>&#40;defn env-dynamic
+  &#91;k&#93;
+  &#40;if-let &#91;v &#40;-&gt; k name System/getenv&#41;&#93;
+    v
+    &#40;throw &#40;ex-info &#40;str &quot;Missing env variable: &quot; k&#41;
+                    {:missing-env-variable k}&#41;&#41;&#41;&#41;
+</code></pre><p>We then wrap it in a macro.</p><pre><code>&#40;defmacro env
+  &#91;k&#93;
+  &#40;env-dynamic k&#41;&#41;
+</code></pre><p>This turns it into a compile time check.</p><pre><code>&#40;env :DATABASE&#95;URL&#41;
+
+=&gt;
+Missing env variable: :DATABASE&#95;URL
+</code></pre><p>For this to work you will need to have access to environment variables at compile time. In practice this require your build pipeline to have access to the same environment variables as production.</p><p>The <code>env-dynamic</code> function is useful for environment variables that differ between processes for example <code>PORT</code> environment variable on a heroku dyno.</p><p>This macro guarantees your build will fail at compile time so production won't break because of a missing environment variable.</p></article><div class="footer"><p>© 2015-2022 Anders Murphy</p></div></div></body></html>
