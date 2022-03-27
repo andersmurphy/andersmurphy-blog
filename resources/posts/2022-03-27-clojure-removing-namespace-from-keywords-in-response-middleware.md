@@ -1,6 +1,6 @@
 Title: Clojure: removing namespace from keywords in response middleware
 
-Namespaced keywords let you add a namespace to a keyword `:id` -> `:user/id`, this is a really nice feature that prevents collisions when merging two maps. For example merging  `{:account/id "foo"}` with  `{:user/id "bar"})` would give you `{:account/id "foo" :user/id "bar"}`. This lets you avoid unnecessary data nesting and keep your data flat. However, by the time this data gets to the edge of your system, where it meets an external system that expects json, you will often want to remove these namespaces. This post shows you how to write a middleware that automates the removal of namespaces from keywords.
+Namespaced keywords let you add a namespace to a keyword `:id` -> `:user/id`, this is a really nice feature that prevents collisions when merging two maps. For example merging  `{:account/id "foo"}` with  `{:user/id "bar"})` would give you `{:account/id "foo" :user/id "bar"}`. This lets you avoid unnecessary data nesting and keep your data flat. However, by the time this data gets to the edge of your system, where it meets something that expects json, you will often want to remove these namespaces. This post shows you how to write a middleware that automates the removal of namespaces from keywords.
 
 We can remove the namespace from a keyword with the following code.
 
@@ -37,7 +37,7 @@ Now for the middleware. Ring defines middleware as a function of type `handler &
 
 Thanks to this middleware we no longer have to remember to remove namespaces form keywords when returning json responses form our API.
 
-It is worth pointing out that the if the keywords without namespaces are not unique they will get overwritten. This normally isn't an problem as by the time you are structuring your data for a json response it will be nested.
+Something to point out with this implementation, is that if the keywords without namespaces are not unique they will get overwritten. This normally isn't an problem as by the time you are structuring your data for a json response it will be nested, but it's still worth bearing in mind.
 
 ```
 (update-keys
