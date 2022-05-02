@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2022/05/02/clojure-extend-honeysql-to-support-postgres-alter-column-and-add-constraint.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/theme.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: extend honeysql to support postgres alter column and add constraint</h1><time class="post-date" datetime="2022-05-02T00:00:00+00:00">02 May 2022</time><p><a href='https://github.com/seancorfield/honeysql'>honeysql</a> is an amazing library that lets you write SQL using clojure data structures. This makes SQL much more composable as you no longer need to smash strings together. That being said when using it with <a href='https://www.postgresql.org/'>postgresql</a> there are some features that don't work out of the box. Thankfully, honeysql is very easy to extend. This post will show you how to add support for <code>alter column</code> and  <code>add constraint</code>.</p><p>If you try to use <code>:modify-column</code> with postgresql you'll get a PSQLException syntax error:</p><pre><code class="clojure">&#40;... {:alter-table   :member
+      :modify-column &#91;:owner :text &#91;:not nil&#93;
+                     &#91;:default &quot;default&quot;&#93;&#93;} ...&#41;
+
+=&gt;
+Execution error &#40;PSQLException&#41; at org.postgresql.core.v3.QueryExecutorImpl/receiveErrorResponse &#40;QueryExecutorImpl.java:2468&#41;.
+ERROR: syntax error at or near &quot;MODIFY&quot;
+  Position: 20
+</code></pre><p>If you try to use <code>:alter-column</code> (the postgresql syntax for <code>:modify-column</code>) you will get a honeysql syntax error:</p><pre><code class="clojure">&#40;require '&#91;honey.sql :as hsql&#93;&#41;
+
+&#40;hsql/format
+ {:alter-table  :task
+  :alter-column &#91;:owner :text &#91;:not nil&#93;
+                 &#91;:default &quot;default&quot;&#93;&#93;}&#41;
+
+=&gt;
+Execution error &#40;ExceptionInfo&#41; at honey.sql/format-dsl &#40;sql.cljc:1034&#41;.
+These SQL clauses are unknown or have nil values: :alter-column
+</code></pre><p>We can use the honeysql <code>format</code> function to see what sql <code>:modify-column</code> generates:</p><pre><code class="clojure">&#40;hsql/format
+ {:alter-table   :member
+  :modify-column &#91;:owner :text &#91;:not nil&#93;
+                  &#91;:default &quot;default&quot;&#93;&#93;}&#41;
+
+=&gt;
+&#91;&quot;ALTER TABLE member MODIFY COLUMN owner TEXT NOT NULL DEFAULT 'DEFAULT'&quot;&#93;
+</code></pre><p>This is almost identical to the sql we would want to generate for <code>:alter-column</code>:</p><pre><code class="sql">ALTER TABLE task ALTER COLUMN owner TEXT NOT NULL DEFAULT 'DEFAULT'
+</code></pre><p>The <code>hsql/register-clause!</code> function is used to register a new clause with honeysql. It takes the name of the new clause, a formatter for the new clause, and which clause it should be called before. In this case we are passing in <code>:modify-column</code> as the formatter as we want to re-use the formatter that <code>:modify-column</code> uses:</p><pre><code class="clojure">&#40;hsql/register-clause! :alter-column :modify-column :modify-column&#41;
+</code></pre><p>Once this clause is registered we can generate sql for <code>:alter-column</code>:</p><pre><code class="clojure">&#40;hsql/format
+ {:alter-table  :task
+  :alter-column &#91;:owner :text &#91;:not nil&#93;
+                 &#91;:default &quot;default&quot;&#93;&#93;}&#41;
+
+=&gt;
+&#91;&quot;ALTER TABLE task ALTER COLUMN owner TEXT NOT NULL DEFAULT 'DEFAULT'&quot;&#93;
+</code></pre><p>We can use the same extension mechanism to add support for posgresql <code>:add-constraint</code>.</p><pre><code class="clojure">&#40;hsql/register-clause! :add-constraint :modify-column :modify-column&#41;
+
+&#40;hsql/format
+ {:alter-table    :member
+  :add-constraint &#91;:member-account-id-fkey
+                   &#91;:foreign-key :account-id&#93;
+                   &#91;:references :account :id&#93;&#93;}&#41;
+
+=&gt;
+&#91;&quot;ALTER TABLE member ADD CONSTRAINT member&#95;account&#95;id&#95;fkey FOREIGN KEY&#40;ACCOUNT&#95;ID&#41; REFERENCES ACCOUNT&#40;ID&#41;&quot;&#93;
+</code></pre><p>That's all there is to it.</p><p>I can't recommend <a href='https://github.com/seancorfield/honeysql'>honeysql</a> enough it makes SQL an absolute joy to work with.</p></article><div class="footer"><p>© 2015-2022 Anders Murphy</p></div></div></body></html>
