@@ -1,8 +1,8 @@
-title:  Clojure: extend honeysql to support postgres alter column and add constraint
+title:  Clojure: extend honeysql to support postgres 'alter column' and 'add constraint'
 
-[honeysql](https://github.com/seancorfield/honeysql) is an amazing library that lets you write SQL using clojure data structures. This makes SQL much more composable as you no longer need to smash strings together. That being said when using it with [postgresql](https://www.postgresql.org/) there are some features that don't work out of the box. Thankfully, honeysql is very easy to extend. This post will show you how to add support for `alter column` and  `add constraint`.
+[Honeysql](https://github.com/seancorfield/honeysql) is an amazing library that lets you write SQL using clojure data structures. This makes SQL much more composable as you no longer need to smash strings together. That being said, when using it with [postgresql](https://www.postgresql.org/) there are some features that don't work out of the box. Thankfully, honeysql is very easy to extend. This post will show you how to add support for `alter column` and  `add constraint`.
 
-If you try to use `:modify-column` with postgresql you'll get a PSQLException syntax error:
+If you try to use `:modify-column` with postgresql, you will get a PSQLException syntax error:
 
 ```clojure
 (... {:alter-table   :member
@@ -15,7 +15,7 @@ ERROR: syntax error at or near "MODIFY"
   Position: 20
 ```
 
-If you try to use `:alter-column` (the postgresql syntax for `:modify-column`) you will get a honeysql syntax error:
+If you try to use `:alter-column` (the postgresql syntax for `:modify-column`), you will get a honeysql syntax error:
 
 ```clojure
 (require '[honey.sql :as hsql])
@@ -48,7 +48,7 @@ This is almost identical to the sql we would want to generate for `:alter-column
 ALTER TABLE task ALTER COLUMN owner TEXT NOT NULL DEFAULT 'DEFAULT'
 ```
 
-The `hsql/register-clause!` function is used to register a new clause with honeysql. It takes the name of the new clause, a formatter for the new clause, and which clause it should be called before. In this case we are passing in `:modify-column` as the formatter as we want to re-use the formatter that `:modify-column` uses:
+The `(register-clause! clause formatter before)` function is used to register a new clause with honeysql. To reuse the `:modify-column` formatter we pass `:modify-column` as the formatter argument (see [the honeysql docs](https://cljdoc.org/d/com.github.seancorfield/honeysql/2.2.891/doc/getting-started/extending-honeysql#registering-a-new-clause-formatter) for more details):
 
 ```clojure
 (hsql/register-clause! :alter-column :modify-column :modify-column)
@@ -83,4 +83,4 @@ We can use the same extension mechanism to add support for posgresql `:add-const
 
 That's all there is to it.
 
-I can't recommend [honeysql](https://github.com/seancorfield/honeysql) enough it makes SQL an absolute joy to work with.
+I can't recommend [honeysql](https://github.com/seancorfield/honeysql) enough. It makes SQL an absolute joy to work with.
