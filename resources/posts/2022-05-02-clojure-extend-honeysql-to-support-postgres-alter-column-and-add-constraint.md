@@ -84,3 +84,5 @@ We can use the same extension mechanism to add support for posgresql `:add-const
 That's all there is to it.
 
 I can't recommend [honeysql](https://github.com/seancorfield/honeysql) enough. It makes SQL an absolute joy to work with.
+
+**Update:** Support for `:alter-column` will be [added in a future version of honeysql](https://github.com/seancorfield/honeysql/issues/406).
