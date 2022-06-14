@@ -1,6 +1,6 @@
 Title: Clojure: sending emails with postal and Gmail SMTP
 
-While services like [SendGrid](https://sendgrid.com) are easy to use and offer a plethora of features like bounce and open rate monitoring, they are not cheapest option. Gmail's SMTP service on the other hand, although no where near as feature rich is more affordable. In this post we will cover setting up Gmail SMTP with [postal](https://github.com/drewr/postal).
+While services like [SendGrid](https://sendgrid.com) are easy to use and offer a plethora of features like bounce and open rate monitoring, they are not cheapest option. Gmail's SMTP service on the other hand, although not as feature rich, is more affordable. In this post we will cover setting up Gmail SMTP with [postal](https://github.com/drewr/postal).
 
 ## Limits for sending mail
 
