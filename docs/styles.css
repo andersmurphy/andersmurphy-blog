@@ -96,6 +96,13 @@ ul,ol,dl{
   margin-top:0;
   margin-bottom:1rem
 }
+table, th, td {
+  border: 1px solid;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
 @media (min-width: 30em){
   blockquote{
