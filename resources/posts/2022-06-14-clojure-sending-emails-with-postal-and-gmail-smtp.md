@@ -10,19 +10,19 @@ These are the Gmail per user sending limits:
 **Google Workspace account:** 2000 messages/rolling 24 hours ([source](https://support.google.com/a/answer/166852))
 **Google Workspace SMTP relay service:** 10000 messages/rolling 24 hours ([source](https://support.google.com/a/answer/2956491#sendinglimitsforrelay&zippy=%2Creview-sending-limits-for-the-smtp-relay-service))
 
-# Cost
+## Cost
 
 At the time of writing SendGrid's price point for 200 000 emails a month is $89.95/mo. Comparatively, to send 10000 per day with Gmail is free if you are already using google workspace, and chances are you do for your company email address. Even if you don't a single seat account is just under 5$ a month and comes with a host of other utilities.
 
-# Setting up Gmail
+## Setting up Gmail
 
 First we need to make sure our Gmail account has 2-step verification set up. Then we need to create an app password. To do this go to Google account settings and navigate to the "Security" tab. Under "Signing in to Google", click on the "App passwords" menu item. Select Other under the "Select app" dropdown and enter the name of the app. Click "Generate" and the new app password will appear on the screen. Copy the password to clipboard as we will be needing it later.
 
-# Setting up Google Workspace SMPT (Optional)
+## Setting up Google Workspace SMPT (Optional)
 
 [Follow these steps](https://support.google.com/a/answer/2956491) if you want to set up Google Workspace Relay. This is only necessary if you plan on sending more than 2000 messages/rolling 24 hours.
 
-# Postal
+## Postal
 
 [postal](https://github.com/drewr/postal) is a library for constructing and sending RFC822-compliant Internet email messages via SMTP.
 
