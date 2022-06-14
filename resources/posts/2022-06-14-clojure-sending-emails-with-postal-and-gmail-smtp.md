@@ -7,7 +7,7 @@ While services like [SendGrid](https://sendgrid.com) are easy to use and offer a
 These are the Gmail per user sending limits:
 
 | Account Type                        | messages/rolling 24 hours |
-| ----------------------------------- | ------------------------- |
+|:----------------------------------- | -------------------------:|
 | Standard Gmail                      | 500                       |
 | Google Workspace                    | 2000                      |
 | Google Workspace SMTP relay service | 10000                     |
