@@ -1,6 +1,6 @@
 Title: Clojure: sending emails with postal and Gmail SMTP
 
-While services like [SendGrid](https://sendgrid.com) are easy to use and offer a plethora of features like bounce and open rate monitoring, they are not cheapest option. Gmail's SMTP service on the other hand, although not as feature rich, is more affordable. In this post we will cover setting up Gmail SMTP with [postal](https://github.com/drewr/postal).
+While services like [SendGrid](https://sendgrid.com) are easy to use and offer a plethora of features like bounce and open rate monitoring, they are not the cheapest option. Gmail's SMTP service on the other hand, although not as feature rich, is more affordable. In this post we will cover setting up Gmail SMTP with [postal](https://github.com/drewr/postal).
 
 ## Limits for sending mail
 
@@ -18,7 +18,7 @@ At the time of writing SendGrid's price point for 200 000 emails a month is $89.
 
 ## Setting up Gmail
 
-First we need to make sure our Gmail account has 2-step verification set up. Then we need to create an app password. To do this go to Google account settings and navigate to the "Security" tab. Under "Signing in to Google", click on the "App passwords" menu item. Select Other under the "Select app" dropdown and enter the name of the app. Click "Generate" and the new app password will appear on the screen. Copy the password to clipboard as we will be needing it later.
+First we need to make sure our Gmail account has 2-step verification set up. Then we need to create an app password. To do this go to Google account settings and navigate to the "Security" tab. Under "Signing in to Google", click on the "App passwords" menu item. Select Other under the "Select app" dropdown and enter the name of the app. Click "Generate" and the new app password will appear on the screen. Copy the password somewhere as we will be needing it later.
 
 ## Setting up Google Workspace SMPT (Optional)
 
