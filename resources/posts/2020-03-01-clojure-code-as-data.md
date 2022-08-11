@@ -22,7 +22,7 @@ Simple.
 
 ## Code diff
 
-We can use `clojure.set/diff` to find out the difference between these two pieces of code:
+We can use `clojure.data/diff` to find out the difference between these two pieces of code:
 
 ```clojure
 (clojure.data/diff '(map inc items)
