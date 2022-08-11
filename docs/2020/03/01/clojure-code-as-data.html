@@ -17,7 +17,7 @@ style-src   &apos;self&apos;
    '&#40;map dec items&#41;&#41;
 
 =&gt; false
-</code></pre><p>Simple.</p><h2 id="code&#95;diff">Code diff</h2><p>We can use <code>clojure.set/diff</code> to find out the difference between these two pieces of code:</p><pre><code class="clojure">&#40;clojure.data/diff '&#40;map inc items&#41;
+</code></pre><p>Simple.</p><h2 id="code&#95;diff">Code diff</h2><p>We can use <code>clojure.data/diff</code> to find out the difference between these two pieces of code:</p><pre><code class="clojure">&#40;clojure.data/diff '&#40;map inc items&#41;
                    '&#40;map dec items&#41;&#41;
 
 =&gt; &#91;&#91;nil inc&#93; &#91;nil dec&#93; &#91;map nil items&#93;&#93;
