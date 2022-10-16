@@ -23,6 +23,8 @@ When writing Clojure, I often find I want to transform the values of a map and a
 
 This function is specifically for map collection types, but there is a more generic version called [fmap](https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19) available in the `clojure/algo.generic` library.
 
+**UPDATE:** *As of Clojure 1.11.0 there is now a built in function in `clojure.core` called `update-vals` which behaves identically to `map-values` but takes the arguments in the opposite order `(update-vals m f)`.*
+
 ## map-keys
 
 Another common task I run into is transforming the keys of a map. Useful when you are at the edge of your codebase and want to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to entirely different words or domain language.
@@ -87,5 +89,7 @@ The downside with this function is it takes a key-map not a function, meaning it
     "Primary announcement sent" "event"
     "Item purchased"            "event"}
 ```
+
+**UPDATE:** *As of Clojure 1.11.0 there is now a built in function in `clojure.core` called `update-keys` which behaves identically to `map-keys` but takes the arguments in the opposite order `(update-keys m f)`.*
 
 I hope these functions come in handy.
