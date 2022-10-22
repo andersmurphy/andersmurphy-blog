@@ -35,6 +35,8 @@ Now that we have a function for converting case let's convert all the keys of a 
 => {:characterId 1, :firstName "John", :secondName "Snow"}
 ```
 
+**UPDATE:** *As of Clojure 1.11.0 there is now a built in function in `clojure.core` called `update-keys` which behaves identically to `map-keys` but takes the arguments in the opposite order `(update-keys m f)`.*
+
 ## Converting case of keys in a nested data structure
 
 For converting the keys of arbitrarily nested data structures we can use the `clojure.walk/postwalk` function. Let's check out the docs.
