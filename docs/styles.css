@@ -1,3 +1,5 @@
+@import "theme.css"; 
+
 *{
   -webkit-box-sizing:border-box;
   -moz-box-sizing:border-box;
@@ -8,13 +10,13 @@
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #32302f;
+  background: --dark;
 }
 ::-webkit-scrollbar-thumb {
-  background: #f5dfbc;
+  background: --light;
 }
 html,body{
-  scrollbar-color: #f5dfbc #32302f;
+  scrollbar-color: --light --dark;
   margin:0;
   padding:0
 }
@@ -42,13 +44,13 @@ pre code{
   }
 }
 body{
-  color:#f5dfbc;
-  background-color:#32302f;
+  color:--light;
+  background-color:--dark;
   -webkit-text-size-adjust:100%;
   -ms-text-size-adjust:100%
 }
 a{
-  color:#7daea3;
+  color:--link;
   text-decoration:none
 }
 a:hover,a:focus{
@@ -67,7 +69,7 @@ h1,h2,h3,h4,h5,h6{
   margin-bottom:.5rem;
   font-weight:bold;
   line-height:1.25;
-  color:#f5dfbc;
+  color:--light;
   text-rendering:optimizeLegibility
 }
 h1{
@@ -90,7 +92,7 @@ p{
   margin-bottom:1rem
 }
 strong{
-  color:#f5dfbc
+  color:--light
 }
 ul,ol,dl{
   margin-top:0;
@@ -129,7 +131,7 @@ a[href^="#fn:"],a[href^="#fnref:"]{
   display:block;
   margin-top:-.5rem;
   margin-bottom:1rem;
-  color:#f5dfbc
+  color:--light
 }
 .related{
   padding-top:2rem;
@@ -148,7 +150,7 @@ a[href^="#fn:"],a[href^="#fnref:"]{
   color:#999
 }
 .related-posts li a:hover{
-  color:#7daea3;
+  color:--link;
   text-decoration:none
 }
 .related-posts li a:hover small{

@@ -106,8 +106,6 @@ style-src   'self'
    ;; styles
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "styles.css")}]
-   [:link
-    {:rel "stylesheet" :type "text/css" :href (str site-url "theme.css")}]
    ;; icons
    [:link
     {:rel   "apple-touch-icon-precomposed"
