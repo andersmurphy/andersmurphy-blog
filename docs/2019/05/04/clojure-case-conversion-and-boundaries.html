@@ -25,7 +25,7 @@ style-src   &apos;self&apos;
           {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
 
 =&gt; {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
-</code></pre><h2 id="converting&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;nested&#95;data&#95;structure">Converting case of keys in a nested data structure</h2><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">&#40;doc clojure.walk/postwalk&#41;
+</code></pre><p><strong>UPDATE:</strong> <em>As of Clojure 1.11.0 there is now a built in function in <code>clojure.core</code> called <code>update-keys</code> which behaves identically to <code>map-keys</code> but takes the arguments in the opposite order <code>&#40;update-keys m f&#41;</code>.</em></p><h2 id="converting&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;nested&#95;data&#95;structure">Converting case of keys in a nested data structure</h2><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">&#40;doc clojure.walk/postwalk&#41;
 
 =&gt;
 -------------------------
