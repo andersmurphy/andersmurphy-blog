@@ -20,7 +20,7 @@ style-src   &apos;self&apos;
  {:sign-up &quot;event&quot; :log-out &quot;event&quot;}&#41;
 
 =&gt; {:sign-up &quot;beta-event&quot; :log-out &quot;beta-event&quot;}
-</code></pre><p>This function is specifically for map collection types, but there is a more generic version called <a href='https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19'>fmap</a> available in the <code>clojure/algo.generic</code> library.</p><h2 id="map-keys">map-keys</h2><p>Another common task I run into is transforming the keys of a map. Useful when you are at the edge of your codebase and want to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to entirely different words or domain language.</p><pre><code class="clojure">&#40;defn <strong>map-keys</strong> &#91;f m&#93;
+</code></pre><p>This function is specifically for map collection types, but there is a more generic version called <a href='https://github.com/clojure/algo.generic/blob/master/src/main/clojure/clojure/algo/generic/functor.clj#L19'>fmap</a> available in the <code>clojure/algo.generic</code> library.</p><p><strong>UPDATE:</strong> <em>As of Clojure 1.11.0 there is now a built in function in <code>clojure.core</code> called <code>update-vals</code> which behaves identically to <code>map-values</code> but takes the arguments in the opposite order <code>&#40;update-vals m f&#41;</code>.</em></p><h2 id="map-keys">map-keys</h2><p>Another common task I run into is transforming the keys of a map. Useful when you are at the edge of your codebase and want to communicate to another system that might have different conventions; for example when sending up analytic events. The analytic system might camel case its keys or map keys to entirely different words or domain language.</p><pre><code class="clojure">&#40;defn <strong>map-keys</strong> &#91;f m&#93;
   &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
        &#40;into {}&#41;&#41;&#41;
 
@@ -68,4 +68,4 @@ clojure.set/rename-keys
 =&gt; {:missing-key                &quot;event&quot;
     &quot;Primary announcement sent&quot; &quot;event&quot;
     &quot;Item purchased&quot;            &quot;event&quot;}
-</code></pre><p>I hope these functions come in handy.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
+</code></pre><p><strong>UPDATE:</strong> <em>As of Clojure 1.11.0 there is now a built in function in <code>clojure.core</code> called <code>update-keys</code> which behaves identically to <code>map-keys</code> but takes the arguments in the opposite order <code>&#40;update-keys m f&#41;</code>.</em></p><p>I hope these functions come in handy.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
