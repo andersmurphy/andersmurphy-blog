@@ -36,4 +36,4 @@ style-src   &apos;self&apos;
 =&gt; &quot;https://www.shop.com/bob/items/A567/prices/EUR&quot;
 </code></pre><p>The above works and reads better than our previous solutions as the value substitutions are clear. If you find the destructuring in the <code>reduce</code> a bit cumbersome you can use <code>reduce-kv</code> which returns the accumulator, key and values for us.</p><pre><code class="clojure">&#40;defn <strong>replace-several</strong> &#91;s &amp; {:as replacements}&#93;
   &#40;reduce-kv clojure.string/replace s replacements&#41;&#41;
-</code></pre><p>Hopefully, these examples come in handy the next time you need some pseudo-string interpolation.</p></article><div class="footer"><p>© 2015-2022 Anders Murphy</p></div></div></body></html>
+</code></pre><p>Hopefully, these examples come in handy the next time you need some pseudo-string interpolation.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
