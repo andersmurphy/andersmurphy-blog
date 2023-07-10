@@ -7,7 +7,7 @@ Turns out this is increadibly straightforward!
 
 ## 1. Download SQLite source
 
-Download the latest [SQLite C source code as an amalgamation](https://www.sqlite.org/download.html).o
+Download the latest [SQLite C source code as an amalgamation](https://www.sqlite.org/download.html).
 
 Unzip the amalgamation.zip:
 
