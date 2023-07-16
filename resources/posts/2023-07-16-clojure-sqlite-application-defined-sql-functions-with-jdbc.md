@@ -83,8 +83,8 @@ To use the application defined SQL functions we need to create them. This loads 
 
 ```Clojure
 (let [my-datasource (jdbc/get-datasource
-{:jdbcUrl "jdbc:sqlite:db/database.db"})]
-(with-open [conn (jdbc/get-connection my-datasource)]
+                      {:jdbcUrl "jdbc:sqlite:db/database.db"})]
+  (with-open [conn (jdbc/get-connection my-datasource)]
     (Function/create
       conn
       "regex_capture"
@@ -120,3 +120,5 @@ the `:dev` alias.
 This means we don't have to remember to manually compile the SQLite functions.
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite/application-defined-sql-functions).
+
+Next post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient.
