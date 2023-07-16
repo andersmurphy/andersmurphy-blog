@@ -18,9 +18,11 @@ Function.create(conn, "hello_world", new Function() {
 }, 0, Function.FLAG_DETERMINISTIC);
 ```
 
+## In Clojure
+
 Clojure provides the `proxy` function for creating anonymous classes. However, it doesn't allow you to access protected super methods, and unfortunately `org.sqlite.Function`  implements a bunch of methods as protected.
 
-## Create a gen-class
+### Create a gen-class
 
 `gen-class` creates named classes for direct use as Java classes and allows us to expose inherited protected methods.
 
@@ -35,7 +37,7 @@ Clojure provides the `proxy` function for creating anonymous classes. However, i
 
 We extend `org.sqlite.Function` and expose the methods `result` and `value_text` binding them to `superResult` and `superValueText` respectively.
 
-## Override xFunc
+### Override xFunc
 
 We use `defn` to override the `org.sqlite.Function` class's `xFunc` method. It's important to note that the function name prefix must match the prefix specified in `gen-class` under `:prefix`. In this case that's `regex-capture-`.
 
@@ -51,11 +53,11 @@ We use `defn` to override the `org.sqlite.Function` class's `xFunc` method. It's
         result))))
 ```
 
-## Create a directory called classes
+### Create a directory called classes
 
 Ensure the default target output directory `classes` exists at the top level of the project.
 
-## Add classes directory to paths
+### Add classes directory to paths
 
 Add the classes directory to the class path in `deps.edn`.
 
@@ -67,7 +69,7 @@ Add the classes directory to the class path in `deps.edn`.
  :aliases {}}
 ```
 
-## Generate the classes
+### Generate the classes
 
 Compile to generate classes using the `compile` function.
 
@@ -75,7 +77,7 @@ Compile to generate classes using the `compile` function.
 (compile 'sqlite.db.application-defined-functions)
 ```
 
-## Tests the SQL functions
+### Tests the SQL functions
 
 To use the application defined SQL functions we need to create them. This loads them into SQLite for the duration of the current connection, meaning they can be used in any query that uses the same connection.
 
@@ -97,7 +99,7 @@ To use the application defined SQL functions we need to create them. This loads 
 
 Magic! SQLite is executing functions defined in Clojure.
 
-## Bonus: Automatically compile the SQL functions
+### Bonus: Automatically compile the SQL functions
 
 To compile our SQLite function on repl launch add the following `:main-opts` to
 the `:dev` alias.
