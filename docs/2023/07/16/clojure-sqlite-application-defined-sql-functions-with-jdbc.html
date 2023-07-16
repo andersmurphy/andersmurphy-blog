@@ -36,8 +36,8 @@ style-src   &apos;self&apos;
  :aliases {}}
 </code></pre><h3 id="generate&#95;the&#95;classes">Generate the classes</h3><p>Compile to generate classes using the <code>compile</code> function.</p><pre><code>&#40;compile 'sqlite.db.application-defined-functions&#41;
 </code></pre><h3 id="tests&#95;the&#95;sql&#95;functions">Tests the SQL functions</h3><p>To use the application defined SQL functions we need to create them. This loads them into SQLite for the duration of the current connection, meaning they can be used in any query that uses the same connection.</p><pre><code class="Clojure">&#40;let &#91;my-datasource &#40;jdbc/get-datasource
-{:jdbcUrl &quot;jdbc:sqlite:db/database.db&quot;}&#41;&#93;
-&#40;with-open &#91;conn &#40;jdbc/get-connection my-datasource&#41;&#93;
+                      {:jdbcUrl &quot;jdbc:sqlite:db/database.db&quot;}&#41;&#93;
+  &#40;with-open &#91;conn &#40;jdbc/get-connection my-datasource&#41;&#93;
     &#40;Function/create
       conn
       &quot;regex&#95;capture&quot;
@@ -58,4 +58,4 @@ style-src   &apos;self&apos;
              ;; As they use gen-class to extend org.sqlite.Function
              &quot;-e&quot; &quot;&#40;compile 'sqlite.db.application-defined-functions&#41;&quot;
              &quot;-r&quot;&#93;}}}
-</code></pre><p>This means we don't have to remember to manually compile the SQLite functions.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite/application-defined-sql-functions'>project can be found here</a>.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
+</code></pre><p>This means we don't have to remember to manually compile the SQLite functions.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite/application-defined-sql-functions'>project can be found here</a>.</p><p>Next post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
