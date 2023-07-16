@@ -30,9 +30,10 @@ style-src   &apos;self&apos;
         &#40;second result&#41;
         result&#41;&#41;&#41;&#41;
 </code></pre><h3 id="create&#95;a&#95;directory&#95;called&#95;classes">Create a directory called classes</h3><p>Ensure the default target output directory <code>classes</code> exists at the top level of the project.</p><h3 id="add&#95;classes&#95;directory&#95;to&#95;paths">Add classes directory to paths</h3><p>Add the classes directory to the class path in <code>deps.edn</code>.</p><pre><code class="Clojure">{:paths   &#91;&quot;src&quot; &quot;classes&quot;&#93;
- :deps    {org.clojure/clojure               {:mvn/version &quot;1.11.1&quot;}
-           com.github.seancorfield/next.jdbc {:mvn/version &quot;1.3.874&quot;}
-           org.xerial/sqlite-jdbc            {:mvn/version &quot;3.42.0.0&quot;}}
+ :deps
+ {org.clojure/clojure               {:mvn/version &quot;1.11.1&quot;}
+  com.github.seancorfield/next.jdbc {:mvn/version &quot;1.3.874&quot;}
+  org.xerial/sqlite-jdbc            {:mvn/version &quot;3.42.0.0&quot;}}
  :aliases {}}
 </code></pre><h3 id="generate&#95;the&#95;classes">Generate the classes</h3><p>Compile to generate classes using the <code>compile</code> function.</p><pre><code>&#40;compile 'sqlite.db.application-defined-functions&#41;
 </code></pre><h3 id="tests&#95;the&#95;sql&#95;functions">Tests the SQL functions</h3><p>To use the application defined SQL functions we need to create them. This loads them into SQLite for the duration of the current connection, meaning they can be used in any query that uses the same connection.</p><pre><code class="Clojure">&#40;let &#91;my-datasource &#40;jdbc/get-datasource
