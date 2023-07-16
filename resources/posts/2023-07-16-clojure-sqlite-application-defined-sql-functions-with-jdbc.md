@@ -106,15 +106,17 @@ the `:dev` alias.
 
 ```
 {:paths   ["src" "classes"]
- :deps    {org.clojure/clojure               {:mvn/version "1.11.1"}
-           com.github.seancorfield/next.jdbc {:mvn/version "1.3.874"}
-           org.xerial/sqlite-jdbc            {:mvn/version "3.42.0.0"}}
- :aliases {:dev
-           {:main-opts
-            [;; Ensures application defined functions are compiled
-             ;; As they use gen-class to extend org.sqlite.Function
-             "-e" "(compile 'sqlite.db.application-defined-functions)"
-             "-r"]}}}
+ :deps
+ {org.clojure/clojure               {:mvn/version "1.11.1"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.3.874"}
+  org.xerial/sqlite-jdbc            {:mvn/version "3.42.0.0"}}
+ :aliases
+ {:dev
+  {:main-opts
+   [;; Ensures application defined functions are compiled
+    ;; As they use gen-class to extend org.sqlite.Function
+    "-e" "(compile 'sqlite.db.application-defined-functions)"
+    "-r"]}}}
 ```
 
 This means we don't have to remember to manually compile the SQLite functions.
