@@ -63,9 +63,10 @@ Add the classes directory to the class path in `deps.edn`.
 
 ```Clojure
 {:paths   ["src" "classes"]
- :deps    {org.clojure/clojure               {:mvn/version "1.11.1"}
-           com.github.seancorfield/next.jdbc {:mvn/version "1.3.874"}
-           org.xerial/sqlite-jdbc            {:mvn/version "3.42.0.0"}}
+ :deps
+ {org.clojure/clojure               {:mvn/version "1.11.1"}
+  com.github.seancorfield/next.jdbc {:mvn/version "1.3.874"}
+  org.xerial/sqlite-jdbc            {:mvn/version "3.42.0.0"}}
  :aliases {}}
 ```
 
