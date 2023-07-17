@@ -1,7 +1,7 @@
 Title: Clojure: SQLite application defined SQL functions with JDBC
 
 SQLite provides a convenient interface called [Application-Defined SQL Functions](https://www.sqlite.org/appfunc.html) that lets you create custom SQL functions that call back into your application code to compute their results. This lets us 
-extend SQLite in Clojure. Want to query with regex or jsonpath? Want custom aggregation functions? Don't want to write C? No problem Application Defined SQL Functions have you covered. 
+extend SQLite in Clojure. Want to query with regex or jsonpath? Want custom aggregation functions? Don't want to write C? Don't want to manage different precompiled binaries for different operating systems. No problem Application Defined SQL Functions have you covered. 
 
 ## In Java
 
@@ -20,7 +20,7 @@ Function.create(conn, "hello_world", new Function() {
 
 ## In Clojure
 
-Clojure provides the `proxy` function for creating anonymous classes. However, it doesn't allow you to access protected super methods, and unfortunately `org.sqlite.Function`  implements a bunch of methods as protected.
+Clojure provides the `proxy` function for creating anonymous classes. However, it doesn't allow you to access protected super methods, and unfortunately `org.sqlite.Function`  implements a bunch of methods as protected. So we will need to use the `gen-class` macro.
 
 ### Create a gen-class
 
@@ -120,8 +120,8 @@ the `:dev` alias.
     "-r"]}}}
 ```
 
-This means we don't have to remember to manually compile the SQLite functions.
+This means we don't have to remember to manually compile the SQLite functions (unless you change them during a repl session).
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite/application-defined-sql-functions).
 
-Next post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient.
+Next post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient and more performant.
