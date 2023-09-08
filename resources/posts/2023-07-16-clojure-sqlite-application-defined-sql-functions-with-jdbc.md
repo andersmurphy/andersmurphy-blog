@@ -124,4 +124,4 @@ This means we don't have to remember to manually compile the SQLite functions (u
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite/application-defined-sql-functions).
 
-Next post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient and more performant.
+In a subsequent post I'll be sharing a helper macro that makes writing Application Defined SQL functions more convenient and more performant.
