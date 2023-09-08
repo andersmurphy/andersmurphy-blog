@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>2023/09/08/fennel-making-pico-8-games.html</title><meta content="
+base-uri    &apos;self&apos;;
+form-action &apos;self&apos;;
+default-src &apos;none&apos;;
+script-src  &apos;self&apos;;
+img-src     &apos;self&apos;;
+font-src    &apos;self&apos;;
+connect-src &apos;self&apos;;
+style-src   &apos;self&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Fennel: making PICO-8 games</h1><time class="post-date" datetime="2023-09-08T00:00:00+00:00">08 Sep 2023</time><p>I recently wrote <a href='https://andersmurphy.itch.io/staglight'>a game jam game</a> for <a href='https://www.lexaloffle.com/pico-8.php'>PICO-8</a> using <a href='https://fennel-lang.org'>Fennel</a>. This post goes over setting up a project to write PICO-8 games in Fennel.</p><p>PICO-8 is a fantastic game engine for game jams due to its constraints:</p><pre><code>Display: 128x128, fixed 16 colour palette
+Input:   6-button controllers
+Carts:   32k data encoded as png files
+Sound:   4 channel, 64 definable chip blerps
+Code:    P8 Lua &#40;max 8192 tokens of code&#41;
+CPU:     4M vm insts/sec
+Sprites: Single bank of 128 8x8 sprites &#40;+128 shared&#41;
+Map:     128 x 32 Tilemap &#40;+ 128 x 32 shared&#41;
+</code></pre><p>These constraints help you avoid over scoping your project which makes you more likely to finish the game in the time constraints of the game jam.</p><p>PICO-8 games are written in Lua. Lua is great: tables, first class functions, first class coroutines to name but a few of its awesome features. However, since I mostly write Clojure these days, I've long forgotten how to navigate and edit code without <a href='http://danmidwood.com/content/2014/11/21/animated-paredit.html'>paredit</a>. Enter Fennel, a programming language that brings together the speed, simplicity, and reach of Lua with the flexibility of a lisp syntax and macro system.</p><p>I'm only going to cover the key parts of getting PICO-8 working with Fennel in this post (<a href='https://github.com/andersmurphy/fennel-pico-8-example'>you can find the full example project here</a>).</p><h2 id="project&#95;structure">Project structure</h2><p>The example project is structured as follows. </p><pre><code>├── Makefile
+├── README.md
+├── fennel
+├── fnl
+│   └── your-game-name.fnl
+└── games
+    ├── lua
+    │   └── your-game-name.lua
+    └── your-game-name.p8
+</code></pre><p>For the make script to run you will need a <code>fnl/your-game-name.fnl</code> file and <code>games/lua/your-game-name.lua</code>. We also need a <code>games/your-game-name.p8</code> file with the following contents:</p><pre><code>pico-8 cartridge // http://www.pico-8.com
+version 41
+&#95;&#95;lua&#95;&#95;
+#include lua/your-game-name.lua
+</code></pre><p>Where <code>your-game-name</code> is the name of your game.</p><h2 id="symlink">Symlink</h2><p>To make it easy for  PICO-8  to access your games <code>.p8</code> without having to store the entire project directly in your PICO-8 <code>carts</code>  folder we symlink the project's games directory to the PICO-8 carts folder. In my case on OSX this would be:</p><pre><code>ln -s &#126;/projects/fennel-pico-8-example/games '&#126;/Library/Application Support/pico-8/carts/games'
+</code></pre><h2 id="makefile">Makefile</h2><p>The last piece of the puzzle is the <code>Mmakefile</code>. Fennel offers ahead-of-time compilation for when the target system of your application does not make it easy to include the Fennel compiler directly but uses Lua. This allows you to compile .fnl files to .lua files before shipping an application. </p><p>This script also removes the module return statement generated by Fennel.</p><pre><code>all: games/lua/&#42;.lua
+
+games/lua/%.lua: fnl/%.fnl
+# Compile fennel code to lua
+		./fennel/fennel --compile $&lt; &gt; $@
+# Remove the module return statement generated by fennel
+# &#40;the last line of the output .lua file&#41; as pico-8 doesn't
+# support return statements outside of functions.
+		sed -i '' '$$d' $@
+</code></pre><p>You can then compile your <code>your-game-name.fnl</code> file with by running make at  the root of the project.</p><pre><code>make
+</code></pre><p>You now have everything you need to make PICO-8 games in Fennel.</p><p>The full example <a href='https://github.com/andersmurphy/fennel-pico-8-example'>project can be found here</a>.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
