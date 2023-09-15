@@ -37,7 +37,7 @@ The example project is structured as follows.
     └── your-game-name.p8
 ```
 
-For the make script to run you will need a `fnl/your-game-name.fnl` file and `games/lua/your-game-name.lua`. We also need a `games/your-game-name.p8` file with the following contents:
+For the `make` script to run you will need a `fnl/your-game-name.fnl` file and `games/lua/your-game-name.lua`. We also need a `games/your-game-name.p8` file with the following contents:
 
 ```
 pico-8 cartridge // http://www.pico-8.com
@@ -58,7 +58,7 @@ ln -s ~/projects/fennel-pico-8-example/games '~/Library/Application Support/pico
 
 ## Makefile
 
-The last piece of the puzzle is the `Mmakefile`. Fennel offers ahead-of-time compilation for when the target system of your application does not make it easy to include the Fennel compiler directly but uses Lua. This allows you to compile .fnl files to .lua files that can be included in your PICO-8 `.p8` cart.
+The last piece of the puzzle is the `Makefile`. Fennel offers ahead-of-time compilation for when the target system of your application does not make it easy to include the Fennel compiler directly but uses Lua. This allows you to compile .fnl files to .lua files that can be included in your PICO-8 `.p8` cart.
 
 ```
 all: games/lua/*.lua
@@ -72,7 +72,7 @@ games/lua/%.lua: fnl/%.fnl
 		sed -i '' '$$d' $@
 ```
 
-You can then compile your `your-game-name.fnl` file with by running `make` at 
+You can then compile your `your-game-name.fnl` file by running `make` at 
 the root of the project.
 
 You now have everything you need to make PICO-8 games in Fennel.
