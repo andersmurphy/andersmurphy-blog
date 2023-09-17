@@ -82,3 +82,5 @@ Transfer/sec:    319.22KB
 That's a 29x increase in performance by switching to virtual threads. Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking. That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/http-kit).
+
+For setting up [virtual threads with jetty checkout this post](https://andersmurphy.com/2023/09/16/clojure-virtual-threads-with-ring-and-jetty.html).

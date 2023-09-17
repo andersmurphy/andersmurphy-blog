@@ -86,3 +86,5 @@ That's a 2.6x increase in performance by switching to virtual threads. Keep in m
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/jetty).
 
 *Note: The virtual thread set up above also works with [ring-jetty9-adapter](https://github.com/sunng87/ring-jetty9-adapter) which supports [Jetty 12 and it's new AdaptiveExecutionStrategy](https://webtide.com/jetty-12-virtual-threads-support/).*
+
+For setting up [virtual threads with http-kit checkout this post](https://andersmurphy.com/2023/09/15/clojure-virtual-threads-with-ring-and-http-kit.html).
