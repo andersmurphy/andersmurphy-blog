@@ -33,13 +33,14 @@ style-src   &apos;self&apos;
                        &#40;h/render &#91;:b &quot;hello!&quot;&#93;&#41;&#41;}&#41;}}&#93;
       ...&#41;&#41;&#41;
 </code></pre><p>First we will create a http-kit server without virtual threads so that we can make a performance comparison.</p><pre><code class="Clojure">&#40;def <strong>server</strong> &#40;hk-server/run-server #'app
-                {:port 8080}&#41;&#41;
+                {:port 8080
+                 :thread 50}&#41;&#41;
 </code></pre><p>Then benchmark it with <a href='https://github.com/wg/wrk'>wrk (a http server benchmarking tool)</a>.</p><pre><code>wrk -t 12 -c 120 http://127.0.0.1:8080/hello
 
 Running 10s test @ http://127.0.0.1:8080/hello
 12 threads and 120 connections
-Requests/sec:     76.00
-Transfer/sec:     10.98KB
+Requests/sec:    928.14
+Transfer/sec:    134.15KB
 </code></pre><p>Stop the http-kit server.</p><pre><code class="Clojure">&#40;server&#41;
 </code></pre><p>Now, we will create a http-kit server that uses virtual threads.</p><pre><code class="Clojure">&#40;def <strong>server</strong> &#40;hk-server/run-server #'app
               {:port        8080
@@ -50,4 +51,4 @@ Running 10s test @ http://127.0.0.1:8080/hello
 12 threads and 120 connections
 Requests/sec:   2208.67
 Transfer/sec:    319.22KB
-</code></pre><p>That's a 29x increase in performance by switching to virtual threads. Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking. That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/http-kit'>project can be found here</a>.</p><p>For setting up <a href='https://andersmurphy.com/2023/09/16/clojure-virtual-threads-with-ring-and-jetty.html'>virtual threads with jetty checkout this post</a>.</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
+</code></pre><p>That's a 2.3x increase in performance by switching to virtual threads. <strong>Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking.</strong> That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/http-kit'>project can be found here</a>.</p><p>For setting up <a href='https://andersmurphy.com/2023/09/16/clojure-virtual-threads-with-ring-and-jetty.html'>virtual threads with jetty checkout this post</a>.</p><p><strong>Update (2023-09-18):</strong> This post originally showed a 29x increase in performance when switching to virtual threads this was because http-kit was not configured correctly for operating with synchronous request handlers (the default is only 4 threads). <a href='https://www.reddit.com/r/Clojure/comments/16lq5gr/comment/k14ugqu/?utm_source=share&utm_medium=web2x&context=3'>As was kindly pointed out in this comment on reddit by the maintainer</a>. I have since updated the post to reflect benchmarks with a http-kit configured to use the same number of threads as Jetty's default (50 threads).</p></article><div class="footer"><p>© 2015-2023 Anders Murphy</p></div></div></body></html>
