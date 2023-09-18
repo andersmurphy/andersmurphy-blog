@@ -40,7 +40,8 @@ First we will create a http-kit server without virtual threads so that we can ma
 
 ```Clojure 
 (def server (hk-server/run-server #'app
-                {:port 8080}))
+                {:port 8080
+                 :thread 50}))
 ```
 
 Then benchmark it with [wrk (a http server benchmarking tool)](https://github.com/wg/wrk).
@@ -50,8 +51,8 @@ wrk -t 12 -c 120 http://127.0.0.1:8080/hello
 
 Running 10s test @ http://127.0.0.1:8080/hello
 12 threads and 120 connections
-Requests/sec:     76.00
-Transfer/sec:     10.98KB
+Requests/sec:    928.14
+Transfer/sec:    134.15KB
 ```
 
 Stop the http-kit server.
@@ -79,8 +80,10 @@ Requests/sec:   2208.67
 Transfer/sec:    319.22KB
 ```
 
-That's a 29x increase in performance by switching to virtual threads. Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking. That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).
+That's a 2.3x increase in performance by switching to virtual threads. **Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking.** That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/http-kit).
 
 For setting up [virtual threads with jetty checkout this post](https://andersmurphy.com/2023/09/16/clojure-virtual-threads-with-ring-and-jetty.html).
+
+**Update (2023-09-18):** This post originally showed a 29x increase in performance when switching to virtual threads this was because http-kit was not configured correctly for operating with synchronous request handlers (the default is only 4 threads). [As was kindly pointed out in this comment on reddit by the maintainer](https://www.reddit.com/r/Clojure/comments/16lq5gr/comment/k14ugqu/?utm_source=share&utm_medium=web2x&context=3). I have since updated the post to reflect benchmarks with a http-kit configured to use the same number of threads as Jetty's default (50 threads).
