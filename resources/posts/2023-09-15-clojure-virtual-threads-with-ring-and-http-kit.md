@@ -1,6 +1,6 @@
 Title: Clojure: virtual threads with ring and http-kit
 
-[Java 19 introduce virtual threads](https://openjdk.org/jeps/425) as a preview feature. Virtual threads are lightweight threads that allow you to write server applications in a simple thread-per-request style (as opposed to async style) and still scale with near-optimal hardware utilisation. The thread-per-request approach is generally easier to reason about, maintain and debug than it's asynchronous counterparts. In this post we'll cover configuring [http-kit](https://github.com/http-kit/http-kit) to make your ring handlers use virtual threads and benchmark it against regular threads.
+[Java 19 introduce virtual threads](https://openjdk.org/jeps/425) as a preview feature. Virtual threads are lightweight threads that allow you to write server applications in a simple thread-per-request style (as opposed to async style) and still scale with near-optimal hardware utilisation. The thread-per-request approach is generally easier to reason about, maintain and debug than it's asynchronous counterparts. In this post we'll cover configuring [http-kit](https://github.com/http-kit/http-kit) to make your ring handlers use virtual threads and benchmark it against regular threads to show how it alleviates the need for tuning thread pools.
 
 If you're running Java 19+ you can enable preview features with `--enable-preview` as shown below. This step won't be needed in Java 21 (which is being released this month) as virtual threads will be out of preview and available by default.
 
@@ -80,7 +80,8 @@ Requests/sec:   2208.67
 Transfer/sec:    319.22KB
 ```
 
-That's a 2.3x increase in performance by switching to virtual threads. **Keep in mind, this is a very crude benchmark, and you should always do you're own project specific benchmarking.** That being said the above example gives an indication of the potential benefits to switching to virtual threads, especially in the case where requests are doing a fair bit of work (e.g: querying a database).
+That's a 2.3x increase in performance. The increase is not due to virtual threads per say but due to virtual thread pools having an unlimited number of threads versus a fixed-size thread pool (50 threads). However, what this does highlight is that with virtual thread you no longer need to right size thread pools in environments with lots of IO, you get near-optimal utilisation without the need for manual and machine specific tuning.
+
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/http-kit).
 
