@@ -1,6 +1,6 @@
 Title: Clojure: clj-kondo datalog linting
 
-[clj-kondo](https://github.com/clj-kondo/clj-kondo) has had really nice [datalog syntax checking](https://github.com/clj-kondo/clj-kondo/releases/tag/v2019.11.07) for a while. However, on some projects you might have wrapped the underlying datalog  query function `q` or be using a datalog implementation clj-kondo doesn't know about. Thankfully, it's trivial to add linting support to any implementation of the query function `q` as long as it conforms to the Datalog dialect of [Datomic](https://docs.datomic.com/pro/query/query.htmlu).
+[clj-kondo](https://github.com/clj-kondo/clj-kondo) has had really nice [datalog syntax checking](https://github.com/clj-kondo/clj-kondo/releases/tag/v2019.11.07) for a while. However, on some projects you might have wrapped the underlying datalog  query function `q` or be using a datalog implementation clj-kondo doesn't know about. Thankfully, it's trivial to add linting support to any implementation of the query function `q` as long as it conforms to the Datalog dialect of [Datomic](https://docs.datomic.com/pro/query/query.html).
 
 ## Example of a wrapped q implementation
 
