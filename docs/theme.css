@@ -70,7 +70,7 @@ a.sidebar-nav-item:focus {
   text-align: center;
 }
 /* Media Queries */
-@media (min-width: 76em) {
+@media (min-width: 78em) {
   .sidebar {
     position: fixed;
     top: 0;
