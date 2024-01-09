@@ -177,7 +177,7 @@ style-src   'self'
        (assoc m :post-html)))
 
 (defn page-html
-  [{:keys [page-content previous-page-url next-page-url] :as m}]
+  [{:keys [page-content] :as m}]
   (->>
    (html
     [:html {:lang "en"} (head site-title)
@@ -191,13 +191,6 @@ style-src   'self'
                 [:time {:class "post-date" :datetime (date->datetime date)}
                  (date->post-date date)] [:p (first-paragraph post-content)]])
              page-content)]
-       [:div {:class "pagination"}
-        (when previous-page-url
-          [:div {:class "pagination-item"}
-           [:a {:href (str site-url previous-page-url)} "<-"]])
-        (when next-page-url
-          [:div {:class "pagination-item"}
-           [:a {:href (str site-url next-page-url)} "->"]])]
        footer]]])
    prepend-doctype-header
    (assoc m :page-html)))
@@ -230,25 +223,6 @@ style-src   'self'
 (defn write-page!
   [{:keys [page-path-name page-html]}]
   (write-file! page-path-name page-html))
-
-(defn link-pages
-  [pages]
-  (->> (concat [nil] pages [nil])
-       (partition 3 1)
-       (map (fn [[prev current next]]
-              (cond-> current
-                prev (assoc :previous-page-url (:page-path-name prev))
-                next (assoc :next-page-url     (:page-path-name next)))))))
-
-(defn add-page-urls
-  [pages]
-  (let [number-of-pages (count pages)]
-    (->> (inc number-of-pages)
-         (range 2)
-         (map #(str "page/" % ".html"))
-         (into ["index.html"])
-         (map (fn [page url] {:page-content page :page-path-name url}) pages)
-         link-pages)))
 
 (defn write-404! [s] (let [path-name "docs/404.html"] (spit path-name s)))
 
@@ -307,10 +281,8 @@ style-src   'self'
 (defn generate-site
   []
   (let [posts (get-posts (files))]
-    (->> (partition-all 10 posts)
-         add-page-urls
-         (map page-html)
-         (run! write-page!))
+    (->>  (page-html {:page-content posts :page-path-name "index.html"})
+      write-page!)
     (-> html-404
         write-404!)
     (run! write-post! posts)
