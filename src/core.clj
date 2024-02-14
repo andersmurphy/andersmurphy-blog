@@ -165,8 +165,8 @@ style-src   'self'
    [:p (str "© 2015-" (current-year) " Anders Murphy")]])
 
 (defn add-post-page
-  [{:keys [post-name post-content date post-path-name] :as m}]
-  (->> (html [:html {:lang "en"} (head post-path-name)
+  [{:keys [post-name post-content date] :as m}]
+  (->> (html [:html {:lang "en"} (head post-name)
               [:body sidebar
                [:div {:class "content container"}
                 [:article {:class "post"} [:h1 {:class "post-title"} post-name]
