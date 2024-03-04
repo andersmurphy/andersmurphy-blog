@@ -26,7 +26,7 @@ clojure -T:build uber
 
 A `deps.edn` file:
 
-```
+```clojure
 {:paths   ["src" "resources"]
  :deps    {org.clojure/clojure {:mvn/version "1.11.0-alpha3"}}
  :aliases {:build
@@ -38,7 +38,7 @@ A `deps.edn` file:
 
 A `build.clj` file:
 
-```
+```clojure
 (ns build
   (:require [clojure.tools.build.api :as b]))
 

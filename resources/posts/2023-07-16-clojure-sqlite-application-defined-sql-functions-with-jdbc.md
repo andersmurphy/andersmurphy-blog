@@ -9,7 +9,7 @@ extend SQLite in Clojure. Want to query with regex or jsonpath? Want custom aggr
 
 Bellow is how `org.sqlite.Function` is intended to be used from java using an anonymous class that extends `org.sqlite.Function`.
 
-```
+```java
 Function.create(conn, "hello_world", new Function() {
  @Override
  protected void xFunc() {
@@ -105,7 +105,7 @@ Magic! SQLite is executing functions defined in Clojure.
 To compile our SQLite function on repl launch add the following `:main-opts` to
 the `:dev` alias.
 
-```
+```clojure
 {:paths   ["src" "classes"]
  :deps
  {org.clojure/clojure               {:mvn/version "1.11.1"}

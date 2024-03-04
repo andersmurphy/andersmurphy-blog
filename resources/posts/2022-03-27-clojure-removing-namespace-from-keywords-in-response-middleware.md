@@ -4,7 +4,7 @@ Namespaced keywords let you add a namespace to a keyword `:id` -> `:user/id`, th
 
 We can remove the namespace from a keyword with the following code.
 
-```
+```clojure
 (-> :foo/bar name keyword)
 
 =>
@@ -13,7 +13,7 @@ We can remove the namespace from a keyword with the following code.
 
 To remove all namespaces in an arbitrarily nested piece of data we can use `clojure.walk/postwalk`.
 
-```
+```clojure
 (defn transform-keys
   [t coll]
   (clojure.walk/postwalk (fn [x] (if (map? x) (update-keys x t) x)) coll))
@@ -23,7 +23,7 @@ As of Clojure as of `1.11.0` we can now use  `update-keys` (without having to ro
 
 Now for the middleware. Ring defines middleware as a function of type `handler & args => request => response`.
 
-```
+```clojure
 (defn remove-namespace-keywords-in-response-middleware [handler & _]
   (fn [req]
     (let [resp (handler req)]
@@ -39,7 +39,7 @@ Thanks to this middleware we no longer have to remember to remove namespaces for
 
 Something to point out with this implementation, is that if the keywords without namespaces are not unique they will get overwritten. This normally isn't an problem as by the time you are structuring your data for a json response it will be nested, but it's still worth bearing in mind.
 
-```
+```clojure
 (update-keys
   {:user/id "foo" :accont/id "bar"}
   (comp keyword name))

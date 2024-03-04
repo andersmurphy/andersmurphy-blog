@@ -4,7 +4,7 @@ This article will cover a common pattern of iterating over a list of items whils
 
 Recently I had to implement link pagination for this blog. My initial attempt was rather naive:
 
-```clojur
+```clojure
 (defn link-pages
   [pages]
   (reduce
@@ -22,7 +22,7 @@ Recently I had to implement link pagination for this blog. My initial attempt wa
 
 Using `conj` and an empty list to build a new list of pages that reference each other. It also had an inconvenient side effect of reversing the input list.
 
-```clojur
+```clojure
 (link-pages
   [{:name "page1"}
    {:name "page2"}

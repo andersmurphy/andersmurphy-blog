@@ -9,10 +9,11 @@ Juxt is one of those higher-order functions that you never knew you needed. Desp
 -------------------------
 clojure.core/juxt
 ([f] [f g] [f g h] [f g h & fs])
-  Takes a set of functions and returns a fn that is the juxtaposition
-  of those fns.  The returned fn takes a variable number of args, and
-  returns a vector containing the result of applying each fn to the
-  args (left-to-right).
+  Takes a set of functions and returns a fn that is 
+  the juxtapositionof those fns.  The returned fn 
+  takes a variable number of args, and returns a 
+  vector containing the result of applying each fn 
+  to the args (left-to-right).
   ((juxt a b c) x) => [(a x) (b x) (c x)]
 ```
 

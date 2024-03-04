@@ -4,7 +4,7 @@ Have you ever deployed something to production only to have it break because of 
 
 First we write a regular function that throws an exception if `System/getenv` can't find an environment variable. This gives us a runtime check.
 
-```
+```clojure
 (defn env-dynamic
   [k]
   (if-let [v (-> k name System/getenv)]
@@ -15,7 +15,7 @@ First we write a regular function that throws an exception if `System/getenv` ca
 
 We then wrap it in a macro.
 
-```
+```clojure
 (defmacro env
   [k]
   (env-dynamic k))
@@ -23,7 +23,7 @@ We then wrap it in a macro.
 
 This turns it into a compile time check.
 
-```
+```clojure
 (env :DATABASE_URL)
 
 =>
