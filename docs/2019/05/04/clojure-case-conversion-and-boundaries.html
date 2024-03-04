@@ -8,36 +8,36 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: case conversion and boundaries</h1><time class="post-date" datetime="2019-05-04T00:00:00+00:00">04 May 2019</time><p>Inconsistent case is a problems that tends to come up at application boundaries in your software stack. For example your Clojure codebase might use <code>kebab-case</code> for keywords, whilst your database uses <code>snake&#95;case</code> for column names and your client wants <code>camelCase</code> in its json responses. Often, conventions and/or technical limitations prevent you from simply having a single case throughout your entire stack.</p><p>One "solution" to this problem is to accept the fact that your app will have a mix of cases. However, this can lead to mistake and frustration, does this function expect <code>customer-id</code>, <code>cutomerId</code> or <code>customer&#95;id</code>? What format does our mobile client expect? A more practical solution to this problem, the one this article will cover, is to add automatic case conversion at these boundaries in your software stack.</p><h2 id="converting&#95;the&#95;case&#95;of&#95;a&#95;key">Converting the case of a key</h2><p>Let's start by writing a simple case conversion function for converting <code>kebab-case</code> keywords to <code>camelCase</code> keywords.</p><pre><code class="clojure">&#40;defn <strong>kebab-case-&gt;camelCase</strong> &#91;k&#93;
-  &#40;let &#91;words &#40;clojure.string/split &#40;name k&#41; #&quot;-&quot;&#41;&#93;
-    &#40;-&gt;&gt; &#40;map clojure.string/capitalize &#40;rest words&#41;&#41;
-         &#40;apply str &#40;first words&#41;&#41;
-         keyword&#41;&#41;&#41;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: case conversion and boundaries</h1><time class="post-date" datetime="2019-05-04T00:00:00+00:00">04 May 2019</time><p>Inconsistent case is a problems that tends to come up at application boundaries in your software stack. For example your Clojure codebase might use <code>kebab-case</code> for keywords, whilst your database uses <code>snake&#95;case</code> for column names and your client wants <code>camelCase</code> in its json responses. Often, conventions and/or technical limitations prevent you from simply having a single case throughout your entire stack.</p><p>One "solution" to this problem is to accept the fact that your app will have a mix of cases. However, this can lead to mistake and frustration, does this function expect <code>customer-id</code>, <code>cutomerId</code> or <code>customer&#95;id</code>? What format does our mobile client expect? A more practical solution to this problem, the one this article will cover, is to add automatic case conversion at these boundaries in your software stack.</p><h2 id="converting&#95;the&#95;case&#95;of&#95;a&#95;key">Converting the case of a key</h2><p>Let's start by writing a simple case conversion function for converting <code>kebab-case</code> keywords to <code>camelCase</code> keywords.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>kebab-case-&gt;camelCase</strong> &#91;k&#93;
+  <span class="dim">&#40;</span>let &#91;words <span class="dim">&#40;</span>clojure.string/split <span class="dim">&#40;</span>name k<span class="dim">&#41;</span> #&quot;-&quot;<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>map clojure.string/capitalize <span class="dim">&#40;</span>rest words<span class="dim">&#41;&#41;</span>
+         <span class="dim">&#40;</span>apply str <span class="dim">&#40;</span>first words<span class="dim">&#41;&#41;</span>
+         keyword<span class="dim">&#41;&#41;&#41;</span>
 
-&#40;kebab-case-&gt;camelCase :foo-bar-baz&#41;
+<span class="dim">&#40;</span>kebab-case-&gt;camelCase :foo-bar-baz<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> :fooBarBaz
+</code></pre><h2 id="converting&#95;the&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;map">Converting the case of keys in a map</h2><p>Now that we have a function for converting case let's convert all the keys of a map using the <code>map-keys</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>map-keys</strong> &#91;f m&#93;
+  <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>map <span class="dim">&#40;</span>fn &#91;&#91;k v&#93;&#93; &#91;<span class="dim">&#40;</span>f k<span class="dim">&#41;</span> v&#93;<span class="dim">&#41;</span> m<span class="dim">&#41;</span>
+       <span class="dim">&#40;</span>into {}<span class="dim">&#41;&#41;&#41;</span>
 
-=&gt; :fooBarBaz
-</code></pre><h2 id="converting&#95;the&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;map">Converting the case of keys in a map</h2><p>Now that we have a function for converting case let's convert all the keys of a map using the <code>map-keys</code> function we implemented in <a href='https://andersmurphy.com/2018/11/10/clojure-map-values-and-keys.html'>this article</a>.</p><pre><code class="clojure">&#40;defn <strong>map-keys</strong> &#91;f m&#93;
-  &#40;-&gt;&gt; &#40;map &#40;fn &#91;&#91;k v&#93;&#93; &#91;&#40;f k&#41; v&#93;&#41; m&#41;
-       &#40;into {}&#41;&#41;&#41;
-
-&#40;map-keys kebab-case-&gt;camelCase
-          {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}&#41;
-
-=&gt; {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
-</code></pre><p><strong>UPDATE:</strong> <em>As of Clojure 1.11.0 there is now a built in function in <code>clojure.core</code> called <code>update-keys</code> which behaves identically to <code>map-keys</code> but takes the arguments in the opposite order <code>&#40;update-keys m f&#41;</code>.</em></p><h2 id="converting&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;nested&#95;data&#95;structure">Converting case of keys in a nested data structure</h2><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure">&#40;doc clojure.walk/postwalk&#41;
-
-=&gt;
+<span class="dim">&#40;</span>map-keys kebab-case-&gt;camelCase
+          {:character-id 1 :first-name &quot;John&quot; :second-name &quot;Snow&quot;}<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> {:characterId 1, :firstName &quot;John&quot;, :secondName &quot;Snow&quot;}
+</code></pre><p><strong>UPDATE:</strong> <em>As of Clojure 1.11.0 there is now a built in function in <code>clojure.core</code> called <code>update-keys</code> which behaves identically to <code>map-keys</code> but takes the arguments in the opposite order <code>&#40;update-keys m f&#41;</code>.</em></p><h2 id="converting&#95;case&#95;of&#95;keys&#95;in&#95;a&#95;nested&#95;data&#95;structure">Converting case of keys in a nested data structure</h2><p>For converting the keys of arbitrarily nested data structures we can use the <code>clojure.walk/postwalk</code> function. Let's check out the docs.</p><pre><code class="clojure"><span class="dim">&#40;</span>doc clojure.walk/postwalk<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span>
 -------------------------
 clojure.walk/postwalk
-&#40;&#91;f form&#93;&#41;
+<span class="dim">&#40;</span>&#91;f form&#93;<span class="dim">&#41;</span>
   Performs a depth-first, post-order traversal of form.  Calls f on
   each sub-form, uses f's return value in place of the original.
   Recognizes all Clojure data structures. Consumes seqs as with doall.
-</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>map-keys</code> function we can create a <code>transform-keys</code> function that will take a transformation function and apply it to all keys in a data structure.</p><pre><code class="clojure">&#40;defn <strong>transform-keys</strong> &#91;t form&#93;
-  &#40;clojure.walk/postwalk &#40;fn &#91;x&#93; &#40;if &#40;map? x&#41; &#40;map-keys t x&#41; x&#41;&#41; form&#41;&#41;
+</code></pre><p>Combining <code>clojure.walk/postwalk</code> with our <code>map-keys</code> function we can create a <code>transform-keys</code> function that will take a transformation function and apply it to all keys in a data structure.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>transform-keys</strong> &#91;t form&#93;
+  <span class="dim">&#40;</span>clojure.walk/postwalk <span class="dim">&#40;</span>fn &#91;x&#93; <span class="dim">&#40;</span>if <span class="dim">&#40;</span>map? x<span class="dim">&#41;</span> <span class="dim">&#40;</span>map-keys t x<span class="dim">&#41;</span> x<span class="dim">&#41;&#41;</span> form<span class="dim">&#41;&#41;</span>
 
-&#40;transform-keys kebab-case-&gt;camelCase
+<span class="dim">&#40;</span>transform-keys kebab-case-&gt;camelCase
  &#91;{:character-id 1
    :first-name &quot;Olaf&quot;
    :second-name &quot;Iondrake&quot;
@@ -45,9 +45,9 @@ clojure.walk/postwalk
   {:character-Id 2
    :first-name &quot;Sigurd&quot;
    :second-name &quot;Rockfist&quot;
-   :items {:bag-of-holding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;&#41;
-
-=&gt; &#91;{:characterId 1,
+   :items {:bag-of-holding &#91;&quot;scroll&quot; &quot;potion of healing&quot;&#93;}}&#93;<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> &#91;{:characterId 1,
      :firstName &quot;Olaf&quot;,
      :secondName &quot;Irondrake&quot;,
      :items {:bagOfHolding &#91;&quot;sword&quot; &quot;axe&quot; &quot;money&quot;&#93;}}

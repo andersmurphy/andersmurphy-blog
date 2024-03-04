@@ -11,43 +11,43 @@ style-src   &apos;self&apos;
 " http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: virtual threads with ring and jetty</h1><time class="post-date" datetime="2023-09-16T00:00:00+00:00">16 Sep 2023</time><p><a href='https://openjdk.org/jeps/425'>Java 19 introduce virtual threads</a> as a preview feature. Virtual threads are lightweight threads that allow you to write server applications in a simple thread-per-request style (as opposed to async style) and still scale with near-optimal hardware utilisation. The thread-per-request approach is generally easier to reason about, maintain and debug than it's asynchronous counterparts. In this post we'll cover configuring <a href='https://github.com/ring-clojure/ring/tree/master/ring-jetty-adapter'>Jetty</a> to make your ring handlers use virtual threads and benchmark it against regular threads to show how it alleviates the need for tuning thread pools.</p><p>If you're running Java 19+ you can enable preview features with <code>--enable-preview</code> as shown below. This step won't be needed in Java 21 (which is being released this month) as virtual threads will be out of preview and available by default.</p><pre><code class="Clojure">{:paths   &#91;&quot;src&quot;&#93;
  :deps    {...}
  :aliases {:dev {:jvm-opts &#91;&quot;--enable-preview&quot;&#93;}}}
-</code></pre><p>Set up a ring handler that sleeps for 50 milliseconds to simulate a long request.</p><pre><code class="Clojure">&#40;ns <strong>server.core</strong>
-  &#40;:gen-class&#41;
-  &#40;:require &#91;ring.adapter.jetty :refer &#91;run-jetty&#93;&#93;
-            ...&#41;
-  &#40;:import &#40;java.util.concurrent Executors&#41;
-           &#40;org.eclipse.jetty.util.thread QueuedThreadPool&#41;&#41;&#41;
+</code></pre><p>Set up a ring handler that sleeps for 50 milliseconds to simulate a long request.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>server.core</strong>
+  <span class="dim">&#40;</span>:gen-class<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>:require &#91;ring.adapter.jetty :refer &#91;run-jetty&#93;&#93;
+            ...<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>:import <span class="dim">&#40;</span>java.util.concurrent Executors<span class="dim">&#41;</span>
+           <span class="dim">&#40;</span>org.eclipse.jetty.util.thread QueuedThreadPool<span class="dim">&#41;&#41;&#41;</span>
            
-&#40;def <strong>app</strong>
-  &#40;ring/ring-handler
-    &#40;ring/router
+<span class="dim">&#40;</span>def <strong>app</strong>
+  <span class="dim">&#40;</span>ring/ring-handler
+    <span class="dim">&#40;</span>ring/router
       &#91;&quot;/hello&quot;
        {:get
         {:handler
-         &#40;fn &#91;&#95;&#93;
+         <span class="dim">&#40;</span>fn &#91;&#95;&#93;
            {:headers {&quot;Content-Type&quot; &quot;text/html&quot;}
             :status  200
-            :body    &#40;do
-                       ;; simulate work by sleeping
-                       ;; for 50 milliseconds
-                       &#40;Thread/sleep 50&#41;
-                       &#40;h/render &#91;:b &quot;hello!&quot;&#93;&#41;&#41;}&#41;}}&#93;
-      ...&#41;&#41;&#41;
-</code></pre><p>First we will create a jetty server without virtual threads so that we can make a performance comparison.</p><pre><code class="Clojure">&#40;def <strong>jetty-server</strong> &#40;run-jetty app {:port 8080 :join? false}&#41;&#41;
+            :body    <span class="dim">&#40;</span>do
+                       <span class="dim">;; simulate work by sleeping
+</span>                       <span class="dim">;; for 50 milliseconds
+</span>                       <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+                       <span class="dim">&#40;</span>h/render &#91;:b &quot;hello!&quot;&#93;<span class="dim">&#41;&#41;</span>}<span class="dim">&#41;</span>}}&#93;
+      ...<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>First we will create a jetty server without virtual threads so that we can make a performance comparison.</p><pre><code class="Clojure"><span class="dim">&#40;</span>def <strong>jetty-server</strong> <span class="dim">&#40;</span>run-jetty app {:port 8080 :join? false}<span class="dim">&#41;&#41;</span>
 </code></pre><p>Then benchmark  it with <a href='https://github.com/wg/wrk'>wrk (a http server benchmarking tool)</a>.</p><pre><code>wrk -t 12 -c 120 http://127.0.0.1:8080/hello
 
 Running 10s test @ http://127.0.0.1:8080/hello
 12 threads and 120 connections
 Requests/sec:    842.92
 Transfer/sec:     95.49KB
-</code></pre><p>Stop the jetty server.</p><pre><code class="Clojure">&#40;.stop server&#41;
-</code></pre><p>Now, we will create a jetty server that uses virtual threads.</p><pre><code class="Clojure">&#40;def <strong>jetty-server</strong>
-  &#40;let &#91;thread-pool &#40;new QueuedThreadPool&#41;
-        &#95;           &#40;.setVirtualThreadsExecutor thread-pool
-                      &#40;Executors/newVirtualThreadPerTaskExecutor&#41;&#41;&#93;
-    &#40;run-jetty app {:port        8080
+</code></pre><p>Stop the jetty server.</p><pre><code class="Clojure"><span class="dim">&#40;</span>.stop server<span class="dim">&#41;</span>
+</code></pre><p>Now, we will create a jetty server that uses virtual threads.</p><pre><code class="Clojure"><span class="dim">&#40;</span>def <strong>jetty-server</strong>
+  <span class="dim">&#40;</span>let &#91;thread-pool <span class="dim">&#40;</span>new QueuedThreadPool<span class="dim">&#41;</span>
+        &#95;           <span class="dim">&#40;</span>.setVirtualThreadsExecutor thread-pool
+                      <span class="dim">&#40;</span>Executors/newVirtualThreadPerTaskExecutor<span class="dim">&#41;&#41;</span>&#93;
+    <span class="dim">&#40;</span>run-jetty app {:port        8080
                     :join?       false
-                    :thread-pool thread-pool}&#41;&#41;&#41;
+                    :thread-pool thread-pool}<span class="dim">&#41;&#41;&#41;</span>
 </code></pre><p>Then benchmark it.</p><pre><code>Running 10s test @ http://127.0.0.1:8080/hello
 12 threads and 120 connections
 Requests/sec:   2218.19

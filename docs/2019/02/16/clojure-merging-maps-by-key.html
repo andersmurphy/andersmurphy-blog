@@ -8,52 +8,52 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: merging maps by key (join)</h1><time class="post-date" datetime="2019-02-16T00:00:00+00:00">16 Feb 2019</time><p>We have two sequences of maps (tables) and we want to merge them on matching keys (relations).</p><pre><code class="clojure">&#40;def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: merging maps by key (join)</h1><time class="post-date" datetime="2019-02-16T00:00:00+00:00">16 Feb 2019</time><p>We have two sequences of maps (tables) and we want to merge them on matching keys (relations).</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
-                 {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
+                 {:userid 3 :name &quot;Sarah&quot;}&#93;<span class="dim">&#41;</span>
 
-&#40;def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
+<span class="dim">&#40;</span>def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
                   {:userid 2 :email &quot;jo@email.com&quot;}
-                  {:userid 3 :email &quot;sarah@email.com&quot;}&#93;&#41;
-</code></pre><h2 id="using&#95;concat,&#95;group-by&#95;and&#95;merge">Using concat, group-by and merge</h2><p>We can achieve this using <code>concat</code>, <code>gourp-by</code> and <code>merge</code>. We concatenate the two sequences together, group the maps by <code>:userid</code> key and then map over the grouped maps (rows) merging them.</p><pre><code class="clojure">&#40;defn <strong>merge-on-key</strong>
+                  {:userid 3 :email &quot;sarah@email.com&quot;}&#93;<span class="dim">&#41;</span>
+</code></pre><h2 id="using&#95;concat,&#95;group-by&#95;and&#95;merge">Using concat, group-by and merge</h2><p>We can achieve this using <code>concat</code>, <code>gourp-by</code> and <code>merge</code>. We concatenate the two sequences together, group the maps by <code>:userid</code> key and then map over the grouped maps (rows) merging them.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>merge-on-key</strong>
   &quot;Merger rows of table1 and table2 on matching key k.&quot;
   &#91;k table1 table2&#93;
-  &#40;-&gt;&gt; &#40;concat table1 table2&#41;
-       &#40;group-by k&#41;
-       &#40;map val&#41;
-       &#40;map &#40;fn &#91;&#91;row1 row2&#93;&#93;
-              &#40;merge row1 row2&#41;&#41;&#41;&#41;&#41;
+  <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>concat table1 table2<span class="dim">&#41;</span>
+       <span class="dim">&#40;</span>group-by k<span class="dim">&#41;</span>
+       <span class="dim">&#40;</span>map val<span class="dim">&#41;</span>
+       <span class="dim">&#40;</span>map <span class="dim">&#40;</span>fn &#91;&#91;row1 row2&#93;&#93;
+              <span class="dim">&#40;</span>merge row1 row2<span class="dim">&#41;&#41;&#41;&#41;&#41;</span>
 
-&#40;merge-on-key :userid
+<span class="dim">&#40;</span>merge-on-key :userid
               name-table
-              email-table&#41;
-
-=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+              email-table<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> <span class="dim">&#40;</span>{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
     {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
-    {:userid 3, :name &quot;Sarah&quot;, :email &quot;sarah@email.com&quot;}&#41;
- </code></pre><p>This works for sequences of the same length, but what do we get if the sequences are different lengths (one of the tables has missing rows)?</p><pre><code class="clojure">&#40;def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
+    {:userid 3, :name &quot;Sarah&quot;, :email &quot;sarah@email.com&quot;}<span class="dim">&#41;</span>
+ </code></pre><p>This works for sequences of the same length, but what do we get if the sequences are different lengths (one of the tables has missing rows)?</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
-                 {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
+                 {:userid 3 :name &quot;Sarah&quot;}&#93;<span class="dim">&#41;</span>
 
-&#40;def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
-                  {:userid 2 :email &quot;jo@email.com&quot;}&#93;&#41;
+<span class="dim">&#40;</span>def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
+                  {:userid 2 :email &quot;jo@email.com&quot;}&#93;<span class="dim">&#41;</span>
 
-&#40;merge-on-key :userid
+<span class="dim">&#40;</span>merge-on-key :userid
               name-table
-              email-table&#41;
-
-=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+              email-table<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> <span class="dim">&#40;</span>{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
     {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}
-    {:userid 3, :name &quot;Sarah&quot;}&#41;
- </code></pre><p>This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.</p><h2 id="using&#95;clojure.set/join">Using clojure.set/join</h2><p>If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the <code>join</code> function from the <code>clojure.set</code> namespace.</p><pre><code class="clojure">&#40;def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
+    {:userid 3, :name &quot;Sarah&quot;}<span class="dim">&#41;</span>
+ </code></pre><p>This returns all the user names with their corresponding emails if they have one. We effectively get a LEFT OUTER JOIN.</p><h2 id="using&#95;clojure.set/join">Using clojure.set/join</h2><p>If we just want all user names with corresponding emails, also known as an INNER JOIN, we can use the <code>join</code> function from the <code>clojure.set</code> namespace.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>name-table</strong> &#91;{:userid 1 :name &quot;Bob&quot;}
                  {:userid 2 :name &quot;Jo&quot;}
-                 {:userid 3 :name &quot;Sarah&quot;}&#93;&#41;
+                 {:userid 3 :name &quot;Sarah&quot;}&#93;<span class="dim">&#41;</span>
 
-&#40;def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
-                  {:userid 2 :email &quot;jo@email.com&quot;}&#93;&#41;
+<span class="dim">&#40;</span>def <strong>email-table</strong> &#91;{:userid 1 :email &quot;bob@email.com&quot;}
+                  {:userid 2 :email &quot;jo@email.com&quot;}&#93;<span class="dim">&#41;</span>
 
-&#40;clojure.set/join &#40;set name-table&#41; &#40;set email-table&#41;&#41;
-
-=&gt; &#40;{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
-    {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}&#41;
+<span class="dim">&#40;</span>clojure.set/join <span class="dim">&#40;</span>set name-table<span class="dim">&#41;</span> <span class="dim">&#40;</span>set email-table<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span> <span class="dim">&#40;</span>{:userid 1, :name &quot;Bob&quot;, :email &quot;bob@email.com&quot;}
+    {:userid 2, :name &quot;Jo&quot;, :email &quot;jo@email.com&quot;}<span class="dim">&#41;</span>
 </code></pre><p>This just scratches the surface of the relational algebra you can do with Clojure data structures. For more check out the <a href='https://clojuredocs.org/clojure.set'>clojure.set</a> namespace.</p></article><div class="footer"><p>© 2015-2024 Anders Murphy</p></div></div></body></html>

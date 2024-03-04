@@ -10,27 +10,27 @@ connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
 " http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: connection pooling with hikari-cp</h1><time class="post-date" datetime="2019-07-14T00:00:00+00:00">14 Jul 2019</time><p>Connection pooling is a technique for improving app performance. A pool (cache) of reusable connections is maintained meaning when users connect to the database they can reuse an existing connection. When the user finishes using the connection it is placed back in the pool for other users to use. This reduces the overhead of connecting to the database by decreasing network traffic, limiting the cost of creating new connections, and reducing the load on the garbage collector. Effectively improving the responsiveness of your app for any task that requires connecting to the database.</p><p>This guide will use <a href='https://github.com/tomekw/hikari-cp'>hikari-cp</a> a Clojure wrapper around <a href='https://github.com/brettwooldridge/HikariCP'>HikariCP</a> a java database connection pooling library. It assumes you are using <a href='https://leiningen.org'>leiningen</a> as your build/dependency management tool and have a <a href='https://www.postgresql.org'>postgresql</a> database set up and running. It also won't cover using environment variables to store your database url out of source control (which is highly recommended for security).</p><h2 id="initial&#95;set&#95;up">Initial set up</h2><p>Start postgres.</p><pre><code class="bash">pg&#95;ctl -D pg start
 </code></pre><p>Create a database called <code>databasename</code>.</p><pre><code class="bash">createdb databasename
-</code></pre><h2 id="dependencies">Dependencies</h2><p>Add <code>org.clojure/java.jdbc</code>, <code>org.postgresql/postgresql</code> and <code>hikari-cp</code> to your dependencies.</p><pre><code class="clojure">&#40;defproject <strong>hikari-cp-example</strong> &quot;0.1.0-SNAPSHOT&quot;
+</code></pre><h2 id="dependencies">Dependencies</h2><p>Add <code>org.clojure/java.jdbc</code>, <code>org.postgresql/postgresql</code> and <code>hikari-cp</code> to your dependencies.</p><pre><code class="clojure"><span class="dim">&#40;</span>defproject <strong>hikari-cp-example</strong> &quot;0.1.0-SNAPSHOT&quot;
   :dependencies &#91;&#91;org.clojure/clojure &quot;1.10.1&quot;&#93;
                  &#91;org.clojure/java.jdbc &quot;0.7.7&quot;&#93;
                  &#91;org.postgresql/postgresql &quot;42.2.3&quot;&#93;
-                 &#91;hikari-cp &quot;2.7.1&quot;&#93;&#93;&#41;
-</code></pre><h2 id="parsing&#95;a&#95;database&#95;url">Parsing a database URL</h2><p>Create a helper function for passing urls.</p><pre><code class="clojure">&#40;ns <strong>hikari-cp-example.core</strong>
-  &#40;:require &#91;clojure.java.jdbc :as sql&#93;
+                 &#91;hikari-cp &quot;2.7.1&quot;&#93;&#93;<span class="dim">&#41;</span>
+</code></pre><h2 id="parsing&#95;a&#95;database&#95;url">Parsing a database URL</h2><p>Create a helper function for passing urls.</p><pre><code class="clojure"><span class="dim">&#40;</span>ns <strong>hikari-cp-example.core</strong>
+  <span class="dim">&#40;</span>:require &#91;clojure.java.jdbc :as sql&#93;
             &#91;hikari-cp.core :as cp&#93;
-            &#91;clojure.string :as str&#93;&#41;&#41;
+            &#91;clojure.string :as str&#93;<span class="dim">&#41;&#41;</span>
 
-&#40;defn <strong>db-info-from-url</strong> &#91;db-url&#93;
-  &#40;let &#91;db-uri              &#40;java.net.URI. db-url&#41;
-        &#91;username password&#93; &#40;str/split &#40;or &#40;.getUserInfo db-uri&#41; &quot;:&quot;&#41; #&quot;:&quot;&#41;&#93;
-    {:username      &#40;or username &#40;System/getProperty &quot;user.name&quot;&#41;&#41;
-     :password      &#40;or password &quot;&quot;&#41;
-     :port-number   &#40;.getPort db-uri&#41;
-     :database-name &#40;str/replace-first &#40;.getPath db-uri&#41; &quot;/&quot; &quot;&quot;&#41;
-     :server-name   &#40;.getHost db-uri&#41;}&#41;&#41;
+<span class="dim">&#40;</span>defn <strong>db-info-from-url</strong> &#91;db-url&#93;
+  <span class="dim">&#40;</span>let &#91;db-uri              <span class="dim">&#40;</span>java.net.URI. db-url<span class="dim">&#41;</span>
+        &#91;username password&#93; <span class="dim">&#40;</span>str/split <span class="dim">&#40;</span>or <span class="dim">&#40;</span>.getUserInfo db-uri<span class="dim">&#41;</span> &quot;:&quot;<span class="dim">&#41;</span> #&quot;:&quot;<span class="dim">&#41;</span>&#93;
+    {:username      <span class="dim">&#40;</span>or username <span class="dim">&#40;</span>System/getProperty &quot;user.name&quot;<span class="dim">&#41;&#41;</span>
+     :password      <span class="dim">&#40;</span>or password &quot;&quot;<span class="dim">&#41;</span>
+     :port-number   <span class="dim">&#40;</span>.getPort db-uri<span class="dim">&#41;</span>
+     :database-name <span class="dim">&#40;</span>str/replace-first <span class="dim">&#40;</span>.getPath db-uri<span class="dim">&#41;</span> &quot;/&quot; &quot;&quot;<span class="dim">&#41;</span>
+     :server-name   <span class="dim">&#40;</span>.getHost db-uri<span class="dim">&#41;</span>}<span class="dim">&#41;&#41;</span>
 
-</code></pre><p>This function parses urls that are of the form <code>postgresql://username:password@localhost:5432/databasename&quot;</code>. It also handles defaults if certain parameters are missing.</p><h2 id="setting&#95;up&#95;the&#95;connection&#95;pool">Setting up the connection pool</h2><p>Define the connection.</p><pre><code class="clojure">&#40;def <strong>datasource-options</strong>
-  &#40;merge &#40;db-info-from-url &quot;postgresql://localhost:5432/databasename&quot;&#41;
+</code></pre><p>This function parses urls that are of the form <code>postgresql://username:password@localhost:5432/databasename&quot;</code>. It also handles defaults if certain parameters are missing.</p><h2 id="setting&#95;up&#95;the&#95;connection&#95;pool">Setting up the connection pool</h2><p>Define the connection.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>datasource-options</strong>
+  <span class="dim">&#40;</span>merge <span class="dim">&#40;</span>db-info-from-url &quot;postgresql://localhost:5432/databasename&quot;<span class="dim">&#41;</span>
          {:auto-commit        true
           :read-only          false
           :adapter            &quot;postgresql&quot;
@@ -41,10 +41,10 @@ style-src   &apos;self&apos;
           :minimum-idle       10
           :maximum-pool-size  20
           :pool-name          &quot;db-pool&quot;
-          :register-mbeans    false}&#41;&#41;
-</code></pre><p>Define a connection creating function using <code>defonce</code> to ensure it is only create once and <code>delay</code> to make it lazy.</p><pre><code class="clojure">&#40;defonce <strong>datasource</strong>
-  &#40;delay &#40;cp/make-datasource datasource-options&#41;&#41;&#41;
-</code></pre><p>Create the connection.</p><pre><code class="clojure">&#40;def <strong>database-connection</strong> {:datasource @datasource}&#41;
+          :register-mbeans    false}<span class="dim">&#41;&#41;</span>
+</code></pre><p>Define a connection creating function using <code>defonce</code> to ensure it is only create once and <code>delay</code> to make it lazy.</p><pre><code class="clojure"><span class="dim">&#40;</span>defonce <strong>datasource</strong>
+  <span class="dim">&#40;</span>delay <span class="dim">&#40;</span>cp/make-datasource datasource-options<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>Create the connection.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>database-connection</strong> {:datasource @datasource}<span class="dim">&#41;</span>
 </code></pre><p>You should see some logs from hikari start to flood the repl.</p><pre><code class="clojure">...
 16:28:58.495 &#91;nRepl-session-7849a8f5-c0c2-4a6e-99f7-af9c375c9653&#93; DEBUG com.zaxxer.hikari.HikariConfig - schema..........................none
 16:28:58.495 &#91;nRepl-session-7849a8f5-c0c2-4a6e-99f7-af9c375c9653&#93; DEBUG com.zaxxer.hikari.HikariConfig - threadFactory...................internal
@@ -53,12 +53,12 @@ style-src   &apos;self&apos;
 16:28:58.495 &#91;nRepl-session-7849a8f5-c0c2-4a6e-99f7-af9c375c9653&#93; DEBUG com.zaxxer.hikari.HikariConfig - validationTimeout...............5000
 16:28:58.497 &#91;nRepl-session-7849a8f5-c0c2-4a6e-99f7-af9c375c9653&#93; INFO com.zaxxer.hikari.HikariDataSource - db-pool - Starting...
 ...
-</code></pre><h2 id="stop&#95;the&#95;logs&#95;flooding&#95;the&#95;repl">Stop the logs flooding the repl</h2><p>The hikari logs can be quite noisy. Logback can be used to filter out the DEBUG and INFO level messages.</p><p>Add logback as a dependency.</p><pre><code class="clojure">&#40;defproject <strong>hikari-cp-example</strong> &quot;0.1.0-SNAPSHOT&quot;
+</code></pre><h2 id="stop&#95;the&#95;logs&#95;flooding&#95;the&#95;repl">Stop the logs flooding the repl</h2><p>The hikari logs can be quite noisy. Logback can be used to filter out the DEBUG and INFO level messages.</p><p>Add logback as a dependency.</p><pre><code class="clojure"><span class="dim">&#40;</span>defproject <strong>hikari-cp-example</strong> &quot;0.1.0-SNAPSHOT&quot;
   :dependencies &#91;&#91;org.clojure/clojure &quot;1.10.0&quot;&#93;
                  &#91;org.clojure/java.jdbc &quot;0.7.7&quot;&#93;
                  &#91;org.postgresql/postgresql &quot;42.2.3&quot;&#93;
                  &#91;hikari-cp &quot;2.7.1&quot;&#93;
-                 &#91;ch.qos.logback/logback-classic &quot;1.2.3&quot;&#93;&#93;&#41;
+                 &#91;ch.qos.logback/logback-classic &quot;1.2.3&quot;&#93;&#93;<span class="dim">&#41;</span>
 </code></pre><p>Create a <code>logback.xml</code> in your project <code>resources</code> folder (lein will add this to the class path).</p><pre><code class="xml">&lt;configuration debug=&quot;false&quot;&gt;
  &lt;appender name=&quot;CONSOLE&quot; class=&quot;ch.qos.logback.core.ConsoleAppender&quot;&gt;
     &lt;encoder&gt;

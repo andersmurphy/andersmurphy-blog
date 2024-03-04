@@ -8,28 +8,36 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: the REPL makes contributing to open source easy</h1><time class="post-date" datetime="2024-03-04T00:00:00+00:00">04 Mar 2024</time><p>The Clojure has a great interactive development experience. This makes it surprisingly enjoyable and easy to contribute to open source. It goes something like this: you're using a third party library, you run into a potential bug, you clone the library, you write some code, you evaluate it and you see if the bug is fixed (all without ever having to restart your REPL).</p><p>Recently, I've been using a fantastic datalog database library called <a href='https://github.com/juji-io/datalevin'>Datalevin</a>. I ran into a small issue (now fixed) where the option for validating data for more useful error messages <code>:validate-data?</code> didn't seem to be working as intended. </p><p>Instead of:</p><pre><code>&#40;let &#91;sc {:user/name {:db/valueType :db.type/string}}
-        es &#91;{:db/id -1 :user/name 34}&#93;
-        db &#40;d/empty-db &quot;foo&quot; sc {:validate-data? true}&#41;&#93;
-    &#40;d/db-with db es&#41;
-    &#40;d/close-db db&#41;&#41;
-
-=&gt;
-Execution error &#40;ExceptionInfo&#41; at datalevin.storage/insert-data &#40;storage.cljc:616&#41;.
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: the REPL makes contributing to open source easy</h1><time class="post-date" datetime="2024-03-04T00:00:00+00:00">04 Mar 2024</time><p>Clojure has a great interactive development experience. This makes it surprisingly easy to contribute to open source. It goes something like this: you're using an open source library, you run into a potential bug, you clone the library, you write some code, you evaluate it and you see if the bug is fixed (all without ever having to restart your REPL).</p><p>Recently, I've been using a fantastic datalog database library called <a href='https://github.com/juji-io/datalevin'>Datalevin</a>. I ran into a small issue (now fixed) where the option for validating data for more useful error messages <code>:validate-data?</code> didn't seem to be working as intended.</p><p>Instead of:</p><pre><code class="clojure"><span class="dim">&#40;</span>let &#91;sc {:user/name
+          {:db/valueType :db.type/string}}
+      es &#91;{:db/id -1 :user/name 34}&#93;
+      db <span class="dim">&#40;</span>d/empty-db &quot;foo&quot; sc
+           {:validate-data? true}<span class="dim">&#41;</span>&#93;
+  <span class="dim">&#40;</span>d/db-with db es<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>d/close-db db<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+Execution error <span class="dim">&#40;</span>ExceptionInfo<span class="dim">&#41;</span> 
+at datalevin.storage/insert-data <span class="dim">&#40;</span>storage.cljc:616<span class="dim">&#41;</span>.
 Invalid data, expecting:db.type/long got &quot;foo&quot;
-</code></pre><p>We get:</p><pre><code>&#40;let &#91;sc {:user/name {:db/valueType :db.type/string}}
-        es &#91;{:db/id -1 :user/name 34}&#93;
-        db &#40;d/empty-db &quot;foo&quot; sc {:validate-data? true}&#41;&#93;
-    &#40;d/db-with db es&#41;
-    &#40;d/close-db db&#41;&#41;
+</code></pre><p>We get:</p><pre><code class="clojure"><span class="dim">&#40;</span>let &#91;sc {:user/name
+          {:db/valueType :db.type/string}}
+      es &#91;{:db/id -1 :user/name 34}&#93;
+      db <span class="dim">&#40;</span>d/empty-db &quot;foo&quot; sc
+           {:validate-data? true}<span class="dim">&#41;</span>&#93;
+  <span class="dim">&#40;</span>d/db-with db es<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>d/close-db db<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+Execution error <span class="dim">&#40;</span>ClassCastException<span class="dim">&#41;</span> 
+at datalevin.bits/string-bytes <span class="dim">&#40;</span>bits.cljc:441<span class="dim">&#41;</span>.
+class java.lang.Long cannot be cast to class 
+java.lang.String <span class="dim">&#40;</span>java.lang.Long and java.lang.String 
+are in module java.base of loader 'bootstrap'<span class="dim">&#41;</span>
+</code></pre><p>Let's get the stack trace:</p><pre><code class="clojure"><span class="dim">&#40;</span>-&gt; &#42;e Throwable-&gt;map :trace<span class="dim">&#41;</span>
 
-=&gt;
-Execution error &#40;ClassCastException&#41; at datalevin.bits/string-bytes &#40;bits.cljc:441&#41;.
-class java.lang.Long cannot be cast to class java.lang.String &#40;java.lang.Long and java.lang.String are in module java.base of loader 'bootstrap'&#41;
-</code></pre><p>Let's look at the stack trace:</p><pre><code>&#40;-&gt; &#42;e Throwable-&gt;map :trace&#41;
-
-
-=&gt;
+<span class="dim">
+=&gt;</span>
 &#91;&#91;datalevin.bits$long&#95;header invokeStatic &quot;bits.cljc&quot; 513&#93;
  &#91;datalevin.bits$long&#95;header invoke &quot;bits.cljc&quot; 506&#93;
  &#91;datalevin.bits$val&#95;header invokeStatic &quot;bits.cljc&quot; 745&#93;
@@ -39,53 +47,68 @@ class java.lang.Long cannot be cast to class java.lang.String &#40;java.lang.Lon
  &#91;datalevin.storage$insert&#95;data invokeStatic &quot;storage.cljc&quot; 614&#93;
  &#91;datalevin.storage$insert&#95;data invoke &quot;storage.cljc&quot; 604&#93;
  ...
-</code></pre><p>Clone the <code>datalevin</code> repository and checkout the tag for the version of the library being used.</p><p>Search the source for <code>:validate-data?</code> or <code>validate-data?</code> (catches uses of destructuring).</p><pre><code>src/datalevin/storage.cljc
-616: &#40;or &#40;not &#40;:validate-data? &#40;opts store&#41;&#41; ...
-</code></pre><p>Jump to code.</p><pre><code>&#40;defn- insert-data
+</code></pre><p>Now clone the <code>datalevin</code> repository and checkout the tag for the version of the library being used.</p><p>Search the source for <code>:validate-data?</code> or <code>validate-data?</code> (catches uses of destructuring).</p><pre><code class="clojure">src/datalevin/storage.cljc
+616: <span class="dim">&#40;</span>or <span class="dim">&#40;</span>not <span class="dim">&#40;</span>:validate-data? <span class="dim">&#40;</span>opts store<span class="dim">&#41;&#41;</span> ...
+</code></pre><p>Jump to the code:</p><pre><code class="clojure"><span class="dim">&#40;</span>defn- <strong>insert-data</strong>
   &#91;&#94;Store store &#94;Datom d ft-ds giants&#93;
-  &#40;let &#91;attr  &#40;.-a d&#41;
-        &#95;     &#40;or &#40;not &#40;:closed-schema? &#40;opts store&#41;&#41;&#41;
-                &#40;&#40;schema store&#41; attr&#41;
-                &#40;u/raise &quot;Attribute not defined in schema &quot; attr {}&#41;&#41;
-        props &#40;or &#40;&#40;schema store&#41; attr&#41;
-                &#40;swap-attr store attr identity&#41;&#41;
-        vt    &#40;value-type props&#41;
-        ref?  &#40;= :db.type/ref vt&#41;
-        e     &#40;.-e d&#41;
-        v     &#40;.-v d&#41;
-        aid   &#40;:db/aid props&#41;
-A       i     &#40;b/indexable e aid v vt&#41;
-        ft?   &#40;:db/fulltext props&#41;&#93;
-B   &#40;or &#40;not &#40;:validate-data? &#40;opts store&#41;&#41;&#41;
-                &#40;b/valid-data? v vt&#41;
-                &#40;u/raise &quot;Invalid data, expecting &quot; vt {:input v}&#41;&#41;
+  <span class="dim">&#40;</span>let &#91;attr  <span class="dim">&#40;</span>.-a d<span class="dim">&#41;</span>
+        &#95;     <span class="dim">&#40;</span>or <span class="dim">&#40;</span>not <span class="dim">&#40;</span>:closed-schema?
+                        <span class="dim">&#40;</span>opts store<span class="dim">&#41;&#41;&#41;</span>
+                <span class="dim">&#40;&#40;</span>schema store<span class="dim">&#41;</span> attr<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>u/raise
+                  &quot;Attribute not defined in schema &quot;
+                  attr {}<span class="dim">&#41;&#41;</span>
+        props <span class="dim">&#40;</span>or <span class="dim">&#40;&#40;</span>schema store<span class="dim">&#41;</span> attr<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>swap-attr store attr identity<span class="dim">&#41;&#41;</span>
+        vt    <span class="dim">&#40;</span>value-type props<span class="dim">&#41;</span>
+        ref?  <span class="dim">&#40;</span>= :db.type/ref vt<span class="dim">&#41;</span>
+        e     <span class="dim">&#40;</span>.-e d<span class="dim">&#41;</span>
+        v     <span class="dim">&#40;</span>.-v d<span class="dim">&#41;</span>
+        aid   <span class="dim">&#40;</span>:db/aid props<span class="dim">&#41;</span>
+A       i     <span class="dim">&#40;</span>b/indexable e aid v vt<span class="dim">&#41;</span>
+        ft?   <span class="dim">&#40;</span>:db/fulltext props<span class="dim">&#41;</span>&#93;
+B   <span class="dim">&#40;</span>or <span class="dim">&#40;</span>not <span class="dim">&#40;</span>:validate-data?
+              <span class="dim">&#40;</span>opts store<span class="dim">&#41;&#41;&#41;</span>
+      <span class="dim">&#40;</span>b/valid-data? v vt<span class="dim">&#41;</span>
+      <span class="dim">&#40;</span>u/raise &quot;Invalid data, expecting &quot;
+        vt {:input v}<span class="dim">&#41;&#41;</span>
+        
 ...
-</code></pre><p>Looking at the code for <code>insert-data</code> and the previous stack trace we can determine that the code on line <code>B</code> where <code>&#40;:validate-data? ...&#41;</code> is called is never reached because the stack trace shows <code>datalevin.bits$indexable</code> the function <code>&#40;b/indexable ...&#41;</code> on line <code>A</code> being called.</p><p>In this case the fix is simple. We move the code on line <code>B</code> to be called before the code on line <code>A</code>. That way if the data is not valid we'll get the helpful error message.</p><pre><code>&#40;defn- insert-data
+</code></pre><p>Looking at the code above for <code>insert-data</code> and the previous stack trace we can determine that the code on line <strong>B</strong> where <code>&#40;:validate-data? ...&#41;</code> is never reached because the stack trace shows <code>datalevin.bits$indexable</code> the code <code>&#40;b/indexable ...&#41;</code> on line <strong>A</strong> being called (meaning the error was thrown somewhere in <code>&#40;b/indexable ...&#41;</code>).</p><p>In this case the fix is simple. We move the code on line <strong>B</strong> to be called before the code on line <strong>A</strong>. That way if the data is not valid we'll get the helpful error message.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn- <strong>insert-data</strong>
   &#91;&#94;Store store &#94;Datom d ft-ds giants&#93;
-  &#40;let &#91;attr  &#40;.-a d&#41;
-        &#95;     &#40;or &#40;not &#40;:closed-schema? &#40;opts store&#41;&#41;&#41;
-                &#40;&#40;schema store&#41; attr&#41;
-                &#40;u/raise &quot;Attribute not defined in schema &quot; attr {}&#41;&#41;
-        props &#40;or &#40;&#40;schema store&#41; attr&#41;
-                  &#40;swap-attr store attr identity&#41;&#41;
-        vt    &#40;value-type props&#41;
-        ref?  &#40;= :db.type/ref vt&#41;
-        e     &#40;.-e d&#41;
-        v     &#40;.-v d&#41;
-        aid   &#40;:db/aid props&#41;
-        &#95;     &#40;or &#40;not &#40;:validate-data? &#40;opts store&#41;&#41;&#41;
-                &#40;b/valid-data? v vt&#41;
-                &#40;u/raise &quot;Invalid data, expecting &quot; vt {:input v}&#41;&#41;
-        i     &#40;b/indexable e aid v vt&#41;
-        ft?   &#40;:db/fulltext props&#41;&#93;
-...
-</code></pre><p>After the changes are made. Load the names space ( <code>&#40;in-ns 'datalevin.storage&#41;</code>) , evaluate <code>insert-data</code> and test the changes by evaluating the code that caused the error in your application.</p><pre><code>&#40;let &#91;sc {:user/name {:db/valueType :db.type/string}}
-        es &#91;{:db/id -1 :user/name 34}&#93;
-        db &#40;d/empty-db &quot;foo&quot; sc {:validate-data? true}&#41;&#93;
-    &#40;d/db-with db es&#41;
-    &#40;d/close-db db&#41;&#41;
+  <span class="dim">&#40;</span>let &#91;attr  <span class="dim">&#40;</span>.-a d<span class="dim">&#41;</span>
+        &#95;     <span class="dim">&#40;</span>or <span class="dim">&#40;</span>not <span class="dim">&#40;</span>:closed-schema?
+                        <span class="dim">&#40;</span>opts store<span class="dim">&#41;&#41;&#41;</span>
+                <span class="dim">&#40;&#40;</span>schema store<span class="dim">&#41;</span> attr<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>u/raise
+                  &quot;Attribute not defined in schema &quot;
+                  attr {}<span class="dim">&#41;&#41;</span>
+        props <span class="dim">&#40;</span>or <span class="dim">&#40;&#40;</span>schema store<span class="dim">&#41;</span> attr<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>swap-attr store attr identity<span class="dim">&#41;&#41;</span>
+        vt    <span class="dim">&#40;</span>value-type props<span class="dim">&#41;</span>
+        ref?  <span class="dim">&#40;</span>= :db.type/ref vt<span class="dim">&#41;</span>
+        e     <span class="dim">&#40;</span>.-e d<span class="dim">&#41;</span>
+        v     <span class="dim">&#40;</span>.-v d<span class="dim">&#41;</span>
+        aid   <span class="dim">&#40;</span>:db/aid props<span class="dim">&#41;</span>
+        &#95;     <span class="dim">&#40;</span>or <span class="dim">&#40;</span>not <span class="dim">&#40;</span>:validate-data?
+                        <span class="dim">&#40;</span>opts store<span class="dim">&#41;&#41;&#41;</span>
+                <span class="dim">&#40;</span>b/valid-data? v vt<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>u/raise &quot;Invalid data, expecting &quot;
+                  vt {:input v}<span class="dim">&#41;&#41;</span>
+        i     <span class="dim">&#40;</span>b/indexable e aid v vt<span class="dim">&#41;</span>
+        ft?   <span class="dim">&#40;</span>:db/fulltext props<span class="dim">&#41;</span>&#93;
 
-user=&gt;
-Execution error &#40;ExceptionInfo&#41; at datalevin.storage/insert-data &#40;storage.cljc:616&#41;.
+...
+</code></pre><p>After the changes are made. Load the names space ( <code>&#40;in-ns 'datalevin.storage&#41;</code>) , evaluate <code>insert-data</code> and test the changes by evaluating the code that caused the error in your application.</p><pre><code class="clojure"><span class="dim">&#40;</span>let &#91;sc {:user/name
+          {:db/valueType :db.type/string}}
+      es &#91;{:db/id -1 :user/name 34}&#93;
+      db <span class="dim">&#40;</span>d/empty-db &quot;foo&quot; sc
+           {:validate-data? true}<span class="dim">&#41;</span>&#93;
+  <span class="dim">&#40;</span>d/db-with db es<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>d/close-db db<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+Execution error <span class="dim">&#40;</span>ExceptionInfo<span class="dim">&#41;</span> 
+at datalevin.storage/insert-data <span class="dim">&#40;</span>storage.cljc:616<span class="dim">&#41;</span>.
 Invalid data, expecting :db.type/long
-</code></pre><p>We are now getting the expected error message.</p><p>Once you're happy with the fix you can create a pull request (make sure to read project contribution guidelines first, write tests etc).</p><p>What's great about the REPL is it makes debugging the issue and testing the fix so easy. At no point have I had to build the third party project. Technically you don't even have to download the repository.  However it can be useful for searching the code, and you'll have to do it for making a pull request, running tests etc.</p><p>This reduction in friction makes contributing fixes to open source less of an investment. For me personally, that difference means I'm more likely to open a PR with a potential fix than create an issue asking for something to be fixed.</p></article><div class="footer"><p>© 2015-2024 Anders Murphy</p></div></div></body></html>
+</code></pre><p>We are now getting the expected error message.</p><p>What's great about the REPL is it makes debugging the issue and testing the fix so easy. At no point have I had to build the third party project. Technically you don't even have to download the repository. However, it can be useful for searching the code, and you'll have to do it for making a pull request, running tests etc.</p><p>This reduction in friction makes contributing fixes to open source less of a time investment. For me personally, that difference means I'm more likely to open a pull request with a potential fix than create an issue asking for something to be fixed.</p></article><div class="footer"><p>© 2015-2024 Anders Murphy</p></div></div></body></html>

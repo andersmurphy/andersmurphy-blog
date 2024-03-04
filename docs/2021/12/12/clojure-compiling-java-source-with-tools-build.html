@@ -24,12 +24,12 @@ public class Greater {
       System.out.println&#40;&quot;Hello, world!&quot;&#41;;
   }
 }
-</code></pre><h2 id="clojure&#95;code">Clojure code</h2><p>The Clojure source lives in <code>src</code>.</p><pre><code class="Clojure">&#40;ns <strong>compiling-java.core</strong>
-  &#40;:gen-class&#41;
-  &#40;:import &#91;greatings Greater&#93;&#41;&#41;
+</code></pre><h2 id="clojure&#95;code">Clojure code</h2><p>The Clojure source lives in <code>src</code>.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>compiling-java.core</strong>
+  <span class="dim">&#40;</span>:gen-class<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>:import &#91;greatings Greater&#93;<span class="dim">&#41;&#41;</span>
 
-&#40;defn <strong>-main</strong> &#91;&#93;
-  &#40;.great &#40;Greater.&#41;&#41;&#41;
+<span class="dim">&#40;</span>defn <strong>-main</strong> &#91;&#93;
+  <span class="dim">&#40;</span>.great <span class="dim">&#40;</span>Greater.<span class="dim">&#41;&#41;&#41;</span>
 </code></pre><p>Worth pointing out  <code>&#40;:gen-class&#41;</code> this will be important later when it comes to building an uberjar. When compiling, this generates .class file with a given package-qualified name. This will ensure we can reference this class as the main entry point for our uberjar.</p><h2 id="deps.edn">deps.edn</h2><p>We will be using <code>tools.build</code> to compile our java code. To do this we need to add it as a dependency.</p><pre><code class="Clojure">{:paths &#91;&quot;src&quot;&#93;
  :deps {org.clojure/clojure {:mvn/version &quot;1.10.3&quot;}}
  :aliases
@@ -38,48 +38,48 @@ public class Greater {
                   :git/sha &quot;d79ae84&quot;}}
           :ns-default build}
   :dev {:paths &#91;&quot;src&quot; &quot;target/classes&quot;&#93;}}}
-</code></pre><p>We add <code>target/classes</code> as a dev dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure">&#40;ns <strong>build</strong>
-  &#40;:require &#91;clojure.tools.build.api :as b&#93;&#41;&#41;
+</code></pre><p>We add <code>target/classes</code> as a dev dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>build</strong>
+  <span class="dim">&#40;</span>:require &#91;clojure.tools.build.api :as b&#93;<span class="dim">&#41;&#41;</span>
 
-&#40;def <strong>lib</strong> 'compiling-java&#41;
-&#40;def <strong>version</strong> &quot;0.1.1&quot;&#41;
-&#40;def <strong>class-dir</strong> &quot;target/classes&quot;&#41;
-&#40;def <strong>basis</strong> &#40;b/create-basis {:project &quot;deps.edn&quot;}&#41;&#41;
+<span class="dim">&#40;</span>def <strong>lib</strong> 'compiling-java<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>def <strong>version</strong> &quot;0.1.1&quot;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>def <strong>class-dir</strong> &quot;target/classes&quot;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>def <strong>basis</strong> <span class="dim">&#40;</span>b/create-basis {:project &quot;deps.edn&quot;}<span class="dim">&#41;&#41;</span>
 
-&#40;defn <strong>clean</strong> &#91;&#95;&#93;
-  &#40;b/delete {:path &quot;target&quot;}&#41;&#41;
+<span class="dim">&#40;</span>defn <strong>clean</strong> &#91;&#95;&#93;
+  <span class="dim">&#40;</span>b/delete {:path &quot;target&quot;}<span class="dim">&#41;&#41;</span>
 
-&#40;defn <strong>jcompile</strong> &#91;&#95;&#93;
-  &#40;clean nil&#41;
-  &#40;b/javac {:src-dirs &#91;&quot;java&quot;&#93;
+<span class="dim">&#40;</span>defn <strong>jcompile</strong> &#91;&#95;&#93;
+  <span class="dim">&#40;</span>clean nil<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>b/javac {:src-dirs &#91;&quot;java&quot;&#93;
             :class-dir class-dir
             :basis basis
-            :javac-opts &#91;&quot;-source&quot; &quot;8&quot; &quot;-target&quot; &quot;8&quot;&#93;}&#41;&#41;
+            :javac-opts &#91;&quot;-source&quot; &quot;8&quot; &quot;-target&quot; &quot;8&quot;&#93;}<span class="dim">&#41;&#41;</span>
 </code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build jcompile
 </code></pre><h2 id="calling&#95;our&#95;java&#95;code&#95;at&#95;the&#95;relp">Calling our java code at the relp</h2><p>Start the repl using the dev profile:</p><pre><code>clj -M:dev
-</code></pre><p>Load the namespace and test the Java code:</p><pre><code class="Clojure">&#40;require 'compiling-java.core&#41;
-&#40;in-ns <strong>'compiling-java.core&#41;</strong>
+</code></pre><p>Load the namespace and test the Java code:</p><pre><code class="Clojure"><span class="dim">&#40;</span>require 'compiling-java.core<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>in-ns <strong>'compiling-java.core<span class="dim">&#41;</span></strong>
 
-&#40;.great &#40;Greater.&#41;&#41;
-
-=&gt;
+<span class="dim">&#40;</span>.great <span class="dim">&#40;</span>Greater.<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
 Hello, world!
 
 nil
-</code></pre><p>Everything is working as expected.</p><h2 id="building&#95;and&#95;running&#95;an&#95;uberjar">Building and running an uberjar</h2><p>Clojure/Java projects are often shipped/deployed as an uberjar. An uberjar is the program and all its dependencies compiled into a single executable. With <code>tools.build</code> making uberjars is trivial.</p><p>First we add the following uber task to our <code>build.clj</code> file:</p><pre><code class="Clojure">&#40;def <strong>uber-file</strong> &#40;format &quot;target/%s-%s.jar&quot; &#40;name lib&#41; version&#41;&#41;
+</code></pre><p>Everything is working as expected.</p><h2 id="building&#95;and&#95;running&#95;an&#95;uberjar">Building and running an uberjar</h2><p>Clojure/Java projects are often shipped/deployed as an uberjar. An uberjar is the program and all its dependencies compiled into a single executable. With <code>tools.build</code> making uberjars is trivial.</p><p>First we add the following uber task to our <code>build.clj</code> file:</p><pre><code class="Clojure"><span class="dim">&#40;</span>def <strong>uber-file</strong> <span class="dim">&#40;</span>format &quot;target/%s-%s.jar&quot; <span class="dim">&#40;</span>name lib<span class="dim">&#41;</span> version<span class="dim">&#41;&#41;</span>
 
-&#40;defn <strong>uber</strong> &#91;&#95;&#93;
-  &#40;clean nil&#41;
-  &#40;jcompile nil&#41;
-  &#40;b/copy-dir {:src-dirs &#91;&quot;src&quot; &quot;resources&quot;&#93;
-               :target-dir class-dir}&#41;
-  &#40;b/compile-clj {:basis basis
+<span class="dim">&#40;</span>defn <strong>uber</strong> &#91;&#95;&#93;
+  <span class="dim">&#40;</span>clean nil<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>jcompile nil<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>b/copy-dir {:src-dirs &#91;&quot;src&quot; &quot;resources&quot;&#93;
+               :target-dir class-dir}<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>b/compile-clj {:basis basis
                   :src-dirs &#91;&quot;src&quot;&#93;
-                  :class-dir class-dir}&#41;
-  &#40;b/uber {:class-dir class-dir
+                  :class-dir class-dir}<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>b/uber {:class-dir class-dir
            :uber-file uber-file
            :basis basis
-           :main 'compiling-java.core}&#41;&#41;
+           :main 'compiling-java.core}<span class="dim">&#41;&#41;</span>
 </code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build uber
 </code></pre><p>The resulting uberjar file can be run with:</p><pre><code class="Bash">java -jar target/compiling-java-0.1.1.jar
 
