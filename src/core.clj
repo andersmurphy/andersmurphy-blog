@@ -136,27 +136,32 @@ style-src   'self'
      [:a {:class "sidebar-nav-item" :href site-linkedin} "LinkedIn"]
      [:a {:class "sidebar-nav-item" :href site-rss} "RSS"]]]])
 
-(defn clojure-bold-defs [html]
+(defn code-highlights [html]
   (str/replace html
-               #"<code class=\"([Cc]lojure|[Ee]lisp)\">([\s\S]+?)</code>"
-               (fn [[full-capture]]
-                 (str/replace
-                  full-capture
-                  #"(&#40;def[a-z]* |ns )(\S+)"
-                  "$1<strong>$2</strong>"))))
+    #"<code class=\"([Cc]lojure|[Ee]lisp)\">([\s\S]+?)</code>"
+    (fn [[full-capture]]
+      (-> full-capture
+        (str/replace #"(&#40;def[a-z\-]* |ns )(\S+)"
+          "$1<strong>$2</strong>")
+        (str/replace #"((?:&#40;)+|(?:&#41;)+)"
+          "<span class=\"dim\">$1</span>")
+        (str/replace #"(\n=&gt;)"
+          "<span class=\"dim\">$1</span>")
+        (str/replace #"(;;[^\n]*\n)"
+          "<span class=\"dim\">$1</span>")))))
 
 (defn add-post-content
   [{:keys [file] :as m}]
   (let [{:keys [html metadata]}
         (-> file
-            slurp
-            (md-to-html-string-with-meta :heading-anchors true)
-            (update :html clojure-bold-defs))]
+          slurp
+          (md-to-html-string-with-meta :heading-anchors true)
+          (update :html code-highlights))]
     (assoc m
-           :post-content html
-           :post-name    (-> metadata
-                             :title
-                             first))))
+      :post-content html
+      :post-name    (-> metadata
+                      :title
+                      first))))
 
 (defn prepend-doctype-header [html] (str "<!DOCTYPE html>\n" html))
 
@@ -289,4 +294,8 @@ style-src   'self'
     (-> (generate-rss-feed posts)
         write-rss!)
     (-> (generate-sitemap posts)
-        write-sitemap!)))
+      write-sitemap!)))
+
+(comment
+  (generate-site)
+  )

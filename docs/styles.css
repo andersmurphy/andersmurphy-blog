@@ -105,6 +105,9 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+.dim {
+  color: var(--dim)
+}
 
 @media (min-width: 30em){
   blockquote{
