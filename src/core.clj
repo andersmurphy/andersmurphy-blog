@@ -9,7 +9,7 @@
            [java.time ZoneId]
            [java.time.format DateTimeFormatter]))
 
-(def site-url "https://andersmurphy.com/")
+(def site-url "/")
 (def site-title "Anders Murphy")
 (def site-tagline "A blog mostly about functional programming")
 (def site-github "https://github.com/andersmurphy")

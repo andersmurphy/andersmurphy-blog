@@ -1,0 +1,9 @@
+{:paths ["src"]
+ :deps  {org.clojure/clojure       {:mvn/version "1.12.0-alpha8"}
+         org.clojure/data.xml      {:mvn/version "0.0.8"}
+         hiccup/hiccup             {:mvn/version "2.0.0-RC2"}
+         markdown-clj/markdown-clj {:mvn/version "1.11.9"}}
+ :aliases
+ {:serve {:deps      {org.babashka/http-server {:mvn/version "0.1.12"}}
+          :main-opts ["-m" "babashka.http-server"]
+          :exec-fn   babashka.http-server/exec}}}
