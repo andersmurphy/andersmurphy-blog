@@ -8,7 +8,7 @@ img-src     &apos;self&apos;;
 font-src    &apos;self&apos;;
 connect-src &apos;self&apos;;
 style-src   &apos;self&apos;
-" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="https://andersmurphy.com/styles.css" rel="stylesheet" type="text/css" /><link href="https://andersmurphy.com/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="https://andersmurphy.com/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="https://andersmurphy.com/assets/anderspixel.png" width="60" /><h1><a href="https://andersmurphy.com/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="https://andersmurphy.com/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: compiling java source with tools.build</h1><time class="post-date" datetime="2021-12-12T00:00:00+00:00">12 Dec 2021</time><p>Recently I stumbled over an old Java project from 2011. I wanted to see if I could get it to run. However, the original program had a bunch of IDE related build files that I no longer understood. What if I used Clojure to build the project? The fruit of that journey is covered in this blog post.</p><p>Lets start with a top level overview of the project structure.</p><pre><code>├── README.md
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/apple-touch-icon-precomposed.png" rel="apple-touch-icon-precomposed" sizes="144x144" /><link href="/assets/favicon.ico" rel="shortcut icon" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="A blog mostly about software development." name="description" /></head><body><div class="sidebar"><div class="container sidebar-sticky"><div class="sidebar-about"><img alt="portrait" class="portrait" height="120" src="/assets/anderspixel.png" width="60" /><h1><a href="/">Anders Murphy</a></h1><p class="lead">A blog mostly about functional programming</p></div><nav class="sidebar-nav"><a class="sidebar-nav-item" href="https://github.com/andersmurphy">Github</a><a class="sidebar-nav-item" href="https://twitter.com/anders_murphy">Twitter</a><a class="sidebar-nav-item" href="https://uk.linkedin.com/in/anders-murphy-76457b3a">LinkedIn</a><a class="sidebar-nav-item" href="/feed.xml">RSS</a></nav></div></div><div class="content container"><article class="post"><h1 class="post-title">Clojure: compiling java source with tools.build</h1><time class="post-date" datetime="2021-12-12T00:00:00+00:00">12 Dec 2021</time><p>Recently I stumbled over an old Java project from 2011. I wanted to see if I could get it to run. However, the original program had a bunch of IDE related build files that I no longer understood. What if I used Clojure to build the project? The fruit of that journey is covered in this blog post.</p><p>Lets start with a top level overview of the project structure.</p><pre><code>├── README.md
 ├── build.clj
 ├── deps.edn
 ├── java
@@ -17,14 +17,14 @@ style-src   &apos;self&apos;
 └── src
     └── compiling&#95;java
         └── core.clj
-</code></pre><h2 id="java&#95;code">Java code</h2><p>The Java source lives in the  <code>java</code> directory.</p><pre><code class="Java">package greatings;
+</code></pre><h2 id="java_code">Java code</h2><p>The Java source lives in the  <code>java</code> directory.</p><pre><code class="Java">package greatings;
 
 public class Greater {
   public void great&#40;&#41; {
       System.out.println&#40;&quot;Hello, world!&quot;&#41;;
   }
 }
-</code></pre><h2 id="clojure&#95;code">Clojure code</h2><p>The Clojure source lives in <code>src</code>.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>compiling-java.core</strong>
+</code></pre><h2 id="clojure_code">Clojure code</h2><p>The Clojure source lives in <code>src</code>.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>compiling-java.core</strong>
   <span class="dim">&#40;</span>:gen-class<span class="dim">&#41;</span>
   <span class="dim">&#40;</span>:import &#91;greatings Greater&#93;<span class="dim">&#41;&#41;</span>
 
@@ -38,7 +38,7 @@ public class Greater {
                   :git/sha &quot;d79ae84&quot;}}
           :ns-default build}
   :dev {:paths &#91;&quot;src&quot; &quot;target/classes&quot;&#93;}}}
-</code></pre><p>We add <code>target/classes</code> as a dev dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling&#95;java&#95;with&#95;tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>build</strong>
+</code></pre><p>We add <code>target/classes</code> as a dev dependency so that when using the repl the Java classes will be available.</p><h2 id="compiling_java_with_tools.build">Compiling Java with tools.build</h2><p><code>build.clj</code> is where we define our build tasks. I've added a <code>jcompile</code> task that will compile our Java source code.</p><pre><code class="Clojure"><span class="dim">&#40;</span>ns <strong>build</strong>
   <span class="dim">&#40;</span>:require &#91;clojure.tools.build.api :as b&#93;<span class="dim">&#41;&#41;</span>
 
 <span class="dim">&#40;</span>def <strong>lib</strong> 'compiling-java<span class="dim">&#41;</span>
@@ -56,7 +56,7 @@ public class Greater {
             :basis basis
             :javac-opts &#91;&quot;-source&quot; &quot;8&quot; &quot;-target&quot; &quot;8&quot;&#93;}<span class="dim">&#41;&#41;</span>
 </code></pre><p>This task can be run with:</p><pre><code class="Bash">clj -T:build jcompile
-</code></pre><h2 id="calling&#95;our&#95;java&#95;code&#95;at&#95;the&#95;relp">Calling our java code at the relp</h2><p>Start the repl using the dev profile:</p><pre><code>clj -M:dev
+</code></pre><h2 id="calling_our_java_code_at_the_relp">Calling our java code at the relp</h2><p>Start the repl using the dev profile:</p><pre><code>clj -M:dev
 </code></pre><p>Load the namespace and test the Java code:</p><pre><code class="Clojure"><span class="dim">&#40;</span>require 'compiling-java.core<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>in-ns <strong>'compiling-java.core<span class="dim">&#41;</span></strong>
 
@@ -66,7 +66,7 @@ public class Greater {
 Hello, world!
 
 nil
-</code></pre><p>Everything is working as expected.</p><h2 id="building&#95;and&#95;running&#95;an&#95;uberjar">Building and running an uberjar</h2><p>Clojure/Java projects are often shipped/deployed as an uberjar. An uberjar is the program and all its dependencies compiled into a single executable. With <code>tools.build</code> making uberjars is trivial.</p><p>First we add the following uber task to our <code>build.clj</code> file:</p><pre><code class="Clojure"><span class="dim">&#40;</span>def <strong>uber-file</strong> <span class="dim">&#40;</span>format &quot;target/%s-%s.jar&quot; <span class="dim">&#40;</span>name lib<span class="dim">&#41;</span> version<span class="dim">&#41;&#41;</span>
+</code></pre><p>Everything is working as expected.</p><h2 id="building_and_running_an_uberjar">Building and running an uberjar</h2><p>Clojure/Java projects are often shipped/deployed as an uberjar. An uberjar is the program and all its dependencies compiled into a single executable. With <code>tools.build</code> making uberjars is trivial.</p><p>First we add the following uber task to our <code>build.clj</code> file:</p><pre><code class="Clojure"><span class="dim">&#40;</span>def <strong>uber-file</strong> <span class="dim">&#40;</span>format &quot;target/%s-%s.jar&quot; <span class="dim">&#40;</span>name lib<span class="dim">&#41;</span> version<span class="dim">&#41;&#41;</span>
 
 <span class="dim">&#40;</span>defn <strong>uber</strong> &#91;&#95;&#93;
   <span class="dim">&#40;</span>clean nil<span class="dim">&#41;</span>
