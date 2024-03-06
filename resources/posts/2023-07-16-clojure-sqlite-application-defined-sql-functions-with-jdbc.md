@@ -74,7 +74,7 @@ Add the classes directory to the class path in `deps.edn`.
 
 Compile to generate classes using the `compile` function.
 
-```
+```clojure
 (compile 'sqlite.db.application-defined-functions)
 ```
 
