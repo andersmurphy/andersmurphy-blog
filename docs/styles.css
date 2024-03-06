@@ -1,9 +1,65 @@
 @import "pico.css";
 
+h1 {
+  --pico-font-size: 1.75rem;
+  --pico-line-height: 1.15;
+  --pico-typography-spacing-top: 2.625rem;
+}
+
+h2 {
+  --pico-font-size: 1.5rem;
+  --pico-line-height: 1.175;
+  --pico-typography-spacing-top: 2.25rem;
+}
+
+h3 {
+  --pico-font-size: 1.25rem;
+  --pico-line-height: 1.2;
+  --pico-typography-spacing-top: 1.874rem;
+}
+
+h4 {
+  --pico-font-size: 1.125rem;
+  --pico-line-height: 1.225;
+  --pico-typography-spacing-top: 1.6875rem;
+}
+
+h5,h6 {
+  --pico-font-size: 1rem;
+  --pico-line-height: 1.25;
+  --pico-typography-spacing-top: 1.5rem;
+}
+
+@media (max-width: 400px) {
+  h1 {
+    --pico-font-size: 1.5rem;
+    --pico-line-height: 1.175;
+    --pico-typography-spacing-top: 2.25rem;
+  }
+
+  h2 {
+    --pico-font-size: 1.25rem;
+    --pico-line-height: 1.2;
+    --pico-typography-spacing-top: 1.874rem;
+  }
+
+  h3 {
+    --pico-font-size: 1.125rem;
+    --pico-line-height: 1.225;
+    --pico-typography-spacing-top: 1.6875rem;
+  }
+
+  h4, h5, h6 {
+    --pico-font-size: 1rem;
+    --pico-line-height: 1.25;
+    --pico-typography-spacing-top: 1.5rem;
+  }
+
+}
+
 :root {
   --light-gradient: linear-gradient(to right, #84266d, #6f3985, #5d409a, #43489d);
   --dark-gradient: linear-gradient(to right, #d78dd2, #b999ee, #9da5e9, #8fa9f0);
-
 }
 
 /* Light color scheme (Default) */
@@ -59,7 +115,7 @@
   --pico-primary-background: #b999ee;
   --pico-primary-hover: #9da5e9;
   --pico-primary-hover-background: #b999ee;
-  --pico-primary-focus: #9da5e9;  
+  --pico-primary-focus: #9da5e9;
   --pico-contrast-hover: #9da5e9;
   --chaos-gradient: var(--dark-gradient);
 }
