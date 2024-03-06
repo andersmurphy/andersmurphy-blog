@@ -136,8 +136,9 @@ style-src   'self' 'unsafe-inline'
             :class "contrast"} site-title]]]]]
    [:ul (for [[href desc label]
               [[site-github icons/github-svg "Github"]
-               [site-twitter icons/twitter-svg "Twitter"]
-               [site-linkedin icons/linkedin-svg "LinkedIn"]
+               ;; Don't really use these
+               ;; [site-twitter icons/twitter-svg "Twitter"]
+               ;; [site-linkedin icons/linkedin-svg "LinkedIn"]
                [site-rss icons/rss-svg "RSS"]]]
           [:li [:a {:href       href
                     :class      "contrast no-chaos"
@@ -315,6 +316,5 @@ style-src   'self' 'unsafe-inline'
 
 (comment
   (generate-site)
-
   )
 
