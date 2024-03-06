@@ -1,7 +1,7 @@
 (ns core
   (:require
    [icons :as icons]
-   [hiccup.core :refer [html]]
+   [hiccup2.core :as h]
    [markdown.core :refer [md-to-html-string-with-meta]]
    [clojure.string :as str]
    [clojure.java.io :as io]
@@ -15,12 +15,15 @@
 (def site-title "anders murphy")
 (def site-tagline "A blog mostly about programming")
 (def site-github "https://github.com/andersmurphy")
-(def site-twitter "https://twitter.com/anders_murphy")
+;; (def site-twitter "https://twitter.com/anders_murphy")
 (def site-rss (str site-url "feed.xml"))
-(def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
+;; (def site-linkedin "https://uk.linkedin.com/in/anders-murphy-76457b3a")
 (def directory (io/file "resources/posts"))
 (defn desc [a b] (compare b a))
 (defn files [] (sort desc (drop 1 (file-seq directory))))
+
+(defn html [hiccup]
+  (h/html {:escape-strings? false} hiccup))
 
 (defn replace-n
   [s n match replacement]
@@ -109,8 +112,8 @@ style-src   'self' 'unsafe-inline'
    [:link
     {:rel "stylesheet" :type "text/css" :href (str site-url "styles.css")}]
    ;; icons
-   [:link {:rel   "shortcut icon"
-           :href  (str site-url "assets/favicon.png")}]
+   [:link {:rel  "shortcut icon"
+           :href (str site-url "assets/favicon.png")}]
    ;; enables responsiveness on mobile devices
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; google description
@@ -126,9 +129,9 @@ style-src   'self' 'unsafe-inline'
                     :align-items "center"}}
       [:img
        {:style  {:image-rendering "pixelated"
-                 :padding "4px"}
+                 :padding         "4px"}
         :height "40px"
-        :width   "40px"
+        :width  "40px"
         :src    (str site-url "assets/avatar.png")
         :alt    "portrait"}]
       [:h1 {:style {:margin-bottom 0}}
@@ -181,7 +184,8 @@ style-src   'self' 'unsafe-inline'
 
 (defn add-post-page
   [{:keys [post-name post-content date] :as m}]
-  (->> (html [:html {:lang "en"} (head post-name)
+  (->> (html [:html {:lang "en" :data-theme "dark"}
+              (head post-name)
               [:body sidebar
                [:div {:class "container"}
                 [:article
@@ -199,7 +203,8 @@ style-src   'self' 'unsafe-inline'
   [{:keys [page-content] :as m}]
   (->>
     (html
-      [:html {:lang "en"} (head site-title)
+      [:html {:lang "en" :data-theme "dark"}
+       (head site-title)
        [:body sidebar
         [:div {:class "container"}
          [:div
@@ -221,7 +226,8 @@ style-src   'self' 'unsafe-inline'
 (def html-404
   (->>
     (html
-      [:html {:lang "en"} (head site-title)
+      [:html {:lang "en" :data-theme "dark"}
+       (head site-title)
        [:body sidebar
         [:div {:class "container"}
          [:article
