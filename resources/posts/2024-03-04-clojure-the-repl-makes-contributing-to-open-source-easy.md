@@ -73,12 +73,6 @@ Jump to the code:
 (defn- insert-data
   [^Store store ^Datom d ft-ds giants]
   (let [attr  (.-a d)
-        _     (or (not (:closed-schema?
-                        (opts store)))
-                ((schema store) attr)
-                (u/raise
-                  "Attribute not defined in schema "
-                  attr {}))
         props (or ((schema store) attr)
                 (swap-attr store attr identity))
         vt    (value-type props)
@@ -105,12 +99,6 @@ In this case the fix is simple. We move the code on line **B** to be called befo
 (defn- insert-data
   [^Store store ^Datom d ft-ds giants]
   (let [attr  (.-a d)
-        _     (or (not (:closed-schema?
-                        (opts store)))
-                ((schema store) attr)
-                (u/raise
-                  "Attribute not defined in schema "
-                  attr {}))
         props (or ((schema store) attr)
                 (swap-attr store attr identity))
         vt    (value-type props)
