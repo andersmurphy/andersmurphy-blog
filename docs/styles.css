@@ -1,5 +1,139 @@
 @import "pico.css";
 
+:root {
+  --light-gradient: linear-gradient(to right, #84266d, #6f3985, #5d409a, #43489d);
+
+  --light-color-stop-1: #84266d;
+  --light-color-stop-2: #6f3985;
+  --light-color-stop-3: #5d409a;
+  --light-color-stop-4: #43489d;
+
+  --dark-gradient: linear-gradient(to right, #d78dd2, #b999ee, #9da5e9, #8fa9f0);
+
+  --dark-color-stop-1: #d78dd2;
+  --dark-color-stop-2: #b999ee;
+  --dark-color-stop-3: #9da5e9;
+  --dark-color-stop-4: #8fa9f0;
+}
+
+/* Light color scheme (Default) */
+/* Can be forced with data-theme="light" */
+[data-theme="light"],
+:root:not([data-theme="dark"]) {
+  --pico-code-color: var(--pico-color);
+  --pico-text-decoration: none;
+  --pico-contrast-underline: transparent;
+
+  --pico-text-selection-color: #5d409a;
+  --pico-primary: #6f3985;
+  --pico-primary-background: #6f3985;
+  --pico-primary-underline: #6f3985;
+  --pico-primary-hover: #5d409a;
+  --pico-primary-hover-background: #6f3985;
+  --pico-primary-focus: #5d409a;
+  --pico-contrast-hover: #5d409a;
+
+  --chaos-gradient: var(--light-gradient);
+  --color-stop-1: var(--light-color-stop-1);
+  --color-stop-2: var(--light-color-stop-2);
+  --color-stop-3: var(--light-color-stop-3);
+  --color-stop-4: var(--light-color-stop-4);
+}
+
+/* Dark color scheme (Auto) */
+/* Automatically enabled if user has Dark mode enabled */
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-code-background-color: var(--pico-background-color);
+    --pico-code-color: var(--pico-color);
+    --pico-text-decoration: none;
+    --pico-contrast-underline: transparent;
+
+    --pico-text-selection-color: #b999ee;
+    --pico-primary: #b999ee;
+    --pico-primary-background: #b999ee;
+    --pico-primary-underline: #b999ee;
+    --pico-primary-hover: #9da5e9;
+    --pico-primary-hover-background: #b999ee;
+    --pico-primary-focus: #9da5e9;
+    --pico-contrast-hover: #9da5e9;
+
+    --chaos-gradient: var(--dark-gradient);
+    --color-stop-1: var(--dark-color-stop-1);
+    --color-stop-2: var(--dark-color-stop-2);
+    --color-stop-3: var(--dark-color-stop-3);
+    --color-stop-4: var(--dark-color-stop-4);
+  }
+}
+
+/* Dark color scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+[data-theme="dark"] {
+  --pico-code-background-color: var(--pico-background-color);
+  --pico-code-color: var(--pico-color);
+  --pico-text-decoration: none;
+  --pico-contrast-underline: transparent;
+
+  --pico-text-selection-color: #9da5e9;
+  --pico-primary: #b999ee;
+  --pico-primary-background: #b999ee;
+  --pico-primary-underline: #b999ee;
+  --pico-primary-hover: #9da5e9;
+  --pico-primary-hover-background: #b999ee;
+  --pico-primary-focus: #9da5e9;
+  --pico-contrast-hover: #9da5e9;
+
+  --chaos-gradient: var(--dark-gradient);
+  --color-stop-1: var(--dark-color-stop-1);
+  --color-stop-2: var(--dark-color-stop-2);
+  --color-stop-3: var(--dark-color-stop-3);
+  --color-stop-4: var(--dark-color-stop-4);
+}
+
+.icon {
+  fill: url(#gradient-horizontal);
+}
+
+.chaos {
+  color: transparent;
+  background: var(--chaos-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.no-chaos {}
+
+a:not(.no-chaos), h1 {
+  color: transparent;
+  background: var(--chaos-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.dim {
+  opacity: var(--pico-form-element-disabled-opacity);
+}
+
+.card-fade {
+  mask-image: linear-gradient(to top, transparent,
+                              var(--pico-card-background-color));
+  -webkit-mask-image: linear-gradient(to top, transparent,
+                                      var(--pico-card-background-color));
+}
+
+.linkify {
+  position: relative;
+}
+
+.linkify a::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
+
 h1 {
   --pico-font-size: 1.75rem;
   --pico-line-height: 1.15;
@@ -55,108 +189,4 @@ h5,h6 {
     --pico-typography-spacing-top: 1.5rem;
   }
 
-}
-
-:root {
-  --light-gradient: linear-gradient(to right, #84266d, #6f3985, #5d409a, #43489d);
-  --dark-gradient: linear-gradient(to right, #d78dd2, #b999ee, #9da5e9, #8fa9f0);
-}
-
-/* Light color scheme (Default) */
-/* Can be forced with data-theme="light" */
-[data-theme="light"],
-:root:not([data-theme="dark"]) {
-  --pico-code-color: var(--pico-color);
-  --pico-text-decoration: none;
-  --pico-contrast-underline: transparent;
-
-  --pico-text-selection-color: #5d409a;
-  --pico-primary: #6f3985;
-  --pico-primary-background: #6f3985;
-  --pico-primary-underline: #6f3985;
-  --pico-primary-hover: #5d409a;
-  --pico-primary-hover-background: #6f3985;
-  --pico-primary-focus: #5d409a;
-  --pico-contrast-hover: #5d409a;
-  --chaos-gradient: var(--light-gradient);
-}
-
-/* Dark color scheme (Auto) */
-/* Automatically enabled if user has Dark mode enabled */
-@media only screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --pico-code-background-color: var(--pico-background-color);
-    --pico-code-color: var(--pico-color);
-    --pico-text-decoration: none;
-    --pico-contrast-underline: transparent;
-
-    --pico-text-selection-color: #b999ee;
-    --pico-primary: #b999ee;
-    --pico-primary-background: #b999ee;
-    --pico-primary-underline: #b999ee;
-    --pico-primary-hover: #9da5e9;
-    --pico-primary-hover-background: #b999ee;
-    --pico-primary-focus: #9da5e9;
-    --pico-contrast-hover: #9da5e9;
-    --chaos-gradient: var(--dark-gradient);
-  }
-}
-
-/* Dark color scheme (Forced) */
-/* Enabled if forced with data-theme="dark" */
-[data-theme="dark"] {
-  --pico-code-background-color: var(--pico-background-color);
-  --pico-code-color: var(--pico-color);
-  --pico-text-decoration: none;
-  --pico-contrast-underline: transparent;
-
-  --pico-text-selection-color: #9da5e9;
-  --pico-primary: #b999ee;
-  --pico-primary-background: #b999ee;
-  --pico-primary-underline: #b999ee;
-  --pico-primary-hover: #9da5e9;
-  --pico-primary-hover-background: #b999ee;
-  --pico-primary-focus: #9da5e9;
-  --pico-contrast-hover: #9da5e9;
-  --chaos-gradient: var(--dark-gradient);
-}
-
-.chaos {
-  color: transparent;
-  background: var(--chaos-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.no-chaos {}
-
-a:not(.no-chaos), h1 {
-  color: transparent;
-  background: var(--chaos-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.dim {
-  opacity: var(--pico-form-element-disabled-opacity);
-}
-
-.card-fade {
-  mask-image: linear-gradient(to top, transparent,
-                                    var(--pico-card-background-color));
-  -webkit-mask-image: linear-gradient(to top, transparent,
-                                    var(--pico-card-background-color)); 
-}
-
-.linkify {
-  position: relative;
-}
-
-.linkify a::before {
-  content: "";
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
 }

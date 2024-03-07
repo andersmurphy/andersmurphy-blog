@@ -22,6 +22,7 @@
 (defn desc [a b] (compare b a))
 (defn files [] (sort desc (drop 1 (file-seq directory))))
 
+(def html-props {:lang "en" :data-theme "dark"})
 (defn html [hiccup]
   (h/html {:escape-strings? false} hiccup))
 
@@ -183,7 +184,7 @@ style-src   'self' 'unsafe-inline'
 
 (defn add-post-page
   [{:keys [post-name post-content date] :as m}]
-  (->> (html [:html {:lang "en" :data-theme "dark"}
+  (->> (html [:html html-props
               (head post-name)
               [:body sidebar
                [:div.container
@@ -202,7 +203,7 @@ style-src   'self' 'unsafe-inline'
   [{:keys [page-content] :as m}]
   (->>
     (html
-      [:html {:lang "en" :data-theme "dark"}
+      [:html html-props
        (head site-title)
        [:body sidebar
         [:div.container
@@ -226,7 +227,7 @@ style-src   'self' 'unsafe-inline'
 (def html-404
   (->>
     (html
-      [:html {:lang "en" :data-theme "dark"}
+      [:html html-props
        (head site-title)
        [:body sidebar
         [:div.container
