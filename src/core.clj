@@ -216,7 +216,8 @@ style-src   'self' 'unsafe-inline'
                      (date->post-date date)]]]
                [:hr]
                [:p.card-fade (first-paragraph post-content)]
-               [:a {:href (str site-url post-path-name)}]])
+               [:a {:href (str site-url post-path-name)
+                    :aria-label post-name}]])
             page-content)]
          footer]]])
     prepend-doctype-header
