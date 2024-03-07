@@ -120,7 +120,7 @@ style-src   'self' 'unsafe-inline'
    ;; google description
    [:meta
     {:name    "description"
-     :content "A blog mostly about software development."}]])
+     :content "A blog mostly about programming."}]])
 
 (def sidebar
   [:nav.container
