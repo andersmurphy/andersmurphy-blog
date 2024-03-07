@@ -122,7 +122,7 @@ style-src   'self' 'unsafe-inline'
      :content "A blog mostly about software development."}]])
 
 (def sidebar
-  [:nav {:class "container"}
+  [:nav.container
    [:ul
     [:li
      [:div {:style {:display     "flex"
@@ -135,17 +135,16 @@ style-src   'self' 'unsafe-inline'
         :src    (str site-url "assets/avatar.png")
         :alt    "portrait"}]
       [:h1 {:style {:margin-bottom 0}}
-       [:a {:href  site-url
-            :class "contrast"} site-title]]]]]
+       [:a.contrast {:href  site-url} site-title]]]]]
    [:ul (for [[href desc label]
               [[site-github icons/github-svg "Github"]
                ;; Don't really use these
                ;; [site-twitter icons/twitter-svg "Twitter"]
                ;; [site-linkedin icons/linkedin-svg "LinkedIn"]
                [site-rss icons/rss-svg "RSS"]]]
-          [:li [:a {:href       href
-                    :class      "contrast no-chaos"
-                    :aria-label label} desc]])]])
+          [:li [:a.contrast.no-chaos
+                {:href       href
+                 :aria-label label} desc]])]])
 
 (defn code-highlights [html]
   (str/replace html
@@ -187,7 +186,7 @@ style-src   'self' 'unsafe-inline'
   (->> (html [:html {:lang "en" :data-theme "dark"}
               (head post-name)
               [:body sidebar
-               [:div {:class "container"}
+               [:div.container
                 [:article
                  [:hgroup
                   [:h1 post-name]
@@ -206,18 +205,18 @@ style-src   'self' 'unsafe-inline'
       [:html {:lang "en" :data-theme "dark"}
        (head site-title)
        [:body sidebar
-        [:div {:class "container"}
+        [:div.container
          [:div
-          (map (fn [{:keys [post-name date post-path-name post-content]}]
-                 [:article
-                  [:hgroup
-                   [:h1
-                    [:a {:href  (str site-url post-path-name)
-                         :class "contrast"} post-name]]
-                   [:p [:time {:datetime (date->datetime date)}
-                        (date->post-date date)]]]
-                  [:hr]
-                  [:p (first-paragraph post-content)]])
+          (map
+            (fn [{:keys [post-name date post-path-name post-content]}]
+              [:article.linkify
+               [:hgroup
+                [:h1.chaos post-name]
+                [:p [:time {:datetime (date->datetime date)}
+                     (date->post-date date)]]]
+               [:hr]
+               [:p.card-fade (first-paragraph post-content)]
+               [:a {:href (str site-url post-path-name)}]])
             page-content)]
          footer]]])
     prepend-doctype-header
@@ -229,13 +228,13 @@ style-src   'self' 'unsafe-inline'
       [:html {:lang "en" :data-theme "dark"}
        (head site-title)
        [:body sidebar
-        [:div {:class "container"}
+        [:div.container
          [:article
           [:h1 "404: Page not found"]
           [:p
            "Sorry, we've misplaced that URL or it's
                  pointing to something that doesn't exist. "
-           [:a {:href site-url} "Head back home"]
+            [:a {:href site-url} "Head back home"]
            " to try finding it again."]]]]])
     prepend-doctype-header))
 

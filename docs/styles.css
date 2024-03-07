@@ -90,7 +90,7 @@ h5,h6 {
     --pico-text-decoration: none;
     --pico-contrast-underline: transparent;
 
-    --pico-text-selection-color: #9da5e9;
+    --pico-text-selection-color: #b999ee;
     --pico-primary: #b999ee;
     --pico-primary-background: #b999ee;
     --pico-primary-underline: #b999ee;
@@ -140,4 +140,23 @@ a:not(.no-chaos), h1 {
 .dim {
   opacity: var(--pico-form-element-disabled-opacity);
 }
- 
+
+.card-fade {
+  mask-image: linear-gradient(to top, transparent,
+                                    var(--pico-card-background-color));
+  -webkit-mask-image: linear-gradient(to top, transparent,
+                                    var(--pico-card-background-color)); 
+}
+
+.linkify {
+  position: relative;
+}
+
+.linkify a::before {
+  content: "";
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
