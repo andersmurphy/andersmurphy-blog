@@ -22,7 +22,7 @@
 (defn desc [a b] (compare b a))
 (defn files [] (sort desc (drop 1 (file-seq directory))))
 
-(def html-props {:lang "en" :data-theme "dark"})
+(def html-props {:lang "en"})
 (defn html [hiccup]
   (h/html {:escape-strings? false} hiccup))
 
@@ -115,6 +115,7 @@ style-src   'self' 'unsafe-inline'
    ;; icons
    [:link {:rel  "shortcut icon"
            :href (str site-url "assets/favicon.png")}]
+   [:script {:src (str site-url "toggle.js")}]
    ;; enables responsiveness on mobile devices
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; google description
@@ -137,15 +138,14 @@ style-src   'self' 'unsafe-inline'
         :alt    "portrait"}]
       [:h1 {:style {:margin-bottom 0}}
        [:a.contrast {:href  site-url} site-title]]]]]
-   [:ul (for [[href desc label]
-              [[site-github icons/github-svg "Github"]
-               ;; Don't really use these
-               ;; [site-twitter icons/twitter-svg "Twitter"]
-               ;; [site-linkedin icons/linkedin-svg "LinkedIn"]
-               [site-rss icons/rss-svg "RSS"]]]
-          [:li [:a.contrast.no-chaos
-                {:href       href
-                 :aria-label label} desc]])]])
+   [:ul
+    [:li [:a.contrast.no-chaos
+          {:href       site-github
+           :aria-label "Github"} icons/github-svg]]
+    [:li [:a.contrast.no-chaos
+          {:href       site-rss
+           :aria-label "RSS"} icons/rss-svg]]
+    [:li icons/toggle]]])
 
 (defn code-highlights [html]
   (str/replace html

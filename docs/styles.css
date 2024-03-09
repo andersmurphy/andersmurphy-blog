@@ -134,6 +134,40 @@ a:not(.no-chaos), h1 {
   left: 0px;
 }
 
+.theme-toggle {
+  --theme-toggle__inner-moon--duration: 500ms;
+}
+
+.theme-toggle__inner-moon path {
+  transform-origin: center;
+  transition: transform var(--theme-toggle__inner-moon--duration) cubic-bezier(0, 0, 0.15, 1.25);
+}
+
+.theme-toggle__inner-moon circle {
+  transition: transform calc(var(--theme-toggle__inner-moon--duration) / 1.5) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle--toggled:not(label).theme-toggle .theme-toggle__inner-moon path,
+.theme-toggle ~ .theme-toggle__inner-moon path {
+  transform: rotate(180deg);
+}
+.theme-toggle--toggled:not(label).theme-toggle .theme-toggle__inner-moon circle,
+.theme-toggle ~ .theme-toggle__inner-moon circle {
+  transform: translate3d(15%, 0, 0);
+}
+
+.theme-toggle {
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle:not(.theme-toggle--force-motion) * {
+    transition: none !important;
+  }
+}
+
 h1 {
   --pico-font-size: 1.75rem;
   --pico-line-height: 1.15;

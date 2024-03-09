@@ -9,6 +9,8 @@
 
 (def github-svg
   [:svg.icon {:xmlns   "http://www.w3.org/2000/svg"
+              :style   {:margin-top    "6px"
+                        :margin-bottom "6px"}
               :height  "24"
               :width   "24"
               :viewBox "0 0 496 512"}
@@ -18,13 +20,23 @@
 
 (def rss-svg
   [:svg.icon {:xmlns   "http://www.w3.org/2000/svg"
-         :width   "24"
-         :height  "24"
-         :viewBox "0 0 16 16"}
+              :style   {:margin-top    "6px"
+                        :margin-bottom "6px"}
+              :width   "24"
+              :height  "24"
+              :viewBox "0 0 16 16"}
    gradient
    [:path {:d "M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"}]])
 
-
-
+(def toggle
+  ;; https://github.com/alfiejones/theme-toggles
+  [:div#toggle.theme-toggle
+   [:svg.icon.theme-toggle__inner-moon
+    {:xmlns       "http://www.w3.org/2000/svg"
+     :aria-hidden "true"
+     :width       "30"
+     :height      "30"
+     :viewBox     "0 0 32 32"}
+    [:path {:d "M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"}] [:circle {:cx "16" :cy "16" :r "8.1"}]]])
 
 
