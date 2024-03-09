@@ -97,14 +97,15 @@
     {:http-equiv "Content-Security-Policy"
      :content
      "
-base-uri    'self';
-form-action 'self';
-default-src 'none';
-script-src  'self';
-img-src     'self';
-font-src    'self';
-connect-src 'self';
-style-src   'self' 'unsafe-inline'
+base-uri        'self';
+form-action     'self';
+default-src     'none';
+script-src      'self';
+img-src         'self';
+font-src        'self';
+connect-src     'self';
+frame-ancestors 'self';
+style-src       'self' 'unsafe-inline'
 "}]
    [:meta
     {:http-equiv "content-type"
