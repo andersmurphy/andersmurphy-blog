@@ -22,7 +22,6 @@
 :root:not([data-theme="dark"]) {
   --pico-code-color: var(--pico-color);
   --pico-text-decoration: none;
-  --pico-contrast-underline: transparent;
 
   --pico-text-selection-color: #5d409a;
   --pico-primary: #6f3985;
@@ -31,7 +30,6 @@
   --pico-primary-hover: #5d409a;
   --pico-primary-hover-background: #6f3985;
   --pico-primary-focus: #5d409a;
-  --pico-contrast-hover: #5d409a;
 
   --chaos-gradient: var(--light-gradient);
   --color-stop-1: var(--light-color-stop-1);
@@ -47,7 +45,6 @@
     --pico-code-background-color: var(--pico-background-color);
     --pico-code-color: var(--pico-color);
     --pico-text-decoration: none;
-    --pico-contrast-underline: transparent;
 
     --pico-text-selection-color: #b999ee;
     --pico-primary: #b999ee;
@@ -56,7 +53,6 @@
     --pico-primary-hover: #9da5e9;
     --pico-primary-hover-background: #b999ee;
     --pico-primary-focus: #9da5e9;
-    --pico-contrast-hover: #9da5e9;
 
     --chaos-gradient: var(--dark-gradient);
     --color-stop-1: var(--dark-color-stop-1);
@@ -72,7 +68,6 @@
   --pico-code-background-color: var(--pico-background-color);
   --pico-code-color: var(--pico-color);
   --pico-text-decoration: none;
-  --pico-contrast-underline: transparent;
 
   --pico-text-selection-color: #9da5e9;
   --pico-primary: #b999ee;
@@ -81,7 +76,6 @@
   --pico-primary-hover: #9da5e9;
   --pico-primary-hover-background: #b999ee;
   --pico-primary-focus: #9da5e9;
-  --pico-contrast-hover: #9da5e9;
 
   --chaos-gradient: var(--dark-gradient);
   --color-stop-1: var(--dark-color-stop-1);

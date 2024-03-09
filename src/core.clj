@@ -127,8 +127,9 @@ style-src   'self' 'unsafe-inline'
   [:nav.container
    [:ul
     [:li
-     [:div {:style {:display     "flex"
-                    :align-items "center"}}
+     [:div.linkify
+      {:style {:display     "flex"
+               :align-items "center"}}
       [:img
        {:style  {:image-rendering "pixelated"
                  :padding         "4px"}
@@ -136,8 +137,8 @@ style-src   'self' 'unsafe-inline'
         :width  "40px"
         :src    (str site-url "assets/avatar.png")
         :alt    "portrait"}]
-      [:h1 {:style {:margin-bottom 0}}
-       [:a.contrast {:href  site-url} site-title]]]]]
+      [:h1 {:style {:margin-bottom 0}} site-title]
+      [:a {:href site-url}]]]]
    [:ul
     [:li [:a.contrast.no-chaos
           {:href       site-github
