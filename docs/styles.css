@@ -84,6 +84,10 @@
   --color-stop-4: var(--dark-color-stop-4);
 }
 
+.turbo-progress-bar {
+  background-color: var(--pico-primary);
+}
+
 .icon {
   fill: url(#gradient-horizontal);
 }
