@@ -132,7 +132,7 @@ style-src       'self' 'unsafe-inline'
     {:name    "description"
      :content "A blog mostly about programming."}]])
 
-(def sidebar
+(def navbar
   [:nav.nav-sticky-top.container-fluid
    [:ul
     [:li
@@ -147,7 +147,7 @@ style-src       'self' 'unsafe-inline'
         :src    (str site-url "assets/avatar.png")
         :alt    "portrait"}]
       [:h1 {:style {:margin-bottom 0}} site-title]
-      [:a {:href site-url}]]]]
+      [:a {:href              site-url}]]]]
    [:ul
     [:li [:a.contrast.no-chaos
           {:href       site-github
@@ -196,7 +196,7 @@ style-src       'self' 'unsafe-inline'
   [{:keys [post-name post-content date] :as m}]
   (->> (html [:html html-props
               (head post-name)
-              [:body sidebar
+              [:body navbar
                [:main.container
                 [:article
                  [:hgroup
@@ -215,7 +215,7 @@ style-src       'self' 'unsafe-inline'
     (html
       [:html html-props
        (head site-title)
-       [:body sidebar
+       [:body navbar
         [:main.container
          [:div
           (map
@@ -239,7 +239,7 @@ style-src       'self' 'unsafe-inline'
     (html
       [:html html-props
        (head site-title)
-       [:body sidebar
+       [:body navbar
         [:main.container
          [:article
           [:h1 "404: Page not found"]
