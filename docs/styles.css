@@ -95,6 +95,7 @@
 
 .turbo-progress-bar {
   background-color: var(--pico-primary);
+  visibility: hidden;
 }
 
 .icon {
