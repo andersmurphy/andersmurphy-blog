@@ -124,7 +124,9 @@ style-src       'self' 'unsafe-inline'
              :type "module"
              :src (str site-url "turbo.js")}]
    ;; enables responsiveness on mobile devices
-   [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
+   [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]   
+   ;; view transitions
+   [:meta {:name "view-transition" :content "same-origin"}]
    ;; google description
    [:meta
     {:name    "description"
