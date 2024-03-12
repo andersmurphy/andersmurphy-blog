@@ -84,6 +84,14 @@
   --color-stop-4: var(--dark-color-stop-4);
 }
 
+.nav-sticky-top {
+  z-index: 2;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: var(--pico-card-background-color);
+}
+
 .turbo-progress-bar {
   background-color: var(--pico-primary);
 }

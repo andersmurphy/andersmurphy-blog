@@ -133,7 +133,7 @@ style-src       'self' 'unsafe-inline'
      :content "A blog mostly about programming."}]])
 
 (def sidebar
-  [:nav.container
+  [:nav.nav-sticky-top.container-fluid
    [:ul
     [:li
      [:div.linkify
@@ -197,7 +197,7 @@ style-src       'self' 'unsafe-inline'
   (->> (html [:html html-props
               (head post-name)
               [:body sidebar
-               [:div.container
+               [:main.container
                 [:article
                  [:hgroup
                   [:h1 post-name]
@@ -216,7 +216,7 @@ style-src       'self' 'unsafe-inline'
       [:html html-props
        (head site-title)
        [:body sidebar
-        [:div.container
+        [:main.container
          [:div
           (map
             (fn [{:keys [post-name date post-path-name post-content]}]
@@ -240,7 +240,7 @@ style-src       'self' 'unsafe-inline'
       [:html html-props
        (head site-title)
        [:body sidebar
-        [:div.container
+        [:main.container
          [:article
           [:h1 "404: Page not found"]
           [:p
