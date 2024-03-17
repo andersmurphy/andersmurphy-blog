@@ -147,7 +147,8 @@ style-src       'self' 'unsafe-inline'
         :src    (str site-url "assets/avatar.png")
         :alt    "portrait"}]
       [:h1 {:style {:margin-bottom 0}} site-title]
-      [:a {:href              site-url}]]]]
+      [:a {:href              site-url
+           :aria-label "Home"}]]]]
    [:ul
     [:li [:a.contrast.no-chaos
           {:href       site-github
