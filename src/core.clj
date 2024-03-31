@@ -162,7 +162,9 @@ style-src       'self' 'unsafe-inline'
   (str/replace html
     #"<code class=\"([Cc]lojure|[Ee]lisp)\">([\s\S]+?)</code>"
     (fn [[full-capture]]
-      (-> full-capture
+      (-> full-capture        
+        (str/replace #"\n(\+.*)\n"
+          "\n<ins>$1</ins>\n")
         (str/replace #"(&#40;def[a-z\-]* |ns )(\S+)"
           "$1<strong>$2</strong>")
         (str/replace #"((?:&#40;)+|(?:&#41;)+)"
