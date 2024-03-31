@@ -4,7 +4,7 @@ One of the few things I miss about commuting by car is the radio. Unfortunately,
 
 Turns out you can [live stream "radio" over http](https://en.wikipedia.org/wiki/HTTP_Live_Streaming) using [emms](https://www.gnu.org/software/emms/). Here's my current setup for listening to radio 4.
 
-```
+```elisp
 (use-package emms
   :config
   (emms-minimalistic)
