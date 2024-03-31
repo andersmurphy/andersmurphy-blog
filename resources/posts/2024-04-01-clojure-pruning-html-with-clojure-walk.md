@@ -50,9 +50,9 @@ We are going to add two libraries that will make the processing of this data eas
 (require '[clojure.walk :as walk])
 ```
 
-The code below defines some the "patterns" for the tags and stings we want to  remove.
+The code below defines some "patterns" for the tags and strings we want to remove.
 
-*Note: A quirk of Malli's `:re` implementation is is uses `re-find` not `re-matches` so we need to specify `:start`/`:end` in our `blank-re` or we will match on strings that contain whitespace and other content, not just whitespace.*
+*Note: A quirk of Malli's `:re` implementation is it uses `re-find` not `re-matches` so we need to specify `:start`/`:end` in `blank-re` or we will match on strings that contain whitespace and other content, not just whitespace.*
 
 ```clojure
 (def blank-re    [:cat :start [:* :whitespace] :end])
@@ -102,7 +102,7 @@ Let's try `remove-tags` out.
    [:div ... ] ...] ...] ...]
 ```
 
-The output is cleaner but there's still a bunch of unnecessary nesting, particularly `:div` elements. If would be great to unwrap these where we can. First we write a pattern to validate whether an element is something we want to unwrap.
+The output is cleaner but there's still a bunch of unnecessary nesting, particularly `:div` elements. It would be great to unwrap these where we can. First we write a pattern to validate whether an element is something we want to unwrap.
 
 ```clojure
 (def tags-to-unwrap
@@ -114,7 +114,7 @@ The output is cleaner but there's still a bunch of unnecessary nesting, particul
     [:cat [:vector :any]]])
 ```
 
-This is easy to add to our `remove-tags` function by replacing the surrounding element with it's only child when it satisfies  `tags-to-unwrap`.
+This is easy to add to our `remove-tags` function. It replaces the surrounding element with its only child when it satisfies  `tags-to-unwrap`.
 
 ```clojure
 (defn remove-tags [tags hiccup]
@@ -142,7 +142,7 @@ Our HTML is data is much cleaner, but we still have a load of attribute data we 
   "Clojure"] ... ]
 ```
 
-In practice for my use case. I only care about the `:href` attribute. So we add a clause that when walk encounters a map we select only the `:href` key and value.
+In practice for my use case. I only care about the `:href` attribute. So we add a clause that when `walk/postwalk` encounters a map we select only the `:href` key and value.
 
 ```clojure
 (defn remove-tags [tags hiccup]

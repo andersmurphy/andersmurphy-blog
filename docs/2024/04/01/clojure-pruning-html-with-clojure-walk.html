@@ -37,7 +37,7 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
 <span class="dim">&#40;</span>require '&#91;malli.core :as m&#93;<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>require '&#91;lambdaisland.regal :refer &#91;regex&#93;&#93;<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>require '&#91;clojure.walk :as walk&#93;<span class="dim">&#41;</span>
-</code></pre><p>The code below defines some the "patterns" for the tags and stings we want to  remove.</p><p><em>Note: A quirk of Malli's <code>:re</code> implementation is is uses <code>re-find</code> not <code>re-matches</code> so we need to specify <code>:start</code>/<code>:end</code> in our <code>blank-re</code> or we will match on strings that contain whitespace and other content, not just whitespace.</em></p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>blank-re</strong>    &#91;:cat :start &#91;:&#42; :whitespace&#93; :end&#93;<span class="dim">&#41;</span>
+</code></pre><p>The code below defines some "patterns" for the tags and strings we want to remove.</p><p><em>Note: A quirk of Malli's <code>:re</code> implementation is it uses <code>re-find</code> not <code>re-matches</code> so we need to specify <code>:start</code>/<code>:end</code> in <code>blank-re</code> or we will match on strings that contain whitespace and other content, not just whitespace.</em></p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>blank-re</strong>    &#91;:cat :start &#91;:&#42; :whitespace&#93; :end&#93;<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>def <strong>comment-re</strong>  &#91;:cat &quot;&lt;!--&quot; &#91;:&#42; :any&#93; &quot;--&gt;&quot;&#93;<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>def <strong>doc-type-re</strong> &quot;&lt;!DOCTYPE html&gt;&quot;<span class="dim">&#41;</span>
 
@@ -72,14 +72,14 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
   &#91;:body
    {}
    &#91;:div <span class="dim">...</span> &#93; <span class="dim">...</span>&#93; <span class="dim">...</span>&#93; <span class="dim">...</span>&#93;
-</code></pre><p>The output is cleaner but there's still a bunch of unnecessary nesting, particularly <code>:div</code> elements. If would be great to unwrap these where we can. First we write a pattern to validate whether an element is something we want to unwrap.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>tags-to-unwrap</strong>
+</code></pre><p>The output is cleaner but there's still a bunch of unnecessary nesting, particularly <code>:div</code> elements. It would be great to unwrap these where we can. First we write a pattern to validate whether an element is something we want to unwrap.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>tags-to-unwrap</strong>
   &#91;:or
     <span class="dim">;; Elements that only have one child
 </span>    &#91;:cat &#91;:fn #{:div :span :article :main :body :html}&#93;
       :any &#91;:or &#91;:&#42; :any&#93; :string&#93;&#93;
     <span class="dim">;; Vector with single child that is also a vector
 </span>    &#91;:cat &#91;:vector :any&#93;&#93;&#93;<span class="dim">&#41;</span>
-</code></pre><p>This is easy to add to our <code>remove-tags</code> function by replacing the surrounding element with it's only child when it satisfies  <code>tags-to-unwrap</code>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
+</code></pre><p>This is easy to add to our <code>remove-tags</code> function. It replaces the surrounding element with its only child when it satisfies  <code>tags-to-unwrap</code>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
   <span class="dim">&#40;</span>let &#91;remove-tag? <span class="dim">&#40;</span>m/validator <span class="dim">&#40;</span>tags-to-remove tags<span class="dim">&#41;&#41;</span>
 <ins>+       unwrap-tag? <span class="dim">&#40;</span>m/validator tags-to-unwrap<span class="dim">&#41;</span>&#93;</ins>
     <span class="dim">&#40;</span>walk/postwalk
@@ -97,7 +97,7 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
  &#91;:a
   {:href &quot;/index&quot;, :class &quot;w-nav-brand w-clearfix clj-logo-container&quot;}
   &quot;Clojure&quot;&#93; <span class="dim">...</span> &#93;
-</code></pre><p>In practice for my use case. I only care about the <code>:href</code> attribute. So we add a clause that when walk encounters a map we select only the <code>:href</code> key and value.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
+</code></pre><p>In practice for my use case. I only care about the <code>:href</code> attribute. So we add a clause that when <code>walk/postwalk</code> encounters a map we select only the <code>:href</code> key and value.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
   <span class="dim">&#40;</span>let &#91;remove-tag? <span class="dim">&#40;</span>m/validator <span class="dim">&#40;</span>tags-to-remove tags<span class="dim">&#41;&#41;</span>
         unwrap-tag? <span class="dim">&#40;</span>m/validator tags-to-unwrap<span class="dim">&#41;</span>&#93;
     <span class="dim">&#40;</span>walk/postwalk
