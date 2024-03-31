@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: pruning HTML with clojure.walk</title><meta content="
+base-uri        &apos;self&apos;;
+form-action     &apos;self&apos;;
+default-src     &apos;none&apos;;
+script-src      &apos;self&apos;;
+img-src         &apos;self&apos;;
+font-src        &apos;self&apos;;
+connect-src     &apos;self&apos;;
+style-src       &apos;self&apos; &apos;unsafe-inline&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link data-turbo-track="reload" href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/favicon.png" rel="shortcut icon" /><script defer="defer" src="/toggle.js"></script><script defer="defer" src="/turbo.js" type="module"></script><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="same-origin" name="view-transition" /><meta content="A blog mostly about programming." name="description" /></head><body><nav class="nav-sticky-top container-fluid"><ul><li><div class="linkify" style="align-items:center;display:flex;"><img alt="portrait" height="40px" src="/assets/avatar.png" style="image-rendering:pixelated;padding:4px;" width="40px" /><h1 style="margin-bottom:0;">anders murphy</h1><a aria-label="Home" href="/"></a></div></li></ul><ul><li><a aria-label="Github" class="contrast no-chaos" href="https://github.com/andersmurphy"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 496 512" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></a></li><li><a aria-label="RSS" class="contrast no-chaos" href="/feed.xml"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"></path></svg></a></li><li><div class="theme-toggle" id="toggle"><svg aria-hidden="true" class="icon theme-toggle__inner-moon" height="30" viewBox="0 0 32 32" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"></path><circle cx="16" cy="16" r="8.1"></circle></svg></div></li></ul></nav><main class="container"><article><hgroup><h1>Clojure: pruning HTML with clojure.walk</h1><p><time datetime="2024-04-01T00:00:00+00:00">01 Apr 2024</time></p></hgroup><hr /><p>A problem that comes up when web crawling is you get a lot of data that you don't necessarily care about: layout divs, scripts, classes, ids etc. Thankfully, Clojure comes with tools that make removing the data you don't care about straight forward.</p><p>We're going to use a library called <a href='https://github.com/clj-commons/hickory'>hickory</a> to parse html into <a href='https://github.com/weavejester/hiccup'>hiccup</a> a popular Clojure data representation for html that represents elements with vectors and attributes with maps.</p><p><em>Note: hickory comes with CSS-style selectors that operate on hickory-format data. These selectors work well. However, they have their own custom interface and have to be <a href='https://github.com/clj-commons/hickory/issues/41'>combined with zippers to prune data</a>. clojure.walk is more generic and lets us combine selection with modification more easily.</em></p><p>Let's add hickory and slurp some HTML data:</p><pre><code class="clojure"><span class="dim">&#40;</span>clojure.repl.deps/add-lib
+  'org.clj-commons/hickory {:mvn/version &quot;0.7.4&quot;}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>require '&#91;hickory.core :as hick&#93;<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>html-data</strong>
+  <span class="dim">&#40;</span>-&gt; <span class="dim">&#40;</span>slurp &quot;https://clojure.org/reference/clojure&#95;cli&quot;<span class="dim">&#41;</span>
+    hick/parse hick/as-hiccup<span class="dim">&#41;&#41;</span>
+</code></pre><p>As we see below the data contains lots of information we are not interested in. Like comments, scripts, meta data etc.</p><pre><code class="clojure">html-data
+<span class="dim">
+=&gt;</span>
+<span class="dim">&#40;</span>&quot;&lt;!DOCTYPE html&gt;&quot;
+ &quot;\n&quot;
+ &quot;&lt;!-- This site was created in Webflow. http://www.webflow.com--&gt;&quot;
+ &quot;\n&quot;
+ &quot;&lt;!-- Last Published: Fri Nov 13 2015 01:48:45 GMT+0000 <span class="dim">&#40;</span>UTC<span class="dim">&#41;</span> --&gt;&quot;
+ &quot;\n&quot;
+ &#91;:html <span class="dim">...</span>
+  &#91;:head
+   {}
+   &quot;\n  &quot;
+   &#91;:meta {:charset &quot;utf-8&quot;}&#93; <span class="dim">...</span> <span class="dim">&#41;</span>
+</code></pre><p>We are going to add two libraries that will make the processing of this data easier to describe (interestingly both these libraries use a hiccup like syntax).  <a href='https://github.com/metosin/malli'>Malli</a> lets validate data (it can do much more, but that's what we will be using it for). <a href='https://github.com/lambdaisland/regal'>Regal</a> is optional but personally I think it gives us a more readable way of writing regular expressions.</p><pre><code class="clojure"><span class="dim">&#40;</span>clojure.repl.deps/add-libs
+'{metosin/malli      {:mvn/version &quot;0.14.0&quot;}
+lambdaisland/regal {:mvn/version &quot;0.0.143&quot;}}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>require '&#91;malli.core :as m&#93;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>require '&#91;lambdaisland.regal :refer &#91;regex&#93;&#93;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>require '&#91;clojure.walk :as walk&#93;<span class="dim">&#41;</span>
+</code></pre><p>The code below defines some the "patterns" for the tags and stings we want to  remove.</p><p><em>Note: A quirk of Malli's <code>:re</code> implementation is is uses <code>re-find</code> not <code>re-matches</code> so we need to specify <code>:start</code>/<code>:end</code> in our <code>blank-re</code> or we will match on strings that contain whitespace and other content, not just whitespace.</em></p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>blank-re</strong>    &#91;:cat :start &#91;:&#42; :whitespace&#93; :end&#93;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>def <strong>comment-re</strong>  &#91;:cat &quot;&lt;!--&quot; &#91;:&#42; :any&#93; &quot;--&gt;&quot;&#93;<span class="dim">&#41;</span>
+<span class="dim">&#40;</span>def <strong>doc-type-re</strong> &quot;&lt;!DOCTYPE html&gt;&quot;<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>strings-to-remove</strong>
+  <span class="dim">&#40;</span>regex &#91;:alt blank-re comment-re doc-type-re&#93;<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>tags-to-remove</strong> &#91;tags&#93;
+  &#91;:or
+   <span class="dim">;; elements that match tags we don't want
+</span>   &#91;:cat &#91;:fn tags&#93; &#91;:&#42; :any&#93;&#93;
+   <span class="dim">;; elements that only have two children and are not :br
+</span>   &#91;:cat &#91;:not &#91;:fn #{:br}&#93;&#93; :any&#93;
+   <span class="dim">;; strings we don't want
+</span>   &#91;:and :string &#91;:re strings-to-remove&#93;&#93;
+   <span class="dim">;; this removes anything we don't expect like jsoup objects etc
+</span>   &#91;:not &#91;:or :keyword :string &#91;:vector :any&#93; :map&#93;&#93;&#93;<span class="dim">&#41;</span>
+</code></pre><p>Once these are defined we can use <code>walk/postwalk</code> to remove any vectors that contain tags we don't want. It's not enough to check something is a <code>vector?</code> as <code>clojure.walk</code> traverses maps as map entries, which are vectors. So we need to explicitly check <code>&#40;not &#40;map-entry %&#41;&#41;</code>, otherwise we will end up treating map entries as hiccup vectors.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
+  <span class="dim">&#40;</span>let &#91;remove-tag? <span class="dim">&#40;</span>m/validator <span class="dim">&#40;</span>tags-to-remove tags<span class="dim">&#41;&#41;</span>&#93;
+    <span class="dim">&#40;</span>walk/postwalk
+      #<span class="dim">&#40;</span>cond <span class="dim">&#40;</span>and <span class="dim">&#40;</span>vector? %<span class="dim">&#41;</span> <span class="dim">&#40;</span>not <span class="dim">&#40;</span>map-entry? %<span class="dim">&#41;&#41;&#41;</span>
+             <span class="dim">&#40;</span>into &#91;&#93; <span class="dim">&#40;</span>remove remove-tag?<span class="dim">&#41;</span> %<span class="dim">&#41;</span>
+             :else %<span class="dim">&#41;</span>
+      <span class="dim">&#40;</span>vec hiccup<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Let's try <code>remove-tags</code> out.</p><pre><code class="clojure"><span class="dim">&#40;</span>-&gt;&gt; html-data
+  <span class="dim">&#40;</span>remove-tags #{:head :script :style :nav :link}<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+&#91;&#91;:html
+  {:lang &quot;en&quot;,
+   :data-wf-site &quot;56414d6fc8c27cad0f4e12e7&quot;,
+   :data-wf-page &quot;5643ac587b1f28dc58ed6b89&quot;}
+  &#91;:body
+   {}
+   &#91;:div <span class="dim">...</span> &#93; <span class="dim">...</span>&#93; <span class="dim">...</span>&#93; <span class="dim">...</span>&#93;
+</code></pre><p>The output is cleaner but there's still a bunch of unnecessary nesting, particularly <code>:div</code> elements. If would be great to unwrap these where we can. First we write a pattern to validate whether an element is something we want to unwrap.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>tags-to-unwrap</strong>
+  &#91;:or
+    <span class="dim">;; Elements that only have one child
+</span>    &#91;:cat &#91;:fn #{:div :span :article :main :body :html}&#93;
+      :any &#91;:or &#91;:&#42; :any&#93; :string&#93;&#93;
+    <span class="dim">;; Vector with single child that is also a vector
+</span>    &#91;:cat &#91;:vector :any&#93;&#93;&#93;<span class="dim">&#41;</span>
+</code></pre><p>This is easy to add to our <code>remove-tags</code> function by replacing the surrounding element with it's only child when it satisfies  <code>tags-to-unwrap</code>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
+  <span class="dim">&#40;</span>let &#91;remove-tag? <span class="dim">&#40;</span>m/validator <span class="dim">&#40;</span>tags-to-remove tags<span class="dim">&#41;&#41;</span>
+<ins>+       unwrap-tag? <span class="dim">&#40;</span>m/validator tags-to-unwrap<span class="dim">&#41;</span>&#93;</ins>
+    <span class="dim">&#40;</span>walk/postwalk
+      #<span class="dim">&#40;</span>cond <span class="dim">&#40;</span>and <span class="dim">&#40;</span>vector? %<span class="dim">&#41;</span> <span class="dim">&#40;</span>not <span class="dim">&#40;</span>map-entry? %<span class="dim">&#41;&#41;&#41;</span>
+             <span class="dim">&#40;</span>let &#91;el <span class="dim">&#40;</span>into &#91;&#93; <span class="dim">&#40;</span>remove remove-tag?<span class="dim">&#41;</span> %<span class="dim">&#41;</span>&#93;
+<ins>+               <span class="dim">&#40;</span>if <span class="dim">&#40;</span>unwrap-tag? el<span class="dim">&#41;</span> <span class="dim">&#40;</span>peek el<span class="dim">&#41;</span> el<span class="dim">&#41;&#41;</span></ins>
+             :else %<span class="dim">&#41;</span>
+      <span class="dim">&#40;</span>vec hiccup<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Our HTML is data is much cleaner, but we still have a load of attribute data we don't care about.</p><pre><code class="clojure"><span class="dim">&#40;</span>-&gt;&gt; html-data
+<span class="dim">&#40;</span>remove-tags #{:head :script :style :nav :link}<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+&#91;:body
+ {}
+ &#91;:a
+  {:href &quot;/index&quot;, :class &quot;w-nav-brand w-clearfix clj-logo-container&quot;}
+  &quot;Clojure&quot;&#93; <span class="dim">...</span> &#93;
+</code></pre><p>In practice for my use case. I only care about the <code>:href</code> attribute. So we add a clause that when walk encounters a map we select only the <code>:href</code> key and value.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>remove-tags</strong> &#91;tags hiccup&#93;
+  <span class="dim">&#40;</span>let &#91;remove-tag? <span class="dim">&#40;</span>m/validator <span class="dim">&#40;</span>tags-to-remove tags<span class="dim">&#41;&#41;</span>
+        unwrap-tag? <span class="dim">&#40;</span>m/validator tags-to-unwrap<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>walk/postwalk
+      #<span class="dim">&#40;</span>cond <span class="dim">&#40;</span>and <span class="dim">&#40;</span>vector? %<span class="dim">&#41;</span> <span class="dim">&#40;</span>not <span class="dim">&#40;</span>map-entry? %<span class="dim">&#41;&#41;&#41;</span>
+             <span class="dim">&#40;</span>let &#91;el <span class="dim">&#40;</span>into &#91;&#93; <span class="dim">&#40;</span>remove remove-tag?<span class="dim">&#41;</span> %<span class="dim">&#41;</span>&#93;
+               <span class="dim">&#40;</span>if <span class="dim">&#40;</span>unwrap-tag? el<span class="dim">&#41;</span> <span class="dim">&#40;</span>peek el<span class="dim">&#41;</span> el<span class="dim">&#41;&#41;</span>
+<ins>+            <span class="dim">&#40;</span>map? %<span class="dim">&#41;</span> <span class="dim">&#40;</span>select-keys % &#91;:href&#93;<span class="dim">&#41;</span></ins>
+             :else    %<span class="dim">&#41;</span>
+      <span class="dim">&#40;</span>vec hiccup<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Perfect, we now only have the data we care about.</p><pre><code class="clojure"><span class="dim">&#40;</span>-&gt;&gt; html-data
+  <span class="dim">&#40;</span>remove-tags #{:head :script :style :nav :link}<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span>
+&#91;:body
+ {}
+ &#91;:a {:href &quot;/index&quot;} &quot;Clojure&quot;&#93; <span class="dim">...</span> &#93;
+</code></pre><p>That's as far as we'll go in this post.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/crawling/pruning-html-with-clojure-walk'>project can be found here</a>.</p><p>There's definitely more you can do to sanitise HTML data. Currently our implementation relies on semantic data. If you are interested in a more probabilistic approach I recommend checking out the source code of <a href='https://github.com/mozilla/readability'>readablility.js</a> which is a standalone version of the readability library used for Firefox Reader View.</p></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
