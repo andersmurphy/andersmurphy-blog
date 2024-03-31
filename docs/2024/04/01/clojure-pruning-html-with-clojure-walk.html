@@ -31,8 +31,8 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
    &quot;\n  &quot;
    &#91;:meta {:charset &quot;utf-8&quot;}&#93; <span class="dim">...</span> <span class="dim">&#41;</span>
 </code></pre><p>We are going to add two libraries that will make the processing of this data easier to describe (interestingly both these libraries use a hiccup like syntax).  <a href='https://github.com/metosin/malli'>Malli</a> lets validate data (it can do much more, but that's what we will be using it for). <a href='https://github.com/lambdaisland/regal'>Regal</a> is optional but personally I think it gives us a more readable way of writing regular expressions.</p><pre><code class="clojure"><span class="dim">&#40;</span>clojure.repl.deps/add-libs
-'{metosin/malli      {:mvn/version &quot;0.14.0&quot;}
-lambdaisland/regal {:mvn/version &quot;0.0.143&quot;}}<span class="dim">&#41;</span>
+  '{metosin/malli      {:mvn/version &quot;0.14.0&quot;}
+    lambdaisland/regal {:mvn/version &quot;0.0.143&quot;}}<span class="dim">&#41;</span>
 
 <span class="dim">&#40;</span>require '&#91;malli.core :as m&#93;<span class="dim">&#41;</span>
 <span class="dim">&#40;</span>require '&#91;lambdaisland.regal :refer &#91;regex&#93;&#93;<span class="dim">&#41;</span>

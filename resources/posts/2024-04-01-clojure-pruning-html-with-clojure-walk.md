@@ -42,8 +42,8 @@ We are going to add two libraries that will make the processing of this data eas
 
 ```clojure
 (clojure.repl.deps/add-libs
-'{metosin/malli      {:mvn/version "0.14.0"}
-lambdaisland/regal {:mvn/version "0.0.143"}})
+  '{metosin/malli      {:mvn/version "0.14.0"}
+    lambdaisland/regal {:mvn/version "0.0.143"}})
 
 (require '[malli.core :as m])
 (require '[lambdaisland.regal :refer [regex]])
