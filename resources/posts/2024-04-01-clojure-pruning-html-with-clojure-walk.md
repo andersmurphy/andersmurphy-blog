@@ -128,7 +128,7 @@ This is easy to add to our `remove-tags` function. It replaces the surrounding e
       (vec hiccup))))
 ```
 
-Our HTML is data is much cleaner, but we still have a load of attribute data we don't care about.
+Our HTML data is much cleaner, but we still have a load of attribute data we don't care about.
 
 ```clojure
 (->> html-data
