@@ -2,7 +2,7 @@ title: Clojure: pruning HTML with clojure.walk
 
 A problem that comes up when web crawling is you get a lot of data that you don't necessarily care about: layout divs, scripts, classes, ids etc. Thankfully, Clojure comes with tools that make removing the data you don't care about straight forward.
 
-We're going to use a library called [hickory](https://github.com/clj-commons/hickory) to parse html into [hiccup](https://github.com/weavejester/hiccup) a popular Clojure data representation for html that represents elements with vectors and attributes with maps.
+We're going to use a library called [hickory](https://github.com/clj-commons/hickory) to parse HTML into [hiccup](https://github.com/weavejester/hiccup) a popular Clojure data representation for HTML that represents elements with vectors and attributes with maps.
 
 *Note: hickory comes with CSS-style selectors that operate on hickory-format data. These selectors work well. However, they have their own custom interface and have to be [combined with zippers to prune data](https://github.com/clj-commons/hickory/issues/41). clojure.walk is more generic and lets us combine selection with modification more easily.*
 
@@ -38,7 +38,7 @@ html-data
    [:meta {:charset "utf-8"}] ... )
 ```
 
-We are going to add two libraries that will make the processing of this data easier to describe (interestingly both these libraries use a hiccup like syntax).  [Malli](https://github.com/metosin/malli) lets validate data (it can do much more, but that's what we will be using it for). [Regal](https://github.com/lambdaisland/regal) is optional but personally I think it gives us a more readable way of writing regular expressions.
+We are going to add two libraries that will make the processing of this data easier to describe (interestingly both these libraries use a hiccup like syntax).  [Malli](https://github.com/metosin/malli) lets validate data (it can do much more, but that's what we will be using it for). [Regal](https://github.com/lambdaisland/regal) is a regex builder that gives us a more composable and more readable way of writing regular expressions (similar to [Emacs rx notation](https://www.gnu.org/software/emacs/manual/html_node/elisp/Rx-Notation.html)). 
 
 ```clojure
 (clojure.repl.deps/add-libs
@@ -74,7 +74,7 @@ The code below defines some "patterns" for the tags and strings we want to remov
    [:not [:or :keyword :string [:vector :any] :map]]])
 ```
 
-Once these are defined we can use `walk/postwalk` to remove any vectors that contain tags we don't want. It's not enough to check something is a `vector?` as `clojure.walk` traverses maps as map entries, which are vectors. So we need to explicitly check `(not (map-entry %))`, otherwise we will end up treating map entries as hiccup vectors.
+Once these are defined we can use `walk/postwalk` to remove any vectors that contain tags we don't want. It's worth pointing out that it is not enough to check a node is a `vector?` as `clojure.walk` traverses maps as map entries, which are vectors. So we need to explicitly check `(not (map-entry %))`, otherwise we will end up treating map entries as hiccup vectors.
 
 ```clojure
 (defn remove-tags [tags hiccup]
