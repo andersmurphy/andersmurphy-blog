@@ -133,30 +133,31 @@ style-src       'self' 'unsafe-inline'
      :content "A blog mostly about programming."}]])
 
 (def navbar
-  [:nav.nav-sticky-top.container-fluid
-   [:ul
-    [:li
-     [:div.linkify
-      {:style {:display     "flex"
-               :align-items "center"}}
-      [:img
-       {:style  {:image-rendering "pixelated"
-                 :padding         "4px"}
-        :height "40px"
-        :width  "40px"
-        :src    (str site-url "assets/avatar.png")
-        :alt    "portrait"}]
-      [:h1 {:style {:margin-bottom 0}} site-title]
-      [:a {:href              site-url
-           :aria-label "Home"}]]]]
-   [:ul
-    [:li [:a.contrast.no-chaos
-          {:href       site-github
-           :aria-label "Github"} icons/github-svg]]
-    [:li [:a.contrast.no-chaos
-          {:href       site-rss
-           :aria-label "RSS"} icons/rss-svg]]
-    [:li icons/toggle]]])
+  [:header.nav-sticky-top.container-fluid
+   [:nav.container
+    [:ul
+     [:li
+      [:div.linkify
+       {:style {:display     "flex"
+                :align-items "center"}}
+       [:img
+        {:style  {:image-rendering "pixelated"
+                  :padding         "4px"}
+         :height "40px"
+         :width  "40px"
+         :src    (str site-url "assets/avatar.png")
+         :alt    "portrait"}]
+       [:h1 {:style {:margin-bottom 0}} site-title]
+       [:a {:href       site-url
+            :aria-label "Home"}]]]]
+    [:ul
+     [:li [:a.contrast.no-chaos
+           {:href       site-github
+            :aria-label "Github"} icons/github-svg]]
+     [:li [:a.contrast.no-chaos
+           {:href       site-rss
+            :aria-label "RSS"} icons/rss-svg]]
+     [:li icons/toggle]]]])
 
 (defn code-highlights [html]
   (str/replace html
