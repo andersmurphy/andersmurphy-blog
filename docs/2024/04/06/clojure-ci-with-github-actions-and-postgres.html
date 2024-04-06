@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: CI with Github Actions and Postgres</title><meta content="
+base-uri        &apos;self&apos;;
+form-action     &apos;self&apos;;
+default-src     &apos;none&apos;;
+script-src      &apos;self&apos;;
+img-src         &apos;self&apos;;
+font-src        &apos;self&apos;;
+connect-src     &apos;self&apos;;
+style-src       &apos;self&apos; &apos;unsafe-inline&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link data-turbo-track="reload" href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/favicon.png" rel="shortcut icon" /><script defer="defer" src="/toggle.js"></script><script defer="defer" src="/turbo.js" type="module"></script><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="same-origin" name="view-transition" /><meta content="A blog mostly about programming." name="description" /></head><body><header class="nav-sticky-top container-fluid"><nav class="container"><ul><li><div class="linkify" style="align-items:center;display:flex;"><img alt="portrait" height="40px" src="/assets/avatar.png" style="image-rendering:pixelated;padding:4px;" width="40px" /><h1 style="margin-bottom:0;">anders murphy</h1><a aria-label="Home" href="/"></a></div></li></ul><ul><li><a aria-label="Github" class="contrast no-chaos" href="https://github.com/andersmurphy"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 496 512" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></a></li><li><a aria-label="RSS" class="contrast no-chaos" href="/feed.xml"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"></path></svg></a></li><li><div class="theme-toggle" id="toggle"><svg aria-hidden="true" class="icon theme-toggle__inner-moon" height="30" viewBox="0 0 32 32" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"></path><circle cx="16" cy="16" r="8.1"></circle></svg></div></li></ul></nav></header><main class="container"><article><hgroup><h1>Clojure: CI with Github Actions and Postgres</h1><p><time datetime="2024-04-06T00:00:00+00:00">06 Apr 2024</time></p></hgroup><hr /><p>I recently had to move a project to java 21 for <a href='https://openjdk.org/jeps/444'>virtual threads</a> and <a href='https://openjdk.org/jeps/439'>Generational ZGC</a>. Unfortunately, I couldn't find an easy way to use <a href='https://circleci.com/'>Circle CI</a> with Clojure and Java 21. So I figured I'd give <a href='https://github.com/features/actions'>Github Actions</a> a go.</p><p>This guide will only cover using Github Actions to run tests, some of which are run against a Postgres database. It also assumes you are using <a href='https://clojure.org/guides/deps_and_cli'>tools.deps</a> and your <code>deps.edn</code> looks something like this:</p><pre><code class="clojure">{<span class="dim">...</span>
+ :aliases
+ {:dev
+ {:extra-paths &#91;&quot;test&quot; &quot;dev&quot;&#93;
+ :jvm-opts &#91;&quot;-Duser.timezone=UTC&quot;
+            &quot;-XX:+UseZGC&quot;
+            &quot;-XX:+ZGenerational&quot;&#93;
+  :extra-deps
+  {io.github.cognitect-labs/test-runner
+   {:git/tag &quot;v0.5.1&quot; :git/sha &quot;dfb30dd&quot;}
+   ring/ring-mock {:mvn/version &quot;0.4.0&quot;}}}
+  
+  :test 
+  {:main-opts &#91;&quot;-m&quot; &quot;cognitect.test-runner&quot;&#93;
+   :exec-fn   cognitect.test-runner.api/test}
+
+  :migrate-test-db 
+  {:main-opts &#91;&quot;-m&quot; &quot;server.test-db&quot;&#93;
+   :exec-fn   server.test-db/migate-test-db}}
+   <span class="dim">...</span>}
+</code></pre><p>We need to create a <code>.github/workflows/ci.yml</code> file (the file itself doesn't have to be called <code>ci.yml</code> it can be anything you want e.g: <code>foo.yml</code>). With the following contents:</p><pre><code class="yaml">name: CI
+
+on: &#91;push&#93;
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      TEST&#95;DATABASE&#95;URL: &quot;postgres://username:password@localhost:5432/test-database-name&quot;
+      
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        env:
+          POSTGRES&#95;DB: test-database-name
+          POSTGRES&#95;USER: username
+          POSTGRES&#95;PASSWORD: password
+        # Set health checks to wait until postgres has started
+        options: &gt;-
+          --health-cmd pg&#95;isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        
+      - name: Prepare java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Install clojure tools
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: 1.11.2.1446
+          cljfmt: 0.10.2
+          
+      - name: Cache clojure dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            &#126;/.m2/repository
+            &#126;/.gitlibs
+            &#126;/.deps.clj
+          # List all files containing dependencies:
+          key: cljdeps-${{ hashFiles&#40;'deps.edn'&#41; }}
+          restore-keys: cljdeps-
+
+      - name: Check formatting
+        run: cljfmt check
+
+      - name: Run migration on test db
+        run: clojure -X:dev:migrate-test-db
+
+      - name: Run tests
+        run: clojure -X:dev:test
+</code></pre><p>That's basically it. This example doesn't specify a version of Postgres, so you'll want to specify the same version as your production environment. The list of  <a href='https://hub.docker.com/_/postgres'>docker hub tags can be found here</a>.</p><p>You'll also want your Clojure environment variables that specify db name, username and password (or in this case a connection url):</p><pre><code class="yaml">...
+    env:
+      TEST&#95;DATABASE&#95;URL: &quot;postgres://username:password@localhost:5432/test-database-name&quot;
+...
+</code></pre><p>To match the db name, username and password specified in the Postgres environment:</p><pre><code class="yaml">...
+        image: postgres
+        env:
+          POSTGRES&#95;DB: test-database-name
+          POSTGRES&#95;USER: username
+          POSTGRES&#95;PASSWORD: password
+...
+</code></pre><p>That's it. Your are good to go.</p><p>But wait! I know what you're thinking. Yuk YAML! Where are all the parentheses?</p><p>Well if you have <a href='https://github.com/babashka/babashka'>babashka</a> installed you can live a YAML free existence thanks to <a href='https://github.com/clj-commons/clj-yaml'>clj-yaml</a> (which ironically is a fork of Circle CI's clj-yaml, the same Circle CI we are migrating away from).</p><p>clj-yaml is built into babashka, so we can get straight into it.</p><pre><code class="clojure"><span class="dim">&#40;</span>require '&#91;clj-yaml.core :as yaml&#93;<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>-&gt;db-url</strong> &#91;db-name username password&#93;
+  <span class="dim">&#40;</span>str &quot;postgres://&quot; username &quot;:&quot; password &quot;@localhost:5432/&quot; db-name<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>postgres</strong> &#91;db-name username password&#93;
+  {:postgres
+   {:image &quot;postgres&quot;
+    :env
+    {:POSTGRES&#95;DB       db-name
+     :POSTGRES&#95;USER     username
+     :POSTGRES&#95;PASSWORD password}
+    :options
+    &quot;--health-cmd pg&#95;isready --health-interval 10s --health-timeout 5s --health-retries 5&quot;
+    :ports &#91;&quot;5432:5432&quot;&#93;}}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>checkout-code</strong>
+  {:name &quot;Check out repository code&quot; :uses &quot;actions/checkout@v4&quot;}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>java</strong>
+  {:name &quot;Prepare java&quot;
+   :uses &quot;actions/setup-java@v4&quot;
+   :with {:distribution &quot;zulu&quot; :java-version &quot;21&quot;}}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>clojure-tools</strong>
+  {:name &quot;Install clojure tools&quot;
+   :uses &quot;DeLaGuardo/setup-clojure@12.5&quot;
+   :with {:cli &quot;1.11.2.1446&quot; :cljfmt &quot;0.10.2&quot;}}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>cache</strong>
+  {:name &quot;Cache clojure dependencies&quot;
+   :uses &quot;actions/cache@v4&quot;
+   :with
+   {:path         &quot;&#126;/.m2/repository\n&#126;/.gitlibs\n&#126;/.deps.clj\n&quot;
+    :key          &quot;cljdeps-${{ hashFiles<span class="dim">&#40;</span>'deps.edn'<span class="dim">&#41;</span> }}&quot;
+    :restore-keys &quot;cljdeps-&quot;}}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>check-formatting</strong>
+  {:name &quot;Check formatting&quot; :run &quot;cljfmt check&quot;}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>run-migrations</strong>
+  {:name &quot;Run migration on test db&quot;
+   :run  &quot;clojure -X:dev:migrate-test-db&quot;}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>run-tests</strong>
+  {:name &quot;Run tests&quot; :run &quot;clojure -X:dev:test&quot;}<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>def <strong>ci</strong>
+  <span class="dim">&#40;</span>let &#91;db-name  &quot;test-database-name&quot;
+        username &quot;username&quot;
+        password &quot;password&quot;&#93;
+    {:name &quot;CI&quot;
+     true  &#91;&quot;push&quot;&#93;
+     :jobs
+     {:build
+      {:name     &quot;Build&quot;
+       :runs-on  &quot;ubuntu-latest&quot;
+       :env {:TEST&#95;DATABASE&#95;URL
+             <span class="dim">&#40;</span>-&gt;db-url db-name username password<span class="dim">&#41;</span>}
+       :services <span class="dim">&#40;</span>postgres db-name username password<span class="dim">&#41;</span>
+       :steps
+       &#91;checkout-code
+        java
+        clojure-tools
+        cache
+        check-formatting
+        run-migrations
+        run-tests&#93;}}}<span class="dim">&#41;&#41;</span>
+
+<span class="dim">;; Check our generated YAML is semantically the same
+</span><span class="dim">;; as our original handwritten YAML. 
+</span><span class="dim">&#40;</span>= <span class="dim">&#40;</span>yaml/parse-string <span class="dim">&#40;</span>slurp &quot;ci.yml&quot;<span class="dim">&#41;&#41;</span>
+   ci<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>spit &quot;generated-ci.yml&quot; <span class="dim">&#40;</span>yaml/generate-string ci<span class="dim">&#41;&#41;</span>
+</code></pre><p>Overkill for most projects I imagine. But if you ever end up doing a lot of things with Github Actions, Circle CI or any other YAML heavy interface <code>clj-yaml</code> + <code>babashka</code> can give you something more composable and manageable. </p></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
