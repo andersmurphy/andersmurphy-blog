@@ -27,7 +27,7 @@ This guide will only cover using Github Actions to run tests, some of which are 
    ...}
 ```
 
-We need to create a `.github/workflows/ci.yml` file (the file itself doesn't have to be called `ci.yml` it can be anything you want e.g: `foo.yml`). With the following contents:
+We need to create a `.github/workflows/ci.yml` file (the file itself doesn't have to be called `ci.yml` it can be called anything you want e.g: `foo.yml`). With the following contents:
 
 ```yaml
 name: CI
@@ -207,6 +207,6 @@ clj-yaml is built into babashka, so we can get straight into it.
 (spit "generated-ci.yml" (yaml/generate-string ci))
 ```
 
-Overkill for most projects I imagine. But if you ever end up doing a lot of things with Github Actions, Circle CI or any other YAML heavy interface `clj-yaml` + `babashka` can give you something more composable and manageable. 
+Overkill for most projects I imagine. But if you ever end up doing a lot of things with Github Actions, Circle CI or any other YAML heavy interface `clj-yaml` + `babashka` can give you something more composable and easier to manage. 
 
 
