@@ -28,7 +28,7 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
   {:main-opts &#91;&quot;-m&quot; &quot;server.test-db&quot;&#93;
    :exec-fn   server.test-db/migate-test-db}}
    <span class="dim">...</span>}
-</code></pre><p>We need to create a <code>.github/workflows/ci.yml</code> file (the file itself doesn't have to be called <code>ci.yml</code> it can be anything you want e.g: <code>foo.yml</code>). With the following contents:</p><pre><code class="yaml">name: CI
+</code></pre><p>We need to create a <code>.github/workflows/ci.yml</code> file (the file itself doesn't have to be called <code>ci.yml</code> it can be called anything you want e.g: <code>foo.yml</code>). With the following contents:</p><pre><code class="yaml">name: CI
 
 on: &#91;push&#93;
 
@@ -180,4 +180,4 @@ jobs:
    ci<span class="dim">&#41;</span>
 
 <span class="dim">&#40;</span>spit &quot;generated-ci.yml&quot; <span class="dim">&#40;</span>yaml/generate-string ci<span class="dim">&#41;&#41;</span>
-</code></pre><p>Overkill for most projects I imagine. But if you ever end up doing a lot of things with Github Actions, Circle CI or any other YAML heavy interface <code>clj-yaml</code> + <code>babashka</code> can give you something more composable and manageable. </p></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
+</code></pre><p>Overkill for most projects I imagine. But if you ever end up doing a lot of things with Github Actions, Circle CI or any other YAML heavy interface <code>clj-yaml</code> + <code>babashka</code> can give you something more composable and easier to manage. </p></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
