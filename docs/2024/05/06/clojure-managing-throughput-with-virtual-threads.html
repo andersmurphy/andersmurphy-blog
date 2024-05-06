@@ -40,8 +40,7 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
   <span class="dim">&#40;</span>&#91;f coll&#93;
    <span class="dim">&#40;</span>upmap nil f coll<span class="dim">&#41;&#41;</span>
   <span class="dim">&#40;</span>&#91;sem f coll&#93;
-   <span class="dim">&#40;</span>let &#91;cs <span class="dim">&#40;</span>ExecutorCompletionService/new
-              <span class="dim">&#40;</span>Executors/newVirtualThreadPerTaskExecutor<span class="dim">&#41;&#41;</span>&#93;
+   <span class="dim">&#40;</span>let &#91;cs <span class="dim">&#40;</span>ExecutorCompletionService/new executor<span class="dim">&#41;</span>&#93;
      <span class="dim">&#40;</span>run!
        <span class="dim">&#40;</span>fn &#91;x&#93;
          <span class="dim">&#40;</span>when sem <span class="dim">&#40;</span>rate-limited-sem-release sem<span class="dim">&#41;&#41;</span>
@@ -68,8 +67,7 @@ nil
   <span class="dim">&#40;</span>&#91;f coll&#93;
    <span class="dim">&#40;</span>upmap nil f coll<span class="dim">&#41;&#41;</span>
   <span class="dim">&#40;</span>&#91;sem f coll&#93;
-   <span class="dim">&#40;</span>let &#91;cs <span class="dim">&#40;</span>ExecutorCompletionService/new
-              <span class="dim">&#40;</span>Executors/newVirtualThreadPerTaskExecutor<span class="dim">&#41;&#41;</span>&#93;
+   <span class="dim">&#40;</span>let &#91;cs <span class="dim">&#40;</span>ExecutorCompletionService/new executor<span class="dim">&#41;</span>&#93;
 <ins>+    <span class="dim">&#40;</span>Thread/startVirtualThread</ins>
        #<span class="dim">&#40;</span>run!
           <span class="dim">&#40;</span>fn &#91;x&#93;
