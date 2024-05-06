@@ -13,7 +13,7 @@
 
 (def site-url "/")
 (def site-title "anders murphy")
-(def site-tagline "A blog mostly about programming")
+(def site-tagline "A blog mostly about functional programming")
 (def site-github "https://github.com/andersmurphy")
 ;; (def site-twitter "https://twitter.com/anders_murphy")
 (def site-rss (str site-url "feed.xml"))
