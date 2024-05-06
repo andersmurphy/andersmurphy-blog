@@ -186,4 +186,4 @@ Further reading:
 - [Virtual Threads in Clojure](https://ericnormand.me/guide/clojure-virtual-threads)
 - [Clojure Method Values](https://clojure.org/news/2024/04/28/clojure-1-12-alpha10#method_values)
 - [ExecutorCompletionService](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorCompletionService.html)
-- [Semaphor](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Semaphore.html)
+- [Semaphore](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Semaphore.html)
