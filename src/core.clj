@@ -13,7 +13,7 @@
 
 (def site-url "/")
 (def site-title "anders murphy")
-(def site-tagline "A blog mostly about functional programming")
+(def site-tagline "A blog mostly about Clojure programming")
 (def site-github "https://github.com/andersmurphy")
 ;; (def site-twitter "https://twitter.com/anders_murphy")
 (def site-rss (str site-url "feed.xml"))
@@ -111,26 +111,26 @@ style-src       'self' 'unsafe-inline'
      :content    "text/html; charset=UTF-8"}]
    ;; styles
    [:link
-    {:rel "stylesheet" :type "text/css"
-     :href (str site-url "styles.css")
+    {:rel              "stylesheet" :type "text/css"
+     :href             (str site-url "styles.css")
      :data-turbo-track "reload"}]
    ;; icons
    [:link {:rel  "shortcut icon"
            :href (str site-url "assets/favicon.png")}]
    ;; javascript
    [:script {:defer true
-             :src (str site-url "toggle.js")}]
+             :src   (str site-url "toggle.js")}]
    [:script {:defer true
-             :type "module"
-             :src (str site-url "turbo.js")}]
+             :type  "module"
+             :src   (str site-url "turbo.js")}]
    ;; enables responsiveness on mobile devices
-   [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]   
+   [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; view transitions
    [:meta {:name "view-transition" :content "same-origin"}]
    ;; google description
    [:meta
     {:name    "description"
-     :content "A blog mostly about programming."}]])
+     :content site-tagline}]])
 
 (def navbar
   [:header.nav-sticky-top.container-fluid
