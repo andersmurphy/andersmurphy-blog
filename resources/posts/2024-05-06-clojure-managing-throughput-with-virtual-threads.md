@@ -99,8 +99,7 @@ Combining this all together we get:
   ([f coll]
    (upmap nil f coll))
   ([sem f coll]
-   (let [cs (ExecutorCompletionService/new
-              (Executors/newVirtualThreadPerTaskExecutor))]
+   (let [cs (ExecutorCompletionService/new executor)]
      (run!
        (fn [x]
          (when sem (rate-limited-sem-release sem))
@@ -139,8 +138,7 @@ We can get around this by throwing more virtual threads at the problem. We use `
   ([f coll]
    (upmap nil f coll))
   ([sem f coll]
-   (let [cs (ExecutorCompletionService/new
-              (Executors/newVirtualThreadPerTaskExecutor))]
+   (let [cs (ExecutorCompletionService/new executor)]
 +    (Thread/startVirtualThread
        #(run!
           (fn [x]
