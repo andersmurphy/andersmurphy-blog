@@ -182,6 +182,7 @@ The full example [project can be found here](https://github.com/andersmurphy/clj
 
 - [Managing Throughput with Virtual Threads - Sip of Java](https://inside.java/2024/02/04/sip094/ )
 - [Virtual Threads in Clojure](https://ericnormand.me/guide/clojure-virtual-threads)
+- [JEP 444: Virtual Threads](https://openjdk.org/jeps/444)
 - [Clojure Method Values](https://clojure.org/news/2024/04/28/clojure-1-12-alpha10#method_values)
 - [ExecutorCompletionService](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorCompletionService.html)
 - [Semaphore](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Semaphore.html)
