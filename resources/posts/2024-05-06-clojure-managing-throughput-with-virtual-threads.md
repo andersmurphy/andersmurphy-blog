@@ -178,10 +178,14 @@ All of this with zero dependencies. The power that Clojure's tight integration w
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/managing-throughput).
 
-Further reading:
+**Further reading:**
 
 - [Managing Throughput with Virtual Threads - Sip of Java](https://inside.java/2024/02/04/sip094/ )
 - [Virtual Threads in Clojure](https://ericnormand.me/guide/clojure-virtual-threads)
 - [Clojure Method Values](https://clojure.org/news/2024/04/28/clojure-1-12-alpha10#method_values)
 - [ExecutorCompletionService](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorCompletionService.html)
 - [Semaphore](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Semaphore.html)
+
+**Discussion:**
+
+[Hacker News](https://news.ycombinator.com/item?id=40275997)
