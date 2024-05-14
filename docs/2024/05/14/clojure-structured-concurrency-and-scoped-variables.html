@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: structured concurrency and scoped variables</title><meta content="
+base-uri        &apos;self&apos;;
+form-action     &apos;self&apos;;
+default-src     &apos;none&apos;;
+script-src      &apos;self&apos;;
+img-src         &apos;self&apos;;
+font-src        &apos;self&apos;;
+connect-src     &apos;self&apos;;
+style-src       &apos;self&apos; &apos;unsafe-inline&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link data-turbo-track="reload" href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/favicon.png" rel="shortcut icon" /><script defer="defer" src="/toggle.js"></script><script defer="defer" src="/turbo.js" type="module"></script><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="same-origin" name="view-transition" /><meta content="A blog mostly about Clojure programming" name="description" /></head><body><header class="nav-sticky-top container-fluid"><nav class="container"><ul><li><div class="linkify" style="align-items:center;display:flex;"><img alt="portrait" height="40px" src="/assets/avatar.png" style="image-rendering:pixelated;padding:4px;" width="40px" /><h1 style="margin-bottom:0;">anders murphy</h1><a aria-label="Home" href="/"></a></div></li></ul><ul><li><a aria-label="Github" class="contrast no-chaos" href="https://github.com/andersmurphy"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 496 512" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></a></li><li><a aria-label="RSS" class="contrast no-chaos" href="/feed.xml"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"></path></svg></a></li><li><div class="theme-toggle" id="toggle"><svg aria-hidden="true" class="icon theme-toggle__inner-moon" height="30" viewBox="0 0 32 32" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"></path><circle cx="16" cy="16" r="8.1"></circle></svg></div></li></ul></nav></header><main class="container"><article><hgroup><h1>Clojure: structured concurrency and scoped variables</h1><p><time datetime="2024-05-14T00:00:00+00:00">14 May 2024</time></p></hgroup><hr /><p>In this post we'll explore some useful tools for making working with virtual threads easier. Structured concurrency helps eliminate common problems like thread leaks and cancellation delays. Scoped variables lets you extend parent thread based context to child threads so you can treat a group of threads as a single unit of work with the same shared context.</p><h2 id="enable_preview">Enable preview</h2><p>Structured concurrency and scoped variables are available in java 21 as preview features, so we'll need to enable preview:</p><pre><code class="clojure">{:paths &#91;&quot;src&quot;&#93;
+ :deps {org.clojure/clojure {:mvn/version &quot;1.12.0-alpha11&quot;}}
+ :aliases
+{:dev {:jvm-opts &#91;&quot;--enable-preview&quot;&#93;}}}
+</code></pre><h2 id="example_code">Example code</h2><p>We'll be implementing our own of <code>pmap</code> as it has a clear thread hierarchy though which is exactly the sort of place both structured concurrency and scoped variables are useful:</p><pre><code class="clojure"><span class="dim">&#40;</span>ns <strong>server.core</strong>
+  <span class="dim">&#40;</span>:refer-clojure :exclude &#91;pmap&#93;<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>:import
+   <span class="dim">&#40;</span>java.util.concurrent
+     ExecutorService
+     Executors
+     Callable<span class="dim">&#41;&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defonce <strong>executor</strong>
+  <span class="dim">&#40;</span>Executors/newVirtualThreadPerTaskExecutor<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>pmap</strong> &#91;f coll&#93;
+  <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>mapv <span class="dim">&#40;</span>fn &#91;x&#93; <span class="dim">&#40;</span>ExecutorService/.submit executor
+                       <span class="dim">;; More than one matching method found: submit
+</span>                       <span class="dim">;; So we need to type hint Callable
+</span>                       &#94;Callable <span class="dim">&#40;</span>fn &#91;&#93; <span class="dim">&#40;</span>f x<span class="dim">&#41;&#41;&#41;&#41;</span>
+         coll<span class="dim">&#41;</span>
+    <span class="dim">&#40;</span>mapv deref<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>Let's run this code and make one of the tasks cause an exception:</p><pre><code class="clojure"><span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+        <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>inc x<span class="dim">&#41;</span>&#93;
+          <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span> <span class="dim">;; simulate some io
+</span>          <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+          result<span class="dim">&#41;&#41;</span>
+  &#91;1 2 &quot;3&quot; 4 5 6&#93;<span class="dim">&#41;</span>
+<span class="dim">
+=&gt;</span> Error printing return value <span class="dim">&#40;</span>ClassCastException<span class="dim">&#41;</span>
+at clojure.lang.Numbers/inc <span class="dim">&#40;</span>Numbers.java:139<span class="dim">&#41;</span>.
+class java.lang.String cannot be cast to class
+java.lang.Number <span class="dim">&#40;</span>java.lang.String and java.lang.Number
+are in module java.base of loader 'bootstrap'<span class="dim">&#41;</span>
+
+complete 7
+complete 2
+complete 5
+complete 4
+complete 6
+</code></pre><p>Despite one of the tasks causing an exception all the other tasks keep running and complete. This might not be the behaviour we want, particularly if we require all tasks to succeed.</p><p>This is where structured concurrency scopes come in.</p><blockquote><p>Simplify concurrent programming by introducing an API for structured concurrency. Structured concurrency treats groups of related tasks running in different threads as a single unit of work, thereby streamlining error handling and cancellation, improving reliability, and enhancing observability.<br /></p><p><ul><li>JEP 462</li></ul></p></blockquote><h2 id="structured_task_scope">Structured Task Scope</h2><p>First let's import the classes we will need from <code>StructuredTaskScope</code>:</p><pre><code class="clojure"><span class="dim">&#40;</span>ns <strong>server.core</strong>
+  <span class="dim">&#40;</span>:refer-clojure :exclude &#91;pmap&#93;<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>:import
+   <span class="dim">&#40;</span>java.util.concurrent
+<ins>+    StructuredTaskScope</ins>
++    StructuredTaskScope$Subtask
+<ins>+    StructuredTaskScope$ShutdownOnFailure</ins>
++    StructuredTaskScope$ShutdownOnSuccess
+     ExecutorService
+     Executors
+     Callable<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>When dealing with concurrent subtasks it is common to use short-circuiting patterns to avoid doing unnecessary work. Currently, <code>StructuredTaskScope</code> provides two shutdown policies  <code>ShutdownOnFailure</code> and <code>ShutdownOnSuccess</code>. These policies shut down the scope when the first subtask fails or succeeds, respectively.</p><p>We're going to explore the <code>ShutdownOnFailure</code> shutdown policy first. </p><p>Let's redefine our <code>pmap</code> function:</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>pmap</strong> &#91;f coll&#93;
+  <span class="dim">&#40;</span>with-open &#91;scope <span class="dim">&#40;</span>StructuredTaskScope$ShutdownOnFailure/new<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>let &#91;r <span class="dim">&#40;</span>mapv <span class="dim">&#40;</span>fn &#91;x&#93;
+                    <span class="dim">&#40;</span>StructuredTaskScope/.fork scope
+                      <span class="dim">&#40;</span>fn &#91;&#93; <span class="dim">&#40;</span>f x<span class="dim">&#41;&#41;&#41;&#41;</span>
+              coll<span class="dim">&#41;</span>&#93;
+      <span class="dim">;; join subtasks and propagate errors
+</span>      <span class="dim">&#40;</span>.. scope join throwIfFailed<span class="dim">&#41;</span>
+      <span class="dim">;; fork returns <strong>a</strong> Subtask/Supplier not a future
+</span>      <span class="dim">&#40;</span>mapv StructuredTaskScope$Subtask/.get r<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Then run this new version with one task causing an exception:</p><pre><code class="clojure"><span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+        <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>inc x<span class="dim">&#41;</span>&#93;
+          <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+          <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+          result<span class="dim">&#41;&#41;</span>
+  &#91;1 2 &quot;3&quot; 4 5 6&#93;<span class="dim">&#41;</span>
+  <span class="dim">
+=&gt;</span> Error printing return value <span class="dim">&#40;</span>ClassCastException<span class="dim">&#41;</span>
+at clojure.lang.Numbers/inc <span class="dim">&#40;</span>Numbers.java:139<span class="dim">&#41;</span>.
+class java.lang.String cannot be cast to class
+java.lang.Number <span class="dim">&#40;</span>java.lang.String and java.lang.Number
+are in module java.base of loader 'bootstrap'<span class="dim">&#41;</span>
+</code></pre><p>As you can see the other threads are shutdown before they run/complete. Note: this depends on execution order and task completion time. Some threads might complete before the exception occurs.</p><p>Next lets look at the <code>ShutdownOnSuccess</code> shutdown policy. This policy works well in a situation where you only care about one of the results. For example reaching out to three data providers that provide the same data (for redundancy). </p><p>We are going to implement a function called <code>alts</code> that will take the first completed task from a sequence of tasks being executed in parallel. Only failing if all tasks fail.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>alts</strong> &#91;f coll&#93;
+  <span class="dim">&#40;</span>with-open &#91;scope <span class="dim">&#40;</span>StructuredTaskScope$ShutdownOnSuccess/new<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>run! <span class="dim">&#40;</span>fn &#91;x&#93;
+            <span class="dim">&#40;</span>StructuredTaskScope/.fork scope <span class="dim">&#40;</span>fn &#91;&#93; <span class="dim">&#40;</span>f x<span class="dim">&#41;&#41;&#41;&#41;</span>
+      coll<span class="dim">&#41;</span>
+    <span class="dim">;; Throws if none of the subtasks completed successfully
+</span>    <span class="dim">&#40;</span>.. scope join result<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>Let's run <code>alts</code> and make one of the tasks cause an exception:</p><pre><code class="clojure"><span class="dim">&#40;</span>alts <span class="dim">&#40;</span>fn &#91;x&#93;
+        <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>inc x<span class="dim">&#41;</span>&#93;
+          <span class="dim">&#40;</span>Thread/sleep 100<span class="dim">&#41;</span>
+          <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+          result<span class="dim">&#41;&#41;</span>
+  &#91;1 2 &quot;3&quot; 4 5 6&#93;<span class="dim">&#41;</span>
+  <span class="dim">
+=&gt;</span> 
+complete 2
+complete 4
+
+2
+</code></pre><p>We can see two of the tasks manage to complete, the rest are shutdown and only one result is returned.</p><p>Structured concurrency is a really nice addition to Java. It's great for automatically handling thread cancellation which can help keep latency down and avoid thread leaks in the case of error. </p><p>That being said it's not a natural fit for all use cases. Sometimes you do want unstructured concurrency, like in my previous post on <a href='https://andersmurphy.com/2024/05/06/clojure-managing-throughput-with-virtual-threads.html'>Clojure: managing throughput with virtual threads</a> where <code>upmap</code> produces tasks in one thread and consumes their results in another.</p><p>Something I haven't covered is that <code>StructuredTaskScope</code> can be extended to implement your own shutdown policies. However, I'll cover that in a future post as it's a fair bit more involved.</p><h2 id="dynamic_var_binding_conveyance">Dynamic var binding conveyance</h2><p>Before we get on to scoped variables lets explore Clojure's existing mechanism for thread bound state: dynamic vars. Dynamic vars implement a nice feature called binding conveyance which means thread context gets passed to futures and agents spawned by the parent thread. However, because <code>StructuredTaskScope</code> returns <code>StructuredTaskScope$Subtask</code>/<code>Supplier</code> and not a <code>future</code> we don't get binding conveyance automatically: </p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>&#94;:dynamic</strong> &#42;inc-amount&#42; nil<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>binding &#91;&#42;inc-amount&#42; 3&#93;
+  <span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+          <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x &#42;inc-amount&#42;<span class="dim">&#41;</span>&#93;
+            <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+            <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+            result<span class="dim">&#41;&#41;</span>
+    &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;</span>
+    <span class="dim">
+=&gt;</span> Execution error <span class="dim">&#40;</span>NullPointerException<span class="dim">&#41;</span> 
+at server.core/eval3782$fn <span class="dim">&#40;</span>REPL:6<span class="dim">&#41;</span>.
+Cannot invoke &quot;Object.getClass<span class="dim">&#40;</span><span class="dim">&#41;</span>&quot; because &quot;x&quot; is null
+</code></pre><p>The task threads do not inherit the value of the <code>&#42;inc-aomunt&#42;</code> binding so we get an error. Thankfully, this is easy to fix with the <code>bound-fn&#42;</code> function. A higher order function that transfers the current bindings to the new thread:</p><pre><code class="clojure"><span class="dim">&#40;</span>binding &#91;&#42;inc-amount&#42; 3&#93;
+  <span class="dim">&#40;</span>pmap
+<ins>+   <span class="dim">&#40;</span>bound-fn&#42;</ins>
+      <span class="dim">&#40;</span>fn &#91;x&#93;
+        <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x &#42;inc-amount&#42;<span class="dim">&#41;</span>&#93;
+          <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+          <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+          result<span class="dim">&#41;&#41;&#41;</span>
+    &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;</span>
+    <span class="dim">
+=&gt;</span> complete 9
+complete 6
+complete 7
+complete 5
+complete 4
+complete 8
+
+&#91;4 5 6 7 8 9&#93;
+</code></pre><p>Working as expected.</p><h2 id="scoped_values">Scoped Values</h2><p>This brings us to scoped values. These are similar to Clojure's dynamic vars and Java's thread-local variables but designed for use with virtual threads.</p><blockquote><p>Scoped values, values that may be safely and efficiently shared to methods<br />without using method parameters. They are preferred to thread-local variables, especially when using large numbers of virtual threads. This is a preview API.<br /></p><p><ul><li>JEP 446</li></ul></p></blockquote><p>With the following stated goals:</p><blockquote><p><strong>Goals</strong> </p><p><ul><li><strong>Ease of use</strong> — Provide a programming model to share data both within a thread >and with child threads, so as to simplify reasoning about data flow.</p><p></li><li><strong>Comprehensibility</strong> — Make the lifetime of shared data visible from the syntactic >structure of code.</p><p></li><li><strong>Robustness</strong> — Ensure that data shared by a caller can be retrieved only by >legitimate callees.</p><p></li><li><strong>Performance</strong> — Allow shared data to be immutable so as to allow sharing by a large number of threads, and to enable runtime optimizations. </li></ul></p></blockquote><p>First let's import the classes we will need from <code>ScopedValue</code>:</p><pre><code class="clojure"><span class="dim">&#40;</span>ns <strong>server.core</strong>
+  <span class="dim">&#40;</span>:refer-clojure :exclude &#91;pmap&#93;<span class="dim">&#41;</span>
+<ins>+ <span class="dim">&#40;</span>java.lang ScopedValue<span class="dim">&#41;</span></ins>
+  <span class="dim">&#40;</span>:import
+   <span class="dim">&#40;</span>java.util.concurrent
+     StructuredTaskScope
+     StructuredTaskScope$Subtask
+     StructuredTaskScope$ShutdownOnFailure
+     StructuredTaskScope$ShutdownOnSuccess
+     ExecutorService
+     Executors
+     Callable<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>Scoped values have conveyance built in as this is the behaviour that makes the most sense with hierarchical tasks:</p><blockquote><p>Subtasks forked in a scope inherit ScopedValue bindings (JEP 446). If a scope's owner reads a value from a bound ScopedValue then each subtask will read the same value. </p><p><ul><li>JEP 462</li></ul></p></blockquote><p>Let's see how to use a single scoped value:</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>scoped-inc-amount</strong> <span class="dim">&#40;</span>ScopedValue/newInstance<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>ScopedValue/getWhere scoped-inc-amount 3
+  <span class="dim">&#40;</span>delay 
+    <span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+            <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x <span class="dim">&#40;</span>ScopedValue/.get scoped-inc-amount<span class="dim">&#41;&#41;</span>&#93;
+              <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+              <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+              result<span class="dim">&#41;&#41;</span>
+      &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;&#41;</span>
+<span class="dim">
+=&gt;</span> complete 4
+complete 6
+complete 9
+complete 8
+complete 5
+complete 7
+
+&#91;4 5 6 7 8 9&#93;
+</code></pre><p>It's worth pointing out the use of <code>delay</code> using <code>delay</code> to satisfy the <code>Supplier</code> interface is a recent and welcome addition in Clojure 1.12 (see <a href='https://clojure.atlassian.net/browse/CLJ-2792'>CLJ-2792</a>). It avoids us having to <code>reify</code> Supplier:</p><pre><code class="clojure"><span class="dim">&#40;</span>ScopedValue/getWhere scoped-inc-amount 3
+  <span class="dim">&#40;</span>reify Supplier
+    <span class="dim">&#40;</span>get &#91;&#95;&#93;
+      <span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+              <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x <span class="dim">&#40;</span>ScopedValue/.get scoped-inc-amount<span class="dim">&#41;&#41;</span>&#93;
+                <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+                result<span class="dim">&#41;&#41;</span>
+        &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Now let's see how we set multiple scoped values: </p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>scoped-dec-amount</strong> <span class="dim">&#40;</span>ScopedValue/newInstance<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>.. <span class="dim">&#40;</span>ScopedValue/where scoped-inc-amount 3<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>ScopedValue/where scoped-dec-amount -2<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>ScopedValue/get
+    <span class="dim">&#40;</span>delay
+      <span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+              <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x
+                             <span class="dim">&#40;</span>ScopedValue/.get scoped-inc-amount<span class="dim">&#41;</span>
+                             <span class="dim">&#40;</span>ScopedValue/.get scoped-dec-amount<span class="dim">&#41;&#41;</span>&#93;
+                <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+                <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+                result<span class="dim">&#41;&#41;</span>
+        &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;&#41;&#41;</span>
+        <span class="dim">
+=&gt;</span> complete 4
+complete 2
+complete 3
+complete 5
+complete 7
+complete 6
+
+&#91;2 3 4 5 6 7&#93;
+</code></pre><p>Finally, let's make this more ergonomic by writing a convenience macro for scoped values  called <code>scoped-binding</code> that mirrors Clojure's <code>binding</code> macro:</p><pre><code class="clojure"><span class="dim">&#40;</span>defmacro <strong>scoped-binding</strong> &#91;bindings &amp; body&#93;
+  <span class="dim">&#40;</span>assert <span class="dim">&#40;</span>vector? bindings<span class="dim">&#41;</span>
+    &quot;a vector for its binding&quot;<span class="dim">&#41;</span>
+  <span class="dim">&#40;</span>assert <span class="dim">&#40;</span>even? <span class="dim">&#40;</span>count bindings<span class="dim">&#41;&#41;</span>
+    &quot;an even number of forms in binding vector&quot;<span class="dim">&#41;</span>
+  `<span class="dim">&#40;</span>.. &#126;@<span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>partition 2 bindings<span class="dim">&#41;</span>
+           <span class="dim">&#40;</span>map <span class="dim">&#40;</span>fn &#91;&#91;k v&#93;&#93;
+                  <span class="dim">&#40;</span>assert <span class="dim">&#40;</span>-&gt; k resolve deref type <span class="dim">&#40;</span>= ScopedValue<span class="dim">&#41;&#41;</span>
+                    <span class="dim">&#40;</span>str k &quot; is not a ScopedValue&quot;<span class="dim">&#41;&#41;</span>
+                  `<span class="dim">&#40;</span>ScopedValue/where &#126;k &#126;v<span class="dim">&#41;&#41;&#41;&#41;</span>
+     <span class="dim">&#40;</span>ScopedValue/get <span class="dim">&#40;</span>delay &#126;@body<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>And see if it works:</p><pre><code class="clojure"><span class="dim">&#40;</span>scoped-binding &#91;scoped-inc-amount  3
+                 scoped-dec-amount -2&#93;
+  <span class="dim">&#40;</span>pmap <span class="dim">&#40;</span>fn &#91;x&#93;
+          <span class="dim">&#40;</span>let &#91;result <span class="dim">&#40;</span>+ x
+                         <span class="dim">&#40;</span>ScopedValue/.get scoped-inc-amount<span class="dim">&#41;</span>
+                         <span class="dim">&#40;</span>ScopedValue/.get scoped-dec-amount<span class="dim">&#41;&#41;</span>&#93;
+            <span class="dim">&#40;</span>Thread/sleep 50<span class="dim">&#41;</span>
+            <span class="dim">&#40;</span>print <span class="dim">&#40;</span>str &quot;complete &quot; result &quot;\n&quot;<span class="dim">&#41;&#41;</span>
+            result<span class="dim">&#41;&#41;</span>
+    &#91;1 2 3 4 5 6&#93;<span class="dim">&#41;&#41;</span>
+<span class="dim">
+=&gt;</span> complete 4
+complete 6
+complete 9
+complete 8
+complete 5
+complete 7
+
+&#91;4 5 6 7 8 9&#93;
+</code></pre><p>Great we now have all the tools for using scoped values in Clojure. That being said should you use scoped values in Clojure? In places you were already using thread-local variables then scoped values have improved performance and security. But, if you are already using Clojure's dynamic vars then I don't see an obvious benefit to switching to scoped variables other than not having to remember to use <code>bound-fn&#42;</code> when you want to carry over bound dynamic vars to virtual threads.</p><p>Yet again we've seen how Clojure's seamless and constantly improving integration with Java makes exploring the latest Java features effortless, and thanks to macros we can even improve on the Java experience.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/managing-throughput'>project can be found here</a>.</p><p><strong>Further Reading:</strong></p><ul><li><a href='https://openjdk.org/jeps/462'>JEP 462: Structured Concurrency</a></li><li><a href='https://openjdk.org/jeps/446'>JEP 446: Scoped Values</a></li><li><a href='https://clojure.org/reference/vars#conveyance'>Binding conveyance</a></li><li><a href='https://clojuredocs.org/clojure.core/bound-fn*'>bound-fn*</a></li><li><a href='https://clojure.atlassian.net/browse/CLJ-2792'>Java Supplier interop CLJ-2792</a></li><li><a href='https://stuartsierra.com/2013/03/29/perils-of-dynamic-scope'>On the Perils of Dynamic Scope</a></li></ul></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
