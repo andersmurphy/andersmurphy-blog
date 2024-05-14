@@ -222,9 +222,9 @@ With the following stated goals:
 
 >**Goals**
 >
-> - **Ease of use** — Provide a programming model to share data both within a thread >and with child threads, so as to simplify reasoning about data flow.
+> - **Ease of use** — Provide a programming model to share data both within a thread and with child threads, so as to simplify reasoning about data flow.
 >
-> - **Comprehensibility** — Make the lifetime of shared data visible from the syntactic >structure of code.
+> - **Comprehensibility** — Make the lifetime of shared data visible from the syntactic structure of code.
 >
 > - **Robustness** — Ensure that data shared by a caller can be retrieved only by legitimate callees.
 >
