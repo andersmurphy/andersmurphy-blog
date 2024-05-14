@@ -166,6 +166,10 @@ style-src       'self' 'unsafe-inline'
       (-> full-capture        
         (str/replace #"\n(\+.*)\n"
           "\n<ins>$1</ins>\n")
+        ;; We need this replacement twice to handle
+        ;; adjacent inserts.  
+        (str/replace #"\n(\+.*)\n"
+          "\n<ins>$1</ins>\n")
         (str/replace #"(&#40;def[a-z\-]* |ns )(\S+)"
           "$1<strong>$2</strong>")
         (str/replace #"((?:&#40;)+|(?:&#41;)+)"
