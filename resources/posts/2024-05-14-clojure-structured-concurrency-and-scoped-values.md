@@ -185,7 +185,7 @@ at server.core/eval3782$fn (REPL:6).
 Cannot invoke "Object.getClass()" because "x" is null
 ```
 
-The task threads do not inherit the value of the `*inc-aomunt*` binding so we get an error. Thankfully, this is easy to fix with the `bound-fn*` function. A higher order function that transfers the current bindings to the new thread:
+The task threads do not inherit the value of the `*inc-amount*` binding so we get an error. Thankfully, this is easy to fix with the `bound-fn*` function. A higher order function that transfers the current bindings to the new thread:
 
 ```clojure
 (binding [*inc-amount* 3]

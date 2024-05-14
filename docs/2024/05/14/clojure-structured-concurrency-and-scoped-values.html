@@ -113,7 +113,7 @@ complete 4
 =&gt;</span> Execution error <span class="dim">&#40;</span>NullPointerException<span class="dim">&#41;</span> 
 at server.core/eval3782$fn <span class="dim">&#40;</span>REPL:6<span class="dim">&#41;</span>.
 Cannot invoke &quot;Object.getClass<span class="dim">&#40;</span><span class="dim">&#41;</span>&quot; because &quot;x&quot; is null
-</code></pre><p>The task threads do not inherit the value of the <code>&#42;inc-aomunt&#42;</code> binding so we get an error. Thankfully, this is easy to fix with the <code>bound-fn&#42;</code> function. A higher order function that transfers the current bindings to the new thread:</p><pre><code class="clojure"><span class="dim">&#40;</span>binding &#91;&#42;inc-amount&#42; 3&#93;
+</code></pre><p>The task threads do not inherit the value of the <code>&#42;inc-amount&#42;</code> binding so we get an error. Thankfully, this is easy to fix with the <code>bound-fn&#42;</code> function. A higher order function that transfers the current bindings to the new thread:</p><pre><code class="clojure"><span class="dim">&#40;</span>binding &#91;&#42;inc-amount&#42; 3&#93;
   <span class="dim">&#40;</span>pmap
 <ins>+   <span class="dim">&#40;</span>bound-fn&#42;</ins>
       <span class="dim">&#40;</span>fn &#91;x&#93;
