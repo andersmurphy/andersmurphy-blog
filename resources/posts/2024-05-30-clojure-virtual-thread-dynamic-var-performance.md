@@ -4,7 +4,7 @@ In the previous post we explored [structured concurrency, scoped values and bind
 
 A quick disclaimer. I'm using [criterium quick-bench](https://github.com/hugoduncan/criterium) to compare the execution speed of the three implementations below. This is an easy way to benchmark functions. However, benchmarks are very context dependent and these test are by no means extensive. So take these results with a grain of salt and always do you're own benchmarking.
 
-For an extensive guide to benchmarking and performance tuning I highly recommend you check out [Clojure Goes Fast](https://clojure-goes-fast.com/) by Oleksandr Yakushev, it's an incredible resource.
+For an extensive guide to benchmarking and performance tuning, I highly recommend you check out [Clojure Goes Fast](https://clojure-goes-fast.com/) by Oleksandr Yakushev, it's an incredible resource.
 
 ## Set up code
 
@@ -120,7 +120,7 @@ It's worth looking at why dynamic vars and scoped values exist. The summary from
 >
 > - JEP 446
 
-If your function call stack is shallow then, it can be simpler to just pass the context as an explicit argument.
+If your function call stack is shallow, it can be simpler to pass the context as an explicit argument.
 
 ```clojure
 (crit/quick-bench
@@ -141,7 +141,7 @@ If your function call stack is shallow then, it can be simpler to just pass the 
 
 With 50000 virtual threads `pmap`'s execution time mean is 189.313904 ms. Roughly, 5x faster than the dynamic var version and a similar speed to the scoped values version.
 
-My take away is: you probably don't need dynamic scope. Instead, pass the context explicitly. If you really think you need dynamic scope and are using a large number of virtual threads favour scoped values over dynamic vars. That being said thread conveyance for scoped values only works in the context of structured concurrency, so if you are using things like `Executor` and `CompletionService` you'll have to either pass context explicitly or use dynamic vars.
+My takeaway is: you probably don't need dynamic scope. Instead, pass the context explicitly. If you really think you need dynamic scope and are using a large number of virtual threads, favour scoped values over dynamic vars. That being said, thread conveyance for scoped values only works in the context of structured concurrency, so if you are using things like `Executor` and `CompletionService` you'll have to either pass context explicitly or use dynamic vars.
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/dynamic-var-perf).
 
