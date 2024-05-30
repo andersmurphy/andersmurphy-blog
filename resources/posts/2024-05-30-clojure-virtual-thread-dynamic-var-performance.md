@@ -141,7 +141,7 @@ If your function call stack is shallow then, it can be simpler to just pass the 
 
 With 50000 virtual threads `pmap`'s execution time mean is 189.313904 ms. Roughly, 5x faster than the dynamic var version and a similar speed to the scoped values version.
 
-My take away is: you probably don't need dynamic scope. Instead, pass the context explicitly. If you really think you need dynamic scope and are using a large number of virtual threads favour scoped values over dynamic vars. That being said thread conveyance for scoped values only works in the context structured concurrency, so if you are using things like `Executor` and `CompletionService` you'll have to either pass context explicitly or use dynamic vars.
+My take away is: you probably don't need dynamic scope. Instead, pass the context explicitly. If you really think you need dynamic scope and are using a large number of virtual threads favour scoped values over dynamic vars. That being said thread conveyance for scoped values only works in the context of structured concurrency, so if you are using things like `Executor` and `CompletionService` you'll have to either pass context explicitly or use dynamic vars.
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/dynamic-var-perf).
 
