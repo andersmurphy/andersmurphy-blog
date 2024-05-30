@@ -365,6 +365,8 @@ Yet again we've seen how Clojure's seamless and constantly improving integration
 
 The full example [project can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/virtual-threads/structured-concurrency).
 
+**UPDATE:** In [this subsequent post](https://andersmurphy.com/2024/05/30/clojure-virtual-thread-dynamic-var-performance.html) I cover some of the performance implications of dynamic vars and virtual threads.
+
 **Further Reading:**
 
 - [JEP 462: Structured Concurrency](https://openjdk.org/jeps/462)
