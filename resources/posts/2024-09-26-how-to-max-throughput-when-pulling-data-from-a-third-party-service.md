@@ -44,7 +44,7 @@ What happens when we exceed the rate limit? Ideally, the third party service ret
 
 Another thing to keep in mind is you don't want a single failure stopping all your other work in progress i.e if we fail to pull a single transaction we shouldn't stop all the other transactions from being pulled.
 
-## Global concurrent rate limit
+## Global thread safe rate limiter
 
 We need a mechanism that rate limits our requests, most languages will have a library that handles this. Ideally, it should be thread safe so multiple threads can use it concurrently. See [this post for an implementation with semaphores in Clojure](https://andersmurphy.com/2024/05/06/clojure-managing-throughput-with-virtual-threads.html).
 
