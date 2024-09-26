@@ -22,7 +22,7 @@ Also think about what that would do to your system as a whole and the experience
 
 ## Rate limits
 
-So we've got an idea for how long things take if we run things sequentially. Next we need to find out the rate limit of the third party service. Let's say they say you can make 1000 requests a second. So the theoretical limit for how fast you can sync the average user is 10.5 seconds. 
+So we've got an idea for how long things take if we run things sequentially. Next we need to find out the rate limit of the third party service. They say you can make 1000 requests a second. So the theoretical limit for how fast you can sync the average user is 10.5 seconds. 
 
 Keep in mind most services are at beast economical with the truth when it comes to their rate limits and/or leave key details out about their implementation. 
 
@@ -46,7 +46,7 @@ Another thing to keep in mind is you don't want a single failure stopping all yo
 
 ## Global concurrent rate limit
 
-We need a mechanism that rate limits our requests, most languages will have a library that handles this. Ideally, it should thread safe so multiple threads can use it concurrently. See [this post for an implementation with semaphores in Clojure](https://andersmurphy.com/2024/05/06/clojure-managing-throughput-with-virtual-threads.html).
+We need a mechanism that rate limits our requests, most languages will have a library that handles this. Ideally, it should be thread safe so multiple threads can use it concurrently. See [this post for an implementation with semaphores in Clojure](https://andersmurphy.com/2024/05/06/clojure-managing-throughput-with-virtual-threads.html).
 
 ## Concurrency
 
@@ -60,7 +60,7 @@ Here, we effectively want to split our sequence of tasks into multiple concurren
 
 ## Unordered
 
-Unordered concurrency can help minimizing latency by dealing with results as soon as they became available. It also helps you maximise data transformation/write throughput by saturating those resources. 
+Unordered concurrency can help minimize latency by dealing with results as soon as they became available. It also helps you maximise data transformation/write throughput by saturating those resources. 
 
 ## Bottlenecks 
 
@@ -82,7 +82,7 @@ In our case sampling 99% of the results reduced the average wait time by 50%.
 
 ## Don't starve
 
-Make sure your thread safe rate limiter is FIFO to prevent starvation, if not you can end up in a situation where a user is waiting forever because their tasks are always at the back and never processed. 
+Make sure your thread safe rate limiter is FIFO to prevent starvation, if not you can end up in a situation where a user is waiting forever because their tasks are always at the last and never processed. 
 
 ## Conclusion
 
