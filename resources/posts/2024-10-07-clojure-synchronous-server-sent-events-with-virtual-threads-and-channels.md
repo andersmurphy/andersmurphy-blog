@@ -98,7 +98,9 @@ We need a broadcast function to broadcast messages to clients. All it does is it
 
 ## Simple server
 
-We need a server configured to use virtual threads. Virtual threads means we can have hundreds of thousands of threads with very little overhead. This is what enables us to write the handlers in a synchronous manner without running into performance problems.
+We need a server configured to use virtual threads. Virtual threads means we can have hundreds of thousands of threads with very little overhead. This is what enables us to write the handlers in a synchronous manner without running into performance problems. 
+
+*Note:  you'll need to be running Java 21+ to have access to Virtual threads.*
 
 ```clojure
 (def app
