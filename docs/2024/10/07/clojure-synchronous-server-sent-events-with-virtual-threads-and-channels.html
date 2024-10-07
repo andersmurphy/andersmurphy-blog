@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: Synchronous server sent events with virtual threads and channels</title><meta content="
+base-uri        &apos;self&apos;;
+form-action     &apos;self&apos;;
+default-src     &apos;none&apos;;
+script-src      &apos;self&apos;;
+img-src         &apos;self&apos;;
+font-src        &apos;self&apos;;
+connect-src     &apos;self&apos;;
+style-src       &apos;self&apos; &apos;unsafe-inline&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link data-turbo-track="reload" href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/favicon.png" rel="shortcut icon" /><script defer="defer" src="/toggle.js"></script><script defer="defer" src="/turbo.js" type="module"></script><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="same-origin" name="view-transition" /><meta content="A blog mostly about Clojure programming" name="description" /></head><body><header class="nav-sticky-top container-fluid"><nav class="container"><ul><li><div class="linkify" style="align-items:center;display:flex;"><img alt="portrait" height="40px" src="/assets/avatar.png" style="image-rendering:pixelated;padding:4px;" width="40px" /><h1 style="margin-bottom:0;">anders murphy</h1><a aria-label="Home" href="/"></a></div></li></ul><ul><li><a aria-label="Github" class="contrast no-chaos" href="https://github.com/andersmurphy"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 496 512" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></a></li><li><a aria-label="RSS" class="contrast no-chaos" href="/feed.xml"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"></path></svg></a></li><li><div class="theme-toggle" id="toggle"><svg aria-hidden="true" class="icon theme-toggle__inner-moon" height="30" viewBox="0 0 32 32" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"></path><circle cx="16" cy="16" r="8.1"></circle></svg></div></li></ul></nav></header><main class="container"><article><hgroup><h1>Clojure: Synchronous server sent events with virtual threads and channels</h1><p><time datetime="2024-10-07T00:00:00+00:00">07 Oct 2024</time></p></hgroup><hr /><p>I have been playing around with <a href='https://turbo.hotwired.dev/'>turbo</a> and <a href='https://data-star.dev/'>datastar</a> both of which use <a href='https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events'>server sent events</a> to broadcast updates to the client. Traditionally, server sent events work best with asynchronous ring handlers. But, personally I much prefer the simplicity of synchronous handlers, and with the advent of virtual threads we can have our cake and eat it. This post will go over how to build a synchronous ring handler for server sent events.</p><h2 id="extending_streamableresponsebody">Extending StreamableResponseBody</h2><p>First we want to extend <code>StreamableResponseBody</code> protocol to support <code>ManyToManyChannel</code>. Even though we are using virtual threads we still want a way for these virtual threads to communicate with each other and <code>core.async</code> channels are perfect for this. In theory <code>BufferedWriter</code> is thread safe so you could skip <code>core.async</code> if you really want to, but you'd miss out on useful features like <code>sliding-buffer</code> etc.</p><pre><code class="clojure"><span class="dim">;; Extend core.async channel with StreamableResponseBody
+</span><span class="dim">&#40;</span>extend-type clojure.core.async.impl.channels.ManyToManyChannel
+  StreamableResponseBody
+  <span class="dim">&#40;</span>write-body-to-stream &#91;ch &#95;response &#94;OutputStream output-stream&#93;
+    <span class="dim">&#40;</span>with-open &#91;out    output-stream
+                writer <span class="dim">&#40;</span>io/writer out<span class="dim">&#41;</span>&#93;
+      <span class="dim">&#40;</span>try
+        <span class="dim">&#40;</span>loop &#91;&#93;
+          <span class="dim">&#40;</span>when-let &#91;&#94;String msg <span class="dim">&#40;</span>a/&lt;!! ch<span class="dim">&#41;</span>&#93;
+            <span class="dim">&#40;</span>doto writer <span class="dim">&#40;</span>.write msg<span class="dim">&#41;</span> <span class="dim">&#40;</span>.flush<span class="dim">&#41;&#41;</span>
+            <span class="dim">&#40;</span>recur<span class="dim">&#41;&#41;&#41;</span>
+        <span class="dim">;; If the client disconnects writing to the output stream
+</span>        <span class="dim">;; throws an IOException.
+</span>        <span class="dim">&#40;</span>catch java.io.IOException &#95;<span class="dim">&#41;</span>
+        <span class="dim">;; Close channel after client disconnect.
+</span>        <span class="dim">&#40;</span>finally <span class="dim">&#40;</span>a/close! ch<span class="dim">&#41;&#41;&#41;&#41;&#41;&#41;</span>
+</code></pre><p>This code takes a message off the channel and writes it to the output-stream. If a write fails we close the channel. It's important to note this code uses <code>a/&lt;!!</code> so is blocking.</p><h2 id="tracking_client_connections">Tracking client connections</h2><p>Next lets create an atom to keep track of client connections:</p><pre><code class="clojure"><span class="dim">&#40;</span>defonce <strong>clients</strong> <span class="dim">&#40;</span>atom #{}<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="sending_messages">Sending messages</h2><p>Some code for sending messages:</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>format-event</strong> &#91;body&#93;
+  <span class="dim">&#40;</span>str &quot;data: &quot; body &quot;\n\n&quot;<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>send&gt;!!</strong> &#91;ch message&#93;
+  <span class="dim">&#40;</span>let &#91;v <span class="dim">&#40;</span>a/&gt;!! ch message<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>when-not v <span class="dim">&#40;</span>swap! clients disj ch<span class="dim">&#41;&#41;</span>
+    <span class="dim">;; Keeps the return semantics of &gt;!!
+</span>    v<span class="dim">&#41;&#41;</span>
+</code></pre><p>When a channel is closed, we want to remove the clients connection from the <code>clients</code> atom.</p><h2 id="heartbeat">Heartbeat</h2><p>There's no way for us to know that the client has closed the connection without trying to write to the output-stream. To prune disconnected clients, so that we don't have an ever expanding atom of connected zombie clients, we need to occasionally write to the output stream. To do this we send  a <code>\n\n</code> message every X seconds. This heartbeat runs in a virtual thread and stops when the channel is closed. </p><p><em>Note: this code is very similar to what you would normally write in a <code>go</code> block but instead we are using the blocking <code>core.async</code> constructs and running them in a virtual thread.</em></p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>heartbeat&gt;!!</strong> &#91;ch msec&#93;
+  <span class="dim">&#40;</span>Thread/startVirtualThread
+    #<span class="dim">&#40;</span>loop &#91;&#93;
+       <span class="dim">&#40;</span>Thread/sleep &#94;long msec<span class="dim">&#41;</span>
+       <span class="dim">&#40;</span>when <span class="dim">&#40;</span>send&gt;!! ch &quot;\n\n&quot;<span class="dim">&#41;</span>
+         <span class="dim">&#40;</span>recur<span class="dim">&#41;&#41;&#41;&#41;&#41;</span>
+</code></pre><h2 id="the_handler">The handler</h2><p>Finally, our synchronous handler creates a channel, adds the channel to the <code>clients</code> atom, sends a connection message and starts a heartbeat. The channel is then returned as the response body.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>handler-sse</strong> &#91;&#95;&#93;
+  <span class="dim">&#40;</span>let &#91;ch <span class="dim">&#40;</span>a/chan 10<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>swap! clients conj ch<span class="dim">&#41;</span>
+    <span class="dim">&#40;</span>send&gt;!! ch <span class="dim">&#40;</span>format-event &quot;Successfully connected&quot;<span class="dim">&#41;&#41;</span>
+    <span class="dim">;; Every 10 seconds we send a heartbeat to check if output stream
+</span>    <span class="dim">;; is still open.
+</span>    <span class="dim">&#40;</span>heartbeat&gt;!! ch 10000<span class="dim">&#41;</span>
+    {:status  200
+     :headers {&quot;Content-Type&quot;  &quot;text/event-stream&quot;
+               &quot;Cache-Control&quot; &quot;no-cache, no-store&quot;}
+     :body    ch}<span class="dim">&#41;&#41;</span>
+</code></pre><p>The headers are important here, we don't want the client to cache responses and the content type needs to be <code>text/event-stream</code>.</p><h2 id="broadcast">Broadcast</h2><p>We need a broadcast function to broadcast messages to clients. All it does is iterates through each channel in <code>clients</code> and sends a message.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>broadcast-message-to-connected-clients!</strong> &#91;message&#93;
+  <span class="dim">&#40;</span>run! <span class="dim">&#40;</span>fn &#91;ch&#93; <span class="dim">&#40;</span>send&gt;!! ch <span class="dim">&#40;</span>format-event message<span class="dim">&#41;&#41;&#41;</span> @clients<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="simple_server">Simple server</h2><p>We need a server configured to use virtual threads.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>app</strong>
+  <span class="dim">&#40;</span>fn handler &#91;{:keys &#91;request-method uri&#93; :as req}&#93;
+    <span class="dim">&#40;</span>if <span class="dim">&#40;</span>= &#91;:get  &quot;/&quot;&#93; &#91;request-method uri&#93;<span class="dim">&#41;</span>
+      <span class="dim">&#40;</span>handler-sse req<span class="dim">&#41;</span>
+      {:status 404}<span class="dim">&#41;&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defn <strong>start-server</strong> &#91;&amp; {:as opts}&#93;
+  <span class="dim">&#40;</span>let &#91;thread-pool <span class="dim">&#40;</span>new QueuedThreadPool<span class="dim">&#41;</span>
+        &#95;           <span class="dim">&#40;</span>.setVirtualThreadsExecutor thread-pool
+                      <span class="dim">&#40;</span>Executors/newVirtualThreadPerTaskExecutor<span class="dim">&#41;&#41;</span>&#93;
+    <span class="dim">&#40;</span>run-jetty  #'app
+      <span class="dim">&#40;</span>merge
+        {:port        8080
+         :thread-pool thread-pool}
+        opts<span class="dim">&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Start the server.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>server</strong>
+  <span class="dim">&#40;</span>start-server :join? false<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="connecting_clients">Connecting clients</h2><p>Connect a client from a terminal. You can connect multiple clients using different terminal windows.</p><pre><code class="bash">curl localhost:8080 -vv
+
+=&gt;
+
+&#42;   Trying &#91;::1&#93;:8080...
+&#42; Connected to localhost &#40;::1&#41; port 8080
+&gt; GET / HTTP/1.1
+&gt; Host: localhost:8080
+&gt; User-Agent: curl/8.4.0
+&gt; Accept: &#42;/&#42;
+&gt; 
+&lt; HTTP/1.1 200 OK
+&lt; Server: Jetty&#40;12.0.13&#41;
+&lt; Content-Type: text/event-stream;charset=UTF-8
+&lt; Cache-Control: no-cache, no-store
+&lt; Transfer-Encoding: chunked
+&lt; 
+data: Successfully connected
+
+</code></pre><h1 id="broadcast_messages">Broadcast  messages</h1><p>Send a message to all clients.</p><pre><code class="clojure"><span class="dim">&#40;</span>broadcast-message-to-connected-clients! &quot;Hello&quot;<span class="dim">&#41;</span>
+</code></pre><p>You should see the message print in each connected terminal.</p><pre><code class="bash">data: Hello
+</code></pre><h1 id="check_connected_clients">Check connected clients</h1><p>If we deref the <code>clients</code> atom we can see that we have two connected clients.</p><pre><code class="clojure">@clients<span class="dim">
+=&gt;</span>
+#{#object&#91;clojure.core.async.impl.channels.ManyToManyChannel 0x31de488f &quot;clojure.core.async.impl.channels.ManyToManyChannel@31de488f&quot;&#93;
+  #object&#91;clojure.core.async.impl.channels.ManyToManyChannel 0x7870479b &quot;clojure.core.async.impl.channels.ManyToManyChannel@7870479b&quot;&#93;}
+</code></pre><h1 id="pruning_disconnected_clients">Pruning disconnected clients</h1><p>If we close the terminal windows (disconnecting the clients) and wait 30 seconds or so and deref the <code>clients</code> atom again it should be empty.</p><pre><code class="clojure">@clients<span class="dim">
+=&gt;</span>
+#{}
+</code></pre><h1 id="conclusion">Conclusion</h1><p>Hopefully, this post provides a good starting point for anyone wanting to set up server sent events with synchronous ring handlers. </p><p>As an aside <code>core.async</code> channels and their blocking constructs work really nicely with virtual threads. In my experience so far it means you never have to reach for <code>go</code> blocks. This massively simplifies things.</p><p>The full example <a href='https://github.com/andersmurphy/clj-cookbook/tree/master/server-sent-events/synchronous-handler-with-virtual-threads'>project can be found here</a>.</p><p><strong>Further Reading:</strong></p><ul><li><a href='https://www.lucagrulla.com/posts/server-sent-events-with-ring-and-compojure/'>Server-sent events(SSE) with Ring and Compojure</a></li><li><a href='https://fpsd.codes/blog/clojure-bites-sse/'>Clojure bites - SSE with Aleph and Reitit</a></li><li><a href='https://germano.dev/sse-websockets/'>Server-Sent Events: the alternative to WebSockets you should be using</a></li></ul></article><footer><p>© 2015-2024 Anders Murphy</p></footer></main></body></html>
