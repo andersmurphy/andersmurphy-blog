@@ -54,7 +54,7 @@ When a channel is closed, we want to remove the clients connection from the `cli
 
 ## Heartbeat
 
-There's no way for us to know that the client has closed the connection without trying to write to the output-stream. To prune disconnected clients, so that we don't have an ever expanding atom of connected zombie clients, we need to occasionally write to the output stream. To do this we send  a `\n\n` message every X seconds. This heartbeat runs in a virtual thread and stops when the channel is closed. 
+There's no way for us to know that the client has closed the connection without trying to write to the output-stream. To prune disconnected clients, so that we don't have an ever expanding atom of zombie clients, we need to occasionally write to the output stream. To do this we send  a `\n\n` message every X seconds. This heartbeat runs in a virtual thread and stops when the channel is closed. 
 
 *Note: this code is very similar to what you would normally write in a `go` block but instead we are using the blocking `core.async` constructs and running them in a virtual thread.*
 
@@ -98,7 +98,7 @@ We need a broadcast function to broadcast messages to clients. All it does is it
 
 ## Simple server
 
-We need a server configured to use virtual threads.
+We need a server configured to use virtual threads. Virtual threads means we can have hundreds of thousands of threads with very little overhead. This is what enables us to write the handlers in a synchronous manner without running into performance problems.
 
 ```clojure
 (def app
@@ -151,7 +151,7 @@ data: Successfully connected
 
 ```
 
-# Broadcast  messages
+## Broadcast  messages
 
 Send a message to all clients.
 
@@ -165,7 +165,7 @@ You should see the message print in each connected terminal.
 data: Hello
 ```
 
-# Check connected clients
+## Check connected clients
 
 If we deref the `clients` atom we can see that we have two connected clients.
 
@@ -176,7 +176,7 @@ If we deref the `clients` atom we can see that we have two connected clients.
   #object[clojure.core.async.impl.channels.ManyToManyChannel 0x7870479b "clojure.core.async.impl.channels.ManyToManyChannel@7870479b"]}
 ```
 
-# Pruning disconnected clients
+## Pruning disconnected clients
 
 If we close the terminal windows (disconnecting the clients) and wait 30 seconds or so and deref the `clients` atom again it should be empty.
 
@@ -186,7 +186,7 @@ If we close the terminal windows (disconnecting the clients) and wait 30 seconds
 #{}
 ```
 
-# Conclusion
+## Conclusion
 
 Hopefully, this post provides a good starting point for anyone wanting to set up server sent events with synchronous ring handlers. 
 
