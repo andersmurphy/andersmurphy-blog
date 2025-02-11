@@ -112,17 +112,13 @@ style-src       'self' 'unsafe-inline'
    ;; styles
    [:link
     {:rel              "stylesheet" :type "text/css"
-     :href             (str site-url "styles.css")
-     :data-turbo-track "reload"}]
+     :href             (str site-url "styles.css")}]
    ;; icons
    [:link {:rel  "shortcut icon"
            :href (str site-url "assets/favicon.png")}]
    ;; javascript
    [:script {:defer true
              :src   (str site-url "toggle.js")}]
-   [:script {:defer true
-             :type  "module"
-             :src   (str site-url "turbo.js")}]
    ;; enables responsiveness on mobile devices
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
    ;; view transitions
