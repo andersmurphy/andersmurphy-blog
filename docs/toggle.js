@@ -20,7 +20,7 @@ function modeSwitch() {
   iconChange(targetTheme)
 }
 
-document.addEventListener("turbo:load", (event) => {
+document.addEventListener("load", (event) => {
   const toggle = document.querySelector("#toggle")
   toggle.addEventListener("click", modeSwitch)
   const currentTheme = document.documentElement.getAttribute("data-theme")
