@@ -20,7 +20,7 @@ function modeSwitch() {
   iconChange(targetTheme)
 }
 
-document.addEventListener("load", (event) => {
+window.addEventListener("load", (event) => {
   const toggle = document.querySelector("#toggle")
   toggle.addEventListener("click", modeSwitch)
   const currentTheme = document.documentElement.getAttribute("data-theme")
