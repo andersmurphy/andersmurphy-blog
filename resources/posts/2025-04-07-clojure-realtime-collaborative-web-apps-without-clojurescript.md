@@ -6,13 +6,13 @@ Last week I made a fun little multiplayer web app. [Go check it out here](https:
 
 That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) JS framework that lets you write reactive web apps with simple server side rendering.
 
-I've rolled my own opinionated mini set of Datastar helpers that builds on dataof server side rendering. called [hyperlith](https://github.com/andersmurphy/hyperlith), but Datastar itself is both backend language and framework agnostic.
+I've rolled my own opinionated Clojure mini framework that builds on Datastar called [hyperlith](https://github.com/andersmurphy/hyperlith), but Datastar itself is both backend language and framework agnostic.
 
 ## The same model as React
 
-With Datastar you can still use the same `view = f (state)` model the only difference is only the `view` is on the client `f` and `state` can stay on the server.
+With Datastar you can still use the same `view = f (state)` model the difference is  the `view` is on the client `f (state)` stays on the server.
 
-Lets start with a minimal shim, this is for the initial page load.
+Lets start with a minimal shim, this is for the initial page load:
 
 ```clojure
 (def default-shim-handler
@@ -43,13 +43,6 @@ Then we have a hiccup render function with a separate component `board-state` co
     [:link#css {:rel "stylesheet" :type "text/css" :href (css :path)}]
     [:main#morph.main
      [:h1 "Game of Life (multiplayer)"]
-     [:p "Built with ❤️ using "
-      [:a {:href "https://clojure.org/"} "Clojure"]
-      " and "
-      [:a {:href "https://data-star.dev"} "Datastar"]
-      "🚀"]
-     [:p "Source code can be found "
-      [:a {:href "https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj"} "here"]]
      [:div
       [:div.board nil
        (board-state db)]]]))
