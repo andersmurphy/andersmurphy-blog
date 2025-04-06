@@ -6,11 +6,15 @@ Last week I made a fun little multiplayer web app. [Go check it out here](https:
 
 That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) JS framework that lets you write reactive web apps with simple server side rendering.
 
-I've rolled my own opinionated Clojure mini framework that builds on Datastar called [hyperlith](https://github.com/andersmurphy/hyperlith), but Datastar itself is both backend language and framework agnostic.
+This post is intended as a very quick introduction to some of the concepts and features of Datastar. So buckle up.
+
+*Note:  I've rolled my own opinionated Clojure mini framework that builds on Datastar called [hyperlith](https://github.com/andersmurphy/hyperlith), but Datastar itself is both backend language and framework agnostic.*
 
 ## The same model as React
 
-With Datastar you can still use the same `view = f (state)` model the difference is  the `view` is on the client `f (state)` stays on the server.
+With Datastar you can still use the same `view = f (state)` model. The difference is  the `view` is on the client and `f (state)` stays on the server.
+
+## Show me the code
 
 Lets start with a minimal shim, this is for the initial page load:
 
@@ -74,11 +78,11 @@ That's the neat part you don't. It already is. The function we defined in `rende
 
 The function `action-tap-cell` does distinguish between users though. It picks a colour based on their `sid`.
 
-If you've played around with [Electric Clojure](https://github.com/hyperfiddle/electric) you might find this familiar. With datastar though all your logic lives on the server. The client shim is so thin it's almost not there.
+If you've played around with [Electric Clojure](https://github.com/hyperfiddle/electric) you might find this familiar. Rather than having a state of the art compiler. Datastar pushes almost all of your logic to server. The client shim is so thin it's almost not there. 
 
 ## This code is declarative (and naive)
 
-![event listener image](assets/naive.png)
+![event listener image](/assets/naive.png)
 
 There's no canvas here. There's no SVG. There's just a 1600 cell grid, each cell with it's own on-click listener. This is an incredibly naive implementation. Partly, to show how well it performs. Your CRUD app will be fine.
 
@@ -88,11 +92,12 @@ Brotli compression over SSE gives you 50-100:1 compression ratio over a series o
 
 ## Conclusion
 
-[Datastar](https://data-star.dev) pairs really well with Clojure and can make it trivial to implement highly interactive and collaborative web apps without ClojureScript. You should give it a go! 
+[Datastar](https://data-star.dev) pairs really well with Clojure and can make it trivial to implement highly interactive and collaborative web apps without ClojureScript. You should give it a go!
 
 The full Datastar game of life source code can [be found here](https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj).
 
 **Further Reading:**
 
-- [More examples](https://github.com/andersmurphy/hyperlith/tree/master/examples)
-- [More thoughts on using datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
+- [Datastar docs](https://data-star.dev/guide/getting_started)
+- [More hyperlith examples](https://github.com/andersmurphy/hyperlith/tree/master/examples)
+- [More of my thoughts on using datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
