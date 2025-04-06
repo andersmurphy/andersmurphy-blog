@@ -4,7 +4,7 @@ Last week I made a fun little multiplayer web app. [Go check it out here](https:
 
 ... so you're back ...
 
-That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) JS framework that lets you write reactive web apps with simple server side rendering.
+That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) hypermedia framework that lets you write reactive web apps with simple server side rendering.
 
 This post is intended as a very quick introduction to some of the concepts and features of Datastar. So buckle up.
 
