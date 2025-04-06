@@ -78,7 +78,7 @@ That's the neat part you don't. It already is. The function we defined in `rende
 
 The function `action-tap-cell` does distinguish between users though. It picks a colour based on their `sid`.
 
-If you've played around with [Electric Clojure](https://github.com/hyperfiddle/electric) you might find this familiar. Rather than having a state of the art compiler. Datastar pushes almost all of your logic to server. The client shim is so thin it's almost not there. 
+If you've played around with [Electric Clojure](https://github.com/hyperfiddle/electric) you might find this familiar.
 
 ## This code is declarative (and naive)
 
@@ -100,4 +100,4 @@ The full Datastar game of life source code can [be found here](https://github.co
 
 - [Datastar docs](https://data-star.dev/guide/getting_started)
 - [More hyperlith examples](https://github.com/andersmurphy/hyperlith/tree/master/examples)
-- [More of my thoughts on using datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
+- [More of my thoughts on using Datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
