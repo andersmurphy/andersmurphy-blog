@@ -104,7 +104,7 @@ script-src      'self';
 img-src         'self';
 font-src        'self';
 connect-src     'self';
-frame-src       'self';
+frame-src       https://example.andersmurphy.com;
 style-src       'self' 'unsafe-inline'
 "}]
    [:meta
