@@ -2,20 +2,45 @@ title: Clojure: Realtime collaborative web apps without ClojureScript
 
 Last week I made a fun little multiplayer web app. I've embedded it below:
 
-<iframe src="https://example.andersmurphy.com" title="Game of Life" 
-  style="width: 100%;	aspect-ratio: 2/3;	max-width: 400px"></iframe>
+<iframe src="https://example.andersmurphy.com" title="Game of Life"
+style="width: 100%;	aspect-ratio: 2/3;	max-width: 400px"></iframe>
 
-That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) hypermedia framework that lets you write reactive web apps with simple server side rendering.
+A few things to note about this web app:
 
-This post is intended as a very quick introduction to some of the concepts and features of Datastar. So buckle up.
+- It is streaming the whole `<main>` element of the page from the server to the client every 200ms over SSE (server sent events).
+- It has zero ClojurScript
+- It has zero user written client side JS
+- It uses a tiny 11.4kb (brotli compressed) hypermedia framework called [Datastar](https://data-star.dev).
 
-*Note:  I've rolled my own opinionated Clojure mini framework that builds on Datastar called [hyperlith](https://github.com/andersmurphy/hyperlith), but Datastar itself is both backend language and framework agnostic.*
+## What about performance?
 
-## The same model as React
+Surely sending down the whole main body on every change is terrible for performance?!
 
-With Datastar you can still use the same `view = f (state)` model. The difference is  the `view` is on the client and `f (state)` stays on the server.
+![event listener image](/assets/naive.png)
 
-## Show me the code
+There's no canvas here. There's no SVG. There's just a 1600 cell grid, each cell with it's own on-click listener. This is an incredibly naive implementation. Partly, to show how well it performs. Your CRUD app will be fine.
+
+Under the hood Datastar uses a very fast morph algorithm that merges the old `<main>` fragment with the new `<main>` fragment only updating what has changed. 
+
+## What about the network?
+
+Surely sending down the whole main body on every change is terrible for bandwidth?! 
+
+Turns out streaming compression is really good. Brotli compression over SSE (server sent events) gives can give you a 70-100:1 compression ratio over a series of backend re-renders. The compression is so good that in my experience it's more network efficient and more performant that fine grained updates with diffing (without any of the additional complexity). This approach also avoids the additional challenges of view and session maintenance.
+
+## Isn't this a riff on Phoenix Live View?
+
+No, it's much simpler then that. There's no connection state, server side diffing or web sockets. There's no reason the client has to connect/communicate with the same node. Effectively making it stateless.
+
+## Do I have to learn a new model?
+
+With Datastar you can still use the same `view = f (state)` model that react uses. The difference is  the `view` is on the client and `f (state)` stays on the server.
+
+## Show me the code!
+
+In this example I'll be using [hyperlith](https://github.com/andersmurphy/hyperlith) an experimental mini framework that builds on Datastar. It handles manages a few things you'd normally have to manage directly (SSE, compression, connections, re-render rate, missed events, etc).
+
+*Note: Datastar itself is both backend language and framework agnostic.*
 
 Lets start with a minimal shim, this is for the initial page load:
 
@@ -42,7 +67,7 @@ Then we have a hiccup render function with a separate component `board-state` co
               :id            id
               :data-on-click (format "@post('/tap?id=%s')" id)}]))
         (:board @db)))))
-        
+
 (defn render-home [{:keys [db] :as _req}]
   (h/html
     [:link#css {:rel "stylesheet" :type "text/css" :href (css :path)}]
@@ -75,21 +100,11 @@ We pass the `render-home` and `action-tap-cell` functions into some helper funct
 
 ## So how do you change this code to make it multiplayer?
 
-That's the neat part you don't. It already is. The function we defined in `render-home` does not distinguish between users so everyone sees the same thing! If we wanted to render different views for different users, we would just generate user specific views in that function.
+That's the neat part, you don't. It already is multiplayer. The function we defined in `render-home` does not distinguish between users so everyone sees the same thing! If we wanted to render different views for different users, we would just generate user specific views in that function.
 
 The function `action-tap-cell` does distinguish between users though. It picks a colour based on their `sid`.
 
 If you've played around with [Electric Clojure](https://github.com/hyperfiddle/electric) you might find this familiar.
-
-## This code is declarative (and naive)
-
-![event listener image](/assets/naive.png)
-
-There's no canvas here. There's no SVG. There's just a 1600 cell grid, each cell with it's own on-click listener. This is an incredibly naive implementation. Partly, to show how well it performs. Your CRUD app will be fine.
-
-## But what about the network?
-
-Brotli compression over SSE gives you 50-100:1 compression ratio over a series of backend re-renders. The compression is so good that in my experience it's more network efficient and more performant that fine grained updates with diffing (without any of the additional complexity). This approach avoids the additional challenges of view and session maintenance.
 
 ## Conclusion
 
