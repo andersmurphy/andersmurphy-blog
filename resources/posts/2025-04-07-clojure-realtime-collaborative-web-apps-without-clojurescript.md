@@ -32,6 +32,25 @@ Turns out streaming compression is really good. Brotli compression over SSE (ser
 
 No, it's much simpler than that. There's no connection state, server side diffing or web sockets. There's no reason the client has to connect/communicate with the same node. Effectively making it stateless.
 
+## Wait did you say SSE? Why not websockets?
+
+Websockets sound great on paper. But, operationally they are a nightmare (I have had the misfortune of having to use them at scale). To list some of the callenges: 
+
+- firewalls and proxies, blocked ports
+- unlimited connections non multiplexed (so bugs lead to ddos)
+- load balancing nightmare
+- no compression.
+- no automatic handling of disconnect/reconnect.
+- no cross site hijacking protection
+- Worse tooling (you can inspect SSE in the browser).
+- Nukes mobile battery because it hammers the duplex antenna.
+
+You can fix some of these problems with websockets, but these fixes mostly boil down to sending more data... to send more data... to get you back to your own implementation of HTTP.
+
+SSE the other hand, by virtue of being regular HTTP,  work out of the box with, headers, multiplexing, compression, disconnect/reconnect handling, h2/h3, etc. 
+
+If SSE is not performant enough for you then you should probably be rolling your own protocol on UDP rather using websockets. Or wait until [WebTransport](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport) is supported in safari (any day now 😬).
+
 ## Do I have to learn a new UI model?
 
 With Datastar you can still use the same `view = f (state)` model that react uses. The difference is  the `view` is on the client and `f (state)` stays on the server.
@@ -114,6 +133,7 @@ The full Datastar game of life source code can [be found here](https://github.co
 
 **Further Reading:**
 
+- [Original cljs game of life by Shagun Agrawal](https://github.com/kaepr/game-of-life-cljs)
 - [Datastar docs](https://data-star.dev/guide/getting_started)
 - [More hyperlith examples](https://github.com/andersmurphy/hyperlith/tree/master/examples)
 - [More of my thoughts on using Datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
