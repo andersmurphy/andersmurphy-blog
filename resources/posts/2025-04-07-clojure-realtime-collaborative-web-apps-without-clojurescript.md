@@ -49,7 +49,7 @@ You can fix some of these problems with websockets, but these fixes mostly boil 
 
 SSE the other hand, by virtue of being regular HTTP,  work out of the box with, headers, multiplexing, compression, disconnect/reconnect handling, h2/h3, etc. 
 
-If SSE is not performant enough for you then you should probably be rolling your own protocol on UDP rather using websockets. Or wait until [WebTransport](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport) is supported in safari (any day now 😬).
+If SSE is not performant enough for you then you should probably be rolling your own protocol on UDP rather than using websockets. Or wait until [WebTransport](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport) is supported in Safari (any day now 😬).
 
 ## Do I have to learn a new UI model?
 
