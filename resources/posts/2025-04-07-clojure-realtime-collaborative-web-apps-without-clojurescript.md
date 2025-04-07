@@ -34,7 +34,7 @@ No, it's much simpler than that. There's no connection state, server side diffin
 
 ## Wait did you say SSE? Why not websockets?
 
-Websockets sound great on paper. But, operationally they are a nightmare (I have had the misfortune of having to use them at scale). To list some of the callenges: 
+Websockets sound great on paper. But, operationally they are a nightmare. I have had the misfortune of having to use them at scale (the author of Datastar had a similar experience). To list some of the challenges: 
 
 - firewalls and proxies, blocked ports
 - unlimited connections non multiplexed (so bugs lead to ddos)
