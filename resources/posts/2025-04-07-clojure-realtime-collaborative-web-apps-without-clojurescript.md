@@ -8,8 +8,8 @@ style="width: 100%;	aspect-ratio: 2/3;	max-width: 400px"></iframe>
 A few things to note about this web app:
 
 - It is streaming the whole `<main>` element of the page from the server to the client every 200ms over SSE (server sent events).
-- It has zero ClojurScript
-- It has zero user written client side JS
+- It has zero ClojurScript.
+- It has zero user written JS.
 - It uses a tiny 11.4kb (brotli compressed) hypermedia framework called [Datastar](https://data-star.dev).
 
 ## What about performance?
@@ -28,17 +28,17 @@ Surely sending down the whole main body on every change is terrible for bandwidt
 
 Turns out streaming compression is really good. Brotli compression over SSE (server sent events) gives can give you a 70-100:1 compression ratio over a series of backend re-renders. The compression is so good that in my experience it's more network efficient and more performant that fine grained updates with diffing (without any of the additional complexity). This approach also avoids the additional challenges of view and session maintenance.
 
-## Isn't this a riff on Phoenix Live View?
+## Isn't this just another Phoenix Live View clone?
 
 No, it's much simpler then that. There's no connection state, server side diffing or web sockets. There's no reason the client has to connect/communicate with the same node. Effectively making it stateless.
 
-## Do I have to learn a new model?
+## Do I have to learn a new UI model?
 
 With Datastar you can still use the same `view = f (state)` model that react uses. The difference is  the `view` is on the client and `f (state)` stays on the server.
 
 ## Show me the code!
 
-In this example I'll be using [hyperlith](https://github.com/andersmurphy/hyperlith) an experimental mini framework that builds on Datastar. It handles manages a few things you'd normally have to manage directly (SSE, compression, connections, re-render rate, missed events, etc).
+In this example I'll be using [hyperlith](https://github.com/andersmurphy/hyperlith) an experimental mini framework that builds on Datastar. It handles a few things for us that you'd normally have to manage yourself with Datastar (SSE, compression, connections, re-render rate, missed events, etc).
 
 *Note: Datastar itself is both backend language and framework agnostic.*
 
