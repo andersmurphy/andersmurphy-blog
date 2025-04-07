@@ -2,7 +2,8 @@ title: Clojure: Realtime collaborative web apps without ClojureScript
 
 Last week I made a fun little multiplayer web app. I've embedded it below:
 
-<iframe src="https://example.andersmurphy.com" title="Game of Life"> </iframe>
+<iframe src="https://example.andersmurphy.com" title="Game of Life" 
+  style="width: 100%;	aspect-ratio: 2/3;	max-width: 400px"></iframe>
 
 That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) hypermedia framework that lets you write reactive web apps with simple server side rendering.
 
