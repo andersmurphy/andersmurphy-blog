@@ -26,11 +26,11 @@ Under the hood Datastar uses a very fast morph algorithm that merges the old `<m
 
 Surely sending down the whole main body on every change is terrible for bandwidth?! 
 
-Turns out streaming compression is really good. Brotli compression over SSE (server sent events) gives can give you a 70-100:1 compression ratio over a series of backend re-renders. The compression is so good that in my experience it's more network efficient and more performant that fine grained updates with diffing (without any of the additional complexity). This approach also avoids the additional challenges of view and session maintenance.
+Turns out streaming compression is really good. Brotli compression over SSE (server sent events) can give you a 70-100:1 compression ratio over a series of backend re-renders. The compression is so good that in my experience it's more network efficient and more performant that fine grained updates with diffing (without any of the additional complexity). This approach also avoids the additional challenges of view and session maintenance.
 
 ## Isn't this just another Phoenix Live View clone?
 
-No, it's much simpler then that. There's no connection state, server side diffing or web sockets. There's no reason the client has to connect/communicate with the same node. Effectively making it stateless.
+No, it's much simpler than that. There's no connection state, server side diffing or web sockets. There's no reason the client has to connect/communicate with the same node. Effectively making it stateless.
 
 ## Do I have to learn a new UI model?
 
