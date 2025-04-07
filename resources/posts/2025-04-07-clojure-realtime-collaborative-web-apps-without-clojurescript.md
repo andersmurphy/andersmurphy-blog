@@ -8,7 +8,7 @@ style="width: 100%;	aspect-ratio: 2/3;	max-width: 400px"></iframe>
 A few things to note about this web app:
 
 - It is streaming the whole `<main>` element of the page from the server to the client every 200ms over SSE (server sent events).
-- It has zero ClojurScript.
+- It has zero ClojureScript.
 - It has zero user written JS.
 - It uses a tiny 11.4kb (brotli compressed) hypermedia framework called [Datastar](https://data-star.dev).
 
