@@ -104,6 +104,7 @@ script-src      'self';
 img-src         'self';
 font-src        'self';
 connect-src     'self';
+frame-src       'self';
 style-src       'self' 'unsafe-inline'
 "}]
    [:meta

@@ -1,8 +1,8 @@
 title: Clojure: Realtime collaborative web apps without ClojureScript
 
-Last week I made a fun little multiplayer web app. [Go check it out here](https://example.andersmurphy.com).
+Last week I made a fun little multiplayer web app. I've embedded it below:
 
-... so you're back ...
+<iframe src="https://example.andersmurphy.com" title="Game of Life"> </iframe>
 
 That app had zero ClojureScript! What's even more wild is it had zero user written client side JS. Instead it uses [Datastar](https://data-star.dev). A tiny 11.4kb (brotli compressed) hypermedia framework that lets you write reactive web apps with simple server side rendering.
 
@@ -101,3 +101,4 @@ The full Datastar game of life source code can [be found here](https://github.co
 - [Datastar docs](https://data-star.dev/guide/getting_started)
 - [More hyperlith examples](https://github.com/andersmurphy/hyperlith/tree/master/examples)
 - [More of my thoughts on using Datastar](https://github.com/andersmurphy/hyperlith?tab=readme-ov-file#rational-more-like-a-collection-of-opinions)
+- [Direct link to the game](https://example.andersmurphy.com).
