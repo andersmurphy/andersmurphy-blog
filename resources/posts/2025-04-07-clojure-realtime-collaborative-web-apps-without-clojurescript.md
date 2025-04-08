@@ -20,7 +20,9 @@ Surely sending down the whole main body on every change is terrible for performa
 
 There's no canvas here. There's no SVG. There's just a 1600 cell grid, each cell with it's own on-click listener. This is an incredibly naive implementation. Partly, to show how well it performs. Your CRUD app will be fine.
 
-Under the hood Datastar uses a very fast morph algorithm that merges the old `<main>` fragment with the new `<main>` fragment only updating what has changed. 
+Under the hood Datastar uses a very fast morph algorithm that merges the old `<main>` fragment with the new `<main>` fragment only updating what has changed.
+
+*Update: It was pointed out on the Datastar discord that there is no reason not to leverage HTML bubbles up events. Honestly, I completely forgot you could do this (too much time with react I guess?). So now there's only one top level event on-click listener. I've bumped the number of cells to 2500 to keep the volume of data over the wire roughly the same.*
 
 ## What about the network?
 
@@ -83,8 +85,7 @@ Then we have a hiccup render function with a separate component `board-state` co
           (h/html
             [:div.tile
              {:class         color-class
-              :id            id
-              :data-on-click (format "@post('/tap?id=%s')" id)}]))
+              :id            id}]))
         (:board @db)))))
 
 (defn render-home [{:keys [db] :as _req}]
@@ -93,7 +94,7 @@ Then we have a hiccup render function with a separate component `board-state` co
     [:main#morph.main
      [:h1 "Game of Life (multiplayer)"]
      [:div
-      [:div.board nil
+      [:div.board {:data-on-click (format "@post('/tap?id=%s')" id)}
        (board-state db)]]]))
 ```
 
