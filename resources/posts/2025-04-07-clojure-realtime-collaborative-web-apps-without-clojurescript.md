@@ -22,7 +22,7 @@ There's no canvas here. There's no SVG. There's just a 1600 cell grid, each cell
 
 Under the hood Datastar uses a very fast morph algorithm that merges the old `<main>` fragment with the new `<main>` fragment only updating what has changed.
 
-*Update: It was pointed out on the Datastar discord that there is no reason not to leverage HTML bubbles up events. Honestly, I completely forgot you could do this (too much time with react I guess?). So now there's only one top level event on-click listener. I've bumped the number of cells to 2500 to keep the volume of data over the wire roughly the same.*
+*Update: It was pointed out on the Datastar discord that there is no reason not to leverage HTML bubble up events. Honestly, I completely forgot you could do this (too much time with react I guess?). So now there's only one top level event listener. I've bumped the number of cells to 2500 to keep the volume of data over the wire roughly the same.*
 
 ## What about the network?
 
