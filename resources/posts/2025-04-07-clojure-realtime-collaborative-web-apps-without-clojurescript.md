@@ -11,6 +11,7 @@ A few things to note about this web app:
 - It has zero ClojureScript.
 - It has zero user written JS.
 - It uses a tiny 11.4kb (brotli compressed) hypermedia framework called [Datastar](https://data-star.dev).
+- The VPS is in Germany.
 
 ## What about performance?
 
@@ -131,6 +132,11 @@ If you've played around with [Electric Clojure](https://github.com/hyperfiddle/e
 [Datastar](https://data-star.dev) pairs really well with Clojure and can make it trivial to implement highly interactive and collaborative web apps without ClojureScript. You should give it a go!
 
 The full Datastar game of life source code can [be found here](https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj).
+
+**Discussions:**
+- [hackernews](https://news.ycombinator.com/item?id=43625139)
+- [reddit](https://www.reddit.com/r/Clojure/comments/1jtih16/why_i_dont_use_clojurescript_for_web_apps_anymore/)
+- [twitter](https://x.com/anders_murphy)
 
 **Further Reading:**
 
