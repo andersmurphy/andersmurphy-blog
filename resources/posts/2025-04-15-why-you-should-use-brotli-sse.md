@@ -1,4 +1,4 @@
-title: Why you should use brotli compression with SSE
+title: Why you should consider using brotli compression with SSE
 
 Last week the fun little multiplayer GoL game I made got a lot of traffic from hackernews and survived. This blog post will cover how Brotli compressed SSE (Server Sent Events) made this possible.
 
