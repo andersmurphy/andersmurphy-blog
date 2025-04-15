@@ -5,7 +5,7 @@ Last week the fun little multiplayer GoL game I made got a lot of traffic from h
 <iframe src="https://example.andersmurphy.com/star" title="Game of Life"
 style="width: 100%;	aspect-ratio: 1/1;	max-width: 400px"></iframe>
 <br/>
-*Powered by Clojure and Datastar*
+*This iframe is the live game, you can play it, tap away.*
 
 I'm not going to go into massive detail about how the demo was built. You can [read more about it here](https://andersmurphy.com/2025/04/07/clojure-realtime-collaborative-web-apps-without-clojurescript.html).
 
