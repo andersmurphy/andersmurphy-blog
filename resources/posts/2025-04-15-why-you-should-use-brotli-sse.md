@@ -1,4 +1,4 @@
-stitle: Why you should consider using brotli compression with SSE
+title: Why you should consider using brotli compression with SSE
 
 Last week the fun little multiplayer GoL game I made got a lot of traffic from hackernews and survived. This blog post is a story about how Brotli compression saved me from myself and how it could save you too!
 
