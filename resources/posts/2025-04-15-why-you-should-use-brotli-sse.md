@@ -81,7 +81,7 @@ I hope this article has been useful (or at least amusing). The takeaway for me i
 
 **Discussion**
 
-[hackernews](https://news.ycombinator.com/item?id=43692354)
+- [hackernews](https://news.ycombinator.com/item?id=43692354)
 
 **Further Reading:**
 
