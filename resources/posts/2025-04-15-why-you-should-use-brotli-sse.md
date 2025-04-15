@@ -71,15 +71,15 @@ The code below is written Clojure and uses a [Java library for Brotli compressio
     result))
 ```
 
-You can find [the full code here](https://github.com/andersmurphy/hyperlith/blob/master/src/hyperlith/impl/brotli.clj#L39). 
-
-## Discussion
-
-[hackernews](https://news.ycombinator.com/item?id=43692354)
+You can find [the full code here](https://github.com/andersmurphy/hyperlith/blob/master/src/hyperlith/impl/brotli.clj#L39).
 
 ## Conclusion
 
 I hope this article has been useful (or at least amusing). The takeaway for me is: If you are using SSE, you should probably consider compressing that stream. If you are using SSE with long lasting connection that send a lot of data, you should really consider compressing that stream, especially if over time that data repeats (which is likely to do) .
+
+**Discussion**
+
+[hackernews](https://news.ycombinator.com/item?id=43692354)
 
 **Further Reading:**
 
