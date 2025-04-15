@@ -1,4 +1,4 @@
-title: Why you should consider using brotli compression with SSE
+stitle: Why you should consider using brotli compression with SSE
 
 Last week the fun little multiplayer GoL game I made got a lot of traffic from hackernews and survived. This blog post will cover how Brotli compressed SSE (Server Sent Events) made this possible.
 
@@ -38,6 +38,8 @@ The game runs on a 4 core 8gb ram shared Hetzner VPS (at around 15$ per month). 
 
 Without, tuning the context window this could have easily been x4-8 higher. Suddenly, you'd be looking at needing 12-24 core machine. In short without tuning the window my 15$ VPS would have been toast.
 
+*Note: In terms of browser support Brotli is the most [widely supported compression algorithm after gzip](https://caniuse.com/?search=brotli).*
+
 ## Show me the code!
 
 The code below is written Clojure and uses a [Java library for Brotli compression](https://github.com/hyperxpro/Brotli4j?tab=readme-ov-file). Hopefully, this is enough to give you a rough idea of how you would implement SSE compression in your backend language of choice.
@@ -75,7 +77,7 @@ You can find [the full code here](https://github.com/andersmurphy/hyperlith/blob
 
 ## Conclusion
 
-I hope this article has been useful (or at least amusing). The takeaway for me is: If you are using SSE, you should probably consider compressing that stream. If you are using SSE with long lasting connection that send a lot of data, you should really consider compressing that stream, especially if over time that data repeats (which is likely to do) .
+I hope this article has been useful (or at least amusing). The takeaway for me is: If you are using SSE, you should probably consider compressing that stream. If you are using SSE with long lasting connection that send a lot of data, you should really consider compressing that stream, especially if over time that data repeats (which is likely to do).
 
 **Discussion**
 
