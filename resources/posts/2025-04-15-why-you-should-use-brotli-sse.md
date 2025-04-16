@@ -77,7 +77,7 @@ You can find [the full code here](https://github.com/andersmurphy/hyperlith/blob
 
 ## Update: Why not ZSTD?
 
-ZSTD is not available on safari and because every iOS browser uses safari under the hood (even chrome/FF). That mean's ZSTD doesn't work for anyone who is using an iPhone. 
+ZSTD is not available on safari and because every iOS browser uses safari under the hood (even chrome/FF). That means ZSTD doesn't work for anyone who is using an iPhone. 
 
 ## Update: Why not GZIP?
 
@@ -89,7 +89,6 @@ However, things change dramatically when you move to SSE. Brotli is much better 
 
 <img src="/assets/gzip-v-brotli.jpg" alt="gzip vs brotli" style="width:300px;"/>
 <br/>
-*gzip vs brotli*
 
 With context window tuning (which you can't do with GZIP) you can get 3x plus better compression. The context window also makes the CPU costs lower than GZIP when handling the same amount of data, as larger context means less data being compressed and more forward references being used less CPU (in exchange for memory).
 
