@@ -75,6 +75,23 @@ The code below is written Clojure and uses a [Java library for Brotli compressio
 
 You can find [the full code here](https://github.com/andersmurphy/hyperlith/blob/master/src/hyperlith/impl/brotli.clj#L39).
 
+## UPDATE: Why not ZSTD?
+
+ZSTD is not available on safari and because every iOS browser uses safari under the hood (even chrome/FF). That mean's ZSTD doesn't work for anyone who is using an iPhone. 
+
+## UPDATE: Why not GZIP?
+
+GZIP is great for regular request/response. It already comes with java and/or your reverse proxy out of the box. For an 5-10% extra compression Brotli is not worth the extra dependency (including the native ones).
+
+From what I've seen CPU usage of Brotli set to level 5 is better compression than Java's default GZIP and similar CPU. It's not much cheaper.
+
+However, things change dramatically when you move to SSE. Brotli is much better at compressing streaming data than GZIP as it can do forward and backward references and was built with streaming from the ground up (streaming was bolted on to GZIP). So out of the box brotli gives you 2x better compression over streams than GZIP (that's a big deal). 
+
+![gzip vs brotli](/assets/gzip-v-brotli.jpg)
+*gzip vs brotli*
+
+With context window tuning (which you can't do with GZIP) you can get 3x plus better compression. The context window also makes the CPU costs lower than GZIP when handling the same amount of data, as larger context means less data being compressed and more forward references being used less CPU (in exchange for memory).
+
 ## Conclusion
 
 I hope this article has been useful (or at least amusing). The takeaway for me is: If you are using SSE, you should probably consider compressing that stream. If you are using SSE with long lasting connection that send a lot of data, you should really consider compressing that stream, especially if over time that data repeats (which it is likely to do).
