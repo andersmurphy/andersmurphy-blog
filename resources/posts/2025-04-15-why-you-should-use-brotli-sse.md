@@ -99,6 +99,7 @@ I hope this article has been useful (or at least amusing). The takeaway for me i
 **Discussion**
 
 - [hackernews](https://news.ycombinator.com/item?id=43692354)
+- [reddit](https://www.reddit.com/r/Clojure/comments/1jzro9z/why_you_should_consider_using_brotli_compression/)
 
 **Further Reading:**
 
