@@ -117,6 +117,11 @@ style-src       'self' 'unsafe-inline'
    ;; icons
    [:link {:rel  "shortcut icon"
            :href (str site-url "assets/favicon.png")}]
+   ;; rss
+   [:link {:rel "alternate"
+           :type "application/rss+xml"
+           :title "Blog Posts"
+           :href site-rss}]
    ;; javascript
    [:script {:defer true
              :src   (str site-url "toggle.js")}]
