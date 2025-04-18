@@ -3,7 +3,7 @@ title: Why you should consider using brotli compression with SSE
 Last week the fun little multiplayer GoL game I made got a lot of traffic from hackernews and survived. This blog post is a story about how Brotli compression saved me from myself and how it could save you too!
 
 <iframe src="https://example.andersmurphy.com/star" title="Game of Life"
-style="width: 100%;	aspect-ratio: 1/1;	max-width: 400px"></iframe>
+style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
 <br/>
 *This iframe is the live game, you can play it, tap away.*
 
