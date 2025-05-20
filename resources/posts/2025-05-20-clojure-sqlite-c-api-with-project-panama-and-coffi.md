@@ -273,3 +273,7 @@ Hopefully, this whistle stop tour of using SQLite C API has been useful.
 You can find the source code for this blog post in the nascent [sqlite4clj library here](https://github.com/andersmurphy/sqlite4clj). Though the library is far from feature complete it is currently running in production in my [One Billion Checkboxes Demo](https://checkboxes.andersmurphy.com).
 
 A huge thanks to [Joshua Suskalo](https://github.com/sponsors/IGJoshua) for [coffi](https://github.com/IGJoshua/coffi) and being super helpful on clojure slack. If you are curious about project Panama and the new java FFI interface I'd highly recommend taking coffi for a spin.
+
+**Discussion**
+
+- [reddit](https://www.reddit.com/r/Clojure/comments/1kr3uju/clojure_sqlite_c_api_with_project_panama_and_coffi/)
