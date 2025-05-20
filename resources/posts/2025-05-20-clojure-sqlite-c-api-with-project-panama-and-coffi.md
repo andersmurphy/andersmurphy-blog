@@ -2,7 +2,7 @@ title: Clojure: SQLite C API with project Panama and Coffi
 
 In this post I'll go over using [coffi](https://github.com/IGJoshua/coffi) to build a Clojure SQLite wrapper.
 
-# Build SQLite
+## Build SQLite
 
 First we need to compile SQLite for our machine see [this post for details](https://andersmurphy.com/2023/07/09/sqlite-building-from-source-on-macos.html). 
 
