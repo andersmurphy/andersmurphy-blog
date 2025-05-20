@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" /><title>Clojure: SQLite C API with project Panama and Coffi</title><meta content="
+base-uri        &apos;self&apos;;
+form-action     &apos;self&apos;;
+default-src     &apos;none&apos;;
+script-src      &apos;self&apos;;
+img-src         &apos;self&apos;;
+font-src        &apos;self&apos;;
+connect-src     &apos;self&apos;;
+frame-src       https://example.andersmurphy.com;
+style-src       &apos;self&apos; &apos;unsafe-inline&apos;
+" http-equiv="Content-Security-Policy" /><meta content="text/html; charset=UTF-8" http-equiv="content-type" /><link href="/styles.css" rel="stylesheet" type="text/css" /><link href="/assets/favicon.png" rel="shortcut icon" /><link href="/feed.xml" rel="alternate" title="Blog Posts" type="application/rss+xml" /><script defer="defer" src="/toggle.js"></script><meta content="width=device-width, initial-scale=1.0" name="viewport" /><meta content="same-origin" name="view-transition" /><meta content="A blog mostly about Clojure programming" name="description" /></head><body><header class="nav-sticky-top container-fluid"><nav class="container"><ul><li><div class="linkify" style="align-items:center;display:flex;"><img alt="portrait" height="40px" src="/assets/avatar.png" style="image-rendering:pixelated;padding:4px;" width="40px" /><h1 style="margin-bottom:0;">anders murphy</h1><a aria-label="Home" href="/"></a></div></li></ul><ul><li><a aria-label="Github" class="contrast no-chaos" href="https://github.com/andersmurphy"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 496 512" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></a></li><li><a aria-label="RSS" class="contrast no-chaos" href="/feed.xml"><svg class="icon" height="24" style="margin-bottom:6px;margin-top:6px;" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg"><linearGradient id="gradient-horizontal"><stop offset="0%" stop-color="var(--color-stop-1)"></stop><stop offset="33%" stop-color="var(--color-stop-2)"></stop><stop offset="66%" stop-color="var(--color-stop-3)"></stop><stop offset="100%" stop-color="var(--color-stop-4)"></stop></linearGradient><path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm1.5 2.5c5.523 0 10 4.477 10 10a1 1 0 1 1-2 0 8 8 0 0 0-8-8 1 1 0 0 1 0-2m0 4a6 6 0 0 1 6 6 1 1 0 1 1-2 0 4 4 0 0 0-4-4 1 1 0 0 1 0-2m.5 7a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"></path></svg></a></li><li><div class="theme-toggle" id="toggle"><svg aria-hidden="true" class="icon theme-toggle__inner-moon" height="30" viewBox="0 0 32 32" width="30" xmlns="http://www.w3.org/2000/svg"><path d="M27.5 11.5v-7h-7L16 0l-4.5 4.5h-7v7L0 16l4.5 4.5v7h7L16 32l4.5-4.5h7v-7L32 16l-4.5-4.5zM16 25.4a9.39 9.39 0 1 1 0-18.8 9.39 9.39 0 1 1 0 18.8z"></path><circle cx="16" cy="16" r="8.1"></circle></svg></div></li></ul></nav></header><main class="container"><article><hgroup><h1>Clojure: SQLite C API with project Panama and Coffi</h1><p><time datetime="2025-05-20T00:00:00+00:00">20 May 2025</time></p></hgroup><hr /><p>In this post I'll go over using <a href='https://github.com/IGJoshua/coffi'>coffi</a> to build a Clojure SQLite wrapper.</p><h1 id="build_sqlite">Build SQLite</h1><p>First we need to compile SQLite for our machine see <a href='https://andersmurphy.com/2023/07/09/sqlite-building-from-source-on-macos.html'>this post for details</a>. </p><h2 id="load_the_sqlite_library">Load the SQLite Library</h2><p>We can load a Library with ffi/load-library.</p><pre><code class="clojure"><span class="dim">&#40;</span>ffi/load-library &quot;resources/sqlite3.so&quot;<span class="dim">&#41;</span>
+</code></pre><h2 id="open_a_connection">Open a connection</h2><p>To open a connection we need to implement <code>sqlite3-open-v2</code>. The SQLite documentation is really good and they have the C function type signatures so this is mostly a question of reading the docs and translating.</p><pre><code class="clojure"><span class="dim">&#40;</span>defcfn <strong>sqlite3-open-v2</strong>
+  &quot;sqlite3&#95;open&#95;v2&quot; &#91;::mem/c-string ::mem/pointer ::mem/int
+                     ::mem/c-string&#93; ::mem/int
+  sqlite3-open-native
+  &#91;filename flags&#93;
+  <span class="dim">&#40;</span>with-open &#91;arena <span class="dim">&#40;</span>mem/confined-arena<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>let &#91;pdb    <span class="dim">&#40;</span>mem/alloc-instance ::mem/pointer arena<span class="dim">&#41;</span>
+          result <span class="dim">&#40;</span>sqlite3-open-native filename pdb flags nil<span class="dim">&#41;</span>&#93;
+      <span class="dim">&#40;</span>if <span class="dim">&#40;</span>sqlite-ok? result<span class="dim">&#41;</span>
+        <span class="dim">&#40;</span>mem/deserialize-from pdb ::mem/pointer<span class="dim">&#41;</span>
+        <span class="dim">&#40;</span>throw <span class="dim">&#40;</span>ex-info &quot;Failed to open sqlite3 database&quot;
+                 {:filename filename}<span class="dim">&#41;&#41;&#41;&#41;&#41;&#41;</span>
+</code></pre><p>A few things going on here, the <code>&#40;with-open &#91;arena &#40;mem/confined-arena&#41;&#93;</code> pattern is quite common when working with an out variables. An out variable tends to be a pointer you pass in and will get set to a value you want out. In this case the db object.</p><h2 id="close_a_connection">Close a connection</h2><p>We can define <code>close</code> as follows.</p><pre><code class="clojure"><span class="dim">&#40;</span>defcfn <strong>sqlite3-close</strong>
+  sqlite3&#95;close
+  &#91;::mem/pointer&#93; ::mem/int<span class="dim">&#41;</span>
+</code></pre><h2 id="prepare_a_statement">Prepare a statement</h2><p>Now the big reason I went down this rabbit hole is I wanted to be able to cache prepared statements. Enter <code>prepare-v2</code>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defcfn <strong>sqlite3-prepare-v2</strong>
+  &quot;sqlite3&#95;prepare&#95;v2&quot;
+  &#91;::mem/pointer ::mem/c-string ::mem/int
+   ::mem/pointer ::mem/pointer&#93; ::mem/int
+  sqlite3-prepare-native
+  &#91;pdb sql&#93;
+  <span class="dim">&#40;</span>with-open &#91;arena <span class="dim">&#40;</span>mem/confined-arena<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>let &#91;ppStmt <span class="dim">&#40;</span>mem/alloc-instance ::mem/pointer arena<span class="dim">&#41;</span>
+          code   <span class="dim">&#40;</span>sqlite3-prepare-native pdb sql -1 ppStmt
+                   nil<span class="dim">&#41;</span>&#93;
+      <span class="dim">&#40;</span>if <span class="dim">&#40;</span>sqlite-ok? code<span class="dim">&#41;</span>
+        <span class="dim">&#40;</span>mem/deserialize-from ppStmt ::mem/pointer<span class="dim">&#41;</span>
+        <span class="dim">&#40;</span>throw <span class="dim">&#40;</span>ex-info &quot;Failed to create preparde statement&quot;
+                 {:stmt sql}<span class="dim">&#41;&#41;&#41;&#41;&#41;&#41;</span>
+</code></pre><p>Similar to the <code>open</code> function we get an out pointer that we deserialize into Clojure land so we can pass it around to other function.</p><h2 id="reset_a_statement_and_clear_bindings">Reset a statement and clear bindings</h2><p>When you reuse prepared statements in SQLite you need to reset and clear any bindings from it so that it can be re-used. </p><pre><code>&#40;defcfn sqlite3-reset
+  sqlite3&#95;reset
+  &#91;::mem/pointer&#93; ::mem/int&#41;
+  
+&#40;defcfn sqlite3-clear-bindings
+  sqlite3&#95;clear&#95;bindings
+  &#91;::mem/pointer&#93; ::mem/int&#41;
+</code></pre><h2 id="bind_values">Bind values</h2><p>Prepared statements are no use without bindings. Thankfully, SQLite has some very basic types, so we are only going to implement: <code>bind-int</code>, <code>bind-float</code> and <code>bind-text</code>.</p><pre><code class="clojure"><span class="dim">&#40;</span>defcfn <strong>sqlite3-bind-int</strong>
+  sqlite3&#95;bind&#95;int
+  &#91;::mem/pointer ::mem/int ::mem/int&#93; ::mem/int<span class="dim">&#41;</span>
+  
+<span class="dim">&#40;</span>defcfn <strong>sqlite3-bind-double</strong>
+  sqlite3&#95;bind&#95;double
+  &#91;::mem/pointer ::mem/int ::mem/double&#93; ::mem/int<span class="dim">&#41;</span>
+</code></pre><p><code>bind-text</code> is a little more challenging as we need to define a constants defining special destructor behaviour.</p><pre><code class="clojure"><span class="dim">&#40;</span>def <strong>sqlite-transient</strong> <span class="dim">&#40;</span>mem/as-segment -1<span class="dim">&#41;&#41;</span>
+
+<span class="dim">&#40;</span>defcfn <strong>sqlite3-bind-text</strong>
+  &quot;sqlite3&#95;bind&#95;text&quot;
+  &#91;::mem/pointer ::mem/int ::mem/c-string ::mem/int
+   &#91;::ffi/fn &#91;::mem/pointer&#93; ::mem/void&#93;&#93; ::mem/int
+  sqlite3-bind-text-native
+  &#91;pdb idx text&#93;
+  <span class="dim">&#40;</span>let &#91;text <span class="dim">&#40;</span>str text<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>sqlite3-bind-text-native pdb idx text
+      <span class="dim">&#40;</span>count <span class="dim">&#40;</span>String/.getBytes text &quot;UTF-8&quot;<span class="dim">&#41;&#41;</span>
+      sqlite-transient<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><p>Finally we need to iterate through our params to bind them based on their type.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>type-&gt;sqlite3-bind</strong> &#91;param&#93;
+  <span class="dim">&#40;</span>cond
+    <span class="dim">&#40;</span>integer? param<span class="dim">&#41;</span> sqlite3-bind-int
+    <span class="dim">&#40;</span>double? param<span class="dim">&#41;</span>  sqlite3-bind-double
+    :else            sqlite3-bind-text<span class="dim">&#41;&#41;</span>
+    
+<span class="dim">&#40;</span>defn <strong>bind-params</strong> &#91;stmt params&#93;
+  <span class="dim">&#40;</span>doall
+    <span class="dim">&#40;</span>map-indexed
+      <span class="dim">&#40;</span>fn &#91;i param&#93;
+        <span class="dim">;; starts at 1
+</span>        <span class="dim">&#40;&#40;</span>type-&gt;sqlite3-bind param<span class="dim">&#41;</span> stmt <span class="dim">&#40;</span>inc i<span class="dim">&#41;</span> param<span class="dim">&#41;&#41;</span> params<span class="dim">&#41;&#41;&#41;</span>
+</code></pre><h2 id="cache_prepared_statements">Cache prepared statements</h2><p>We use <code>clojure.core.cache</code> for caching our statements. Each connection will have it's own cache.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>prepare-cached</strong> &#91;{:keys &#91;pdb stmt-cache&#93;} &#91;sql &amp; params&#93;&#93;
+  <span class="dim">&#40;</span>let &#91;stmt <span class="dim">&#40;</span>cache/lookup-or-miss stmt-cache sql
+               <span class="dim">&#40;</span>fn &#91;sql&#93; <span class="dim">&#40;</span>sqlite3-prepare-v2 pdb sql<span class="dim">&#41;&#41;&#41;</span>&#93;
+    <span class="dim">&#40;</span>bind-params stmt params<span class="dim">&#41;</span>
+    stmt<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="our_internal_query_function">Our internal query function</h2><p>To run a SQL query we need to do the following:</p><ol><li>Create the prepared statement object using sqlite3<i>prepare</i>v2().</li><li>Bind values to parameters using the sqlite3<i>bind</i>*() interfaces.</li><li>Run the SQL by calling sqlite3_step() one or more times.</li><li>Reset the prepared statement using sqlite3_reset() then go back    to step   2. Do this zero or more times.</li><li>Destroy the object using sqlite3_finalize().</li></ol><p>To keep things simple, we will return all values at TEXT and we won't finalise the statements as they are cached and will be taken care of by the JVM on shutdown.</p><pre><code class="clojure"><span class="dim">&#40;</span>defcfn <strong>sqlite3-column-count</strong>
+  sqlite3&#95;column&#95;count
+  &#91;::mem/pointer&#93; ::mem/int<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>defcfn <strong>sqlite3-column-text</strong>
+  sqlite3&#95;column&#95;text
+  &#91;::mem/pointer ::mem/int&#93; ::mem/c-string<span class="dim">&#41;</span>
+
+<span class="dim">&#40;</span>defn- <strong>q&#42;</strong> &#91;stmt &amp; &#91;row-builder&#93;&#93;
+  <span class="dim">&#40;</span>let &#91;cols <span class="dim">&#40;</span>range <span class="dim">&#40;</span>sqlite3-column-count stmt<span class="dim">&#41;&#41;</span>
+        rs   <span class="dim">&#40;</span>loop &#91;rows <span class="dim">&#40;</span>transient &#91;&#93;<span class="dim">&#41;</span>&#93;
+               <span class="dim">&#40;</span>let &#91;step <span class="dim">&#40;</span>sqlite3-step stmt<span class="dim">&#41;</span>&#93;
+                 <span class="dim">&#40;</span>cond
+                   <span class="dim">&#40;</span>= step 100<span class="dim">&#41;</span>
+                   <span class="dim">&#40;</span>when row-builder
+                     <span class="dim">&#40;</span>recur <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>mapv #<span class="dim">&#40;</span>sqlite3-column-text stmt %<span class="dim">&#41;</span>
+                                   cols<span class="dim">&#41;</span>
+                              row-builder
+                              <span class="dim">&#40;</span>conj! rows<span class="dim">&#41;&#41;&#41;&#41;</span>
+
+                   <span class="dim">&#40;</span>= step 101<span class="dim">&#41;</span> <span class="dim">&#40;</span>persistent! rows<span class="dim">&#41;</span>
+                   :else        :error<span class="dim">&#41;&#41;&#41;</span>&#93;
+    <span class="dim">&#40;</span>sqlite3-reset stmt<span class="dim">&#41;</span>
+    <span class="dim">&#40;</span>sqlite3-clear-bindings stmt<span class="dim">&#41;</span>
+    rs<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="configuring_a_connection">Configuring a connection</h2><p>For web servers the SQLite defaults are not great, so for each connection we want to set a few pragma to tune SQLite for concurrent users.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>new-conn!</strong> &#91;db-name read-only&#93;
+  <span class="dim">&#40;</span>let &#91;flags           <span class="dim">&#40;</span>if read-only
+                          <span class="dim">;; SQLITE&#95;OPEN&#95;READONLY
+</span>                          0x00000001
+                          <span class="dim">;; SQLITE&#95;OPEN&#95;READWRITE | SQLITE&#95;OPEN&#95;CREATE
+</span>                          <span class="dim">&#40;</span>bit-or 0x00000002 0x00000004<span class="dim">&#41;&#41;</span>
+        &#42;pdb            <span class="dim">&#40;</span>sqlite3-open-v2 db-name flags<span class="dim">&#41;</span>
+        statement-cache <span class="dim">&#40;</span>cache/fifo-cache-factory {} :threshold 512<span class="dim">&#41;</span>
+        conn            {:pdb        &#42;pdb
+                         :stmt-cache statement-cache}&#93;
+    <span class="dim">&#40;</span>q&#42; <span class="dim">&#40;</span>sqlite3-prepare-v2 &#42;pdb
+          <span class="dim">&#40;</span>str
+            &quot;pragma cache&#95;size = 15625;&quot;
+            &quot;pragma page&#95;size = 4096;&quot;
+            &quot;pragma journal&#95;mode = WAL;&quot;
+            &quot;pragma synchronous = NORMAL;&quot;
+            &quot;pragma temp&#95;store = MEMORY;&quot;
+            &quot;pragma foreign&#95;keys = false;&quot;<span class="dim">&#41;&#41;&#41;</span>
+    conn<span class="dim">&#41;&#41;</span>
+</code></pre><h2 id="initialising_a_db_and_pool">Initialising a db and pool</h2><p>Next we need a function to initialise our db connection pool. In practice I tend to have a read only pool with as many connections as cores, and a single writer pool with one connection.</p><pre><code class="clojure"><span class="dim">&#40;</span>defn <strong>init-db!</strong>
+  &#91;db-name &amp; &#91;{:keys &#91;pool-size read-only&#93;
+               :or   {pool-size 4}}&#93;&#93;
+  <span class="dim">&#40;</span>let &#91;conns <strong><span class="dim">&#40;</span>repeatedly</strong> pool-size
+                <span class="dim">&#40;</span>fn &#91;&#93; <span class="dim">&#40;</span>new-conn! db-name read-only<span class="dim">&#41;&#41;&#41;</span>
+        pool  <span class="dim">&#40;</span>LinkedBlockingQueue/new &#94;int pool-size<span class="dim">&#41;</span>&#93;
+    <span class="dim">&#40;</span>run! #<span class="dim">&#40;</span>LinkedBlockingQueue/.add pool %<span class="dim">&#41;</span> conns<span class="dim">&#41;</span>
+    {:conn-pool pool
+     :close
+     <span class="dim">&#40;</span>fn &#91;&#93; <span class="dim">&#40;</span>run! <span class="dim">&#40;</span>fn &#91;conn&#93; <span class="dim">&#40;</span>sqlite3-close <span class="dim">&#40;</span>:pdb conn<span class="dim">&#41;&#41;&#41;</span> conns<span class="dim">&#41;&#41;</span>}<span class="dim">&#41;&#41;</span>
+</code></pre><p>We use a <code>LinkedBlockingQueue</code> as it fits well for managing resources like connections. Note: connection pools like HikariCP use a custom concurrent data <a href='https://github.com/brettwooldridge/HikariCP/wiki/Down-the-Rabbit-Hole#concurrentbag'>structure called a concurrentBag</a> for extra performance. But, were going to keep things simple.</p><h2 id="user_facing_query_function">User facing query function</h2><p>We wrap our internal query function in one that handles the pool for us.</p><pre><code>&#40;defn q &#91;{:keys &#91;conn-pool&#93;} query &amp; &#91;row-builder&#93;&#93;
+  &#40;let &#91;conn   &#40;LinkedBlockingQueue/.take conn-pool&#41;
+        stmt   &#40;prepare-cached conn query&#41;&#93;
+    &#40;try
+      &#40;q&#42; stmt row-builder&#41;
+      &#40;finally
+        &#40;LinkedBlockingQueue/.offer conn-pool conn&#41;&#41;&#41;&#41;&#41;
+</code></pre><h2 id="some_naive_benchmarks">Some naive benchmarks</h2><p>Keep in mind this benchmark is very naive and narrow and is not indicative of the overall performance.</p><pre><code class="clojure"><span class="dim">&#40;</span>defonce <strong>db</strong>
+  <span class="dim">&#40;</span>d/init-db! &quot;database.db&quot;
+    {:read-only true
+     :pool-size 4}<span class="dim">&#41;&#41;</span>
+</code></pre><p>We're running this against my one billion checkboxes demo's db. </p><pre><code class="clojure"><span class="dim">&#40;</span>user/bench
+  <span class="dim">&#40;</span>d/q db
+    &#91;&quot;SELECT chunk&#95;id, state FROM cell WHERE chunk&#95;id IN <span class="dim">&#40;</span>?, ?, ?, ?, ?, ?, ?, ?, ?<span class="dim">&#41;</span>&quot;
+     1978 3955 5932 1979 3956 5933 1980 3957 5934&#93;
+    <span class="dim">&#40;</span>fn &#91;&#91;chunk-id state&#93;&#93; {:chunk-id chunk-id :state state}<span class="dim">&#41;&#41;&#41;</span>
+<span class="dim">;; Execution time mean : 545.401696 µs
+</span></code></pre><p>This is 3x faster than the original version using JDBC and HikariCP. Of course there's a long way to go to make this feature complete. But, it's promising non the less.</p><h2 id="conclusion">Conclusion</h2><p>Hopefully, this whistle stop tour of using SQLite C API has been useful.</p><p>You can find the source code for this blog post in the nascent <a href='https://github.com/andersmurphy/sqlite4clj'>sqlite4clj library here</a>. Though the library is far from feature complete. It's currently running in production in my <a href='https://checkboxes.andersmurphy.com'>One Billion Checkboxes Demo</a>.</p><p>A huge thanks to <a href='https://github.com/sponsors/IGJoshua'>Joshua Suskalo</a> for <a href='https://github.com/IGJoshua/coffi'>coffi</a> and being super helpful on clojure slack. If you are curious about project Panama and the new java FFI interface I'd highly recommend taking coffi for a spin.</p></article><footer><p>© 2015-2025 Anders Murphy</p></footer></main></body></html>
