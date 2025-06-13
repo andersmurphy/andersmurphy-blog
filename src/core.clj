@@ -304,7 +304,7 @@ style-src       'self' 'unsafe-inline'
      [:channel [:title site-title] [:description site-tagline] [:link site-url]
       [:atom:link {:href site-rss :rel "self" :type "application/rss+xml"}]
       (map (fn [{:keys [post-name date post-path-name]}]
-             (let [post-url (str site-url post-path-name)]
+             (let [post-url (str "https://andersmurphy.com/" post-path-name)]
                [:item [:title post-name] [:pubDate (date->rfc822 date)]
                 [:link post-url] [:guid {:isPermaLink "true"} post-url]]))
         posts)]]))
