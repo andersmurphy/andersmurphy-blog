@@ -330,13 +330,28 @@ style-src       'self' 'unsafe-inline'
   (with-open [out-file (java.io.FileWriter. "docs/sitemap.xml")]
     (xml/emit xml out-file)))
 
+(def html-about
+  (->>
+    (html
+      [:html html-props
+       (head site-title)
+       [:body navbar
+        [:main.container
+         [:article
+          (-> (slurp "resources/about.md")
+            (md-to-html-string-with-meta :heading-anchors true)
+            :html)]]]])
+    prepend-doctype-header))
+
+(defn write-about! [s] (let [path-name "docs/about.html"] (spit path-name s)))
+
 (defn generate-site
   []
   (let [posts (get-posts (files))]
     (->>  (page-html {:page-content posts :page-path-name "index.html"})
       write-page!)
-    (-> html-404
-      write-404!)
+    (-> html-404 write-404!)
+    (-> html-about write-about!)
     (run! write-post! posts)
     (-> (generate-rss-feed posts)
       write-rss!)
