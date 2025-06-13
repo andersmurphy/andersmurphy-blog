@@ -4,18 +4,16 @@
 
 I do consulting work on: Clojure, JVM, SQLite, product design, rapid prototyping and performance tuning (with a focus on vertical scaling).
 
-### Open source
+### Open Source
 
 - [hyperlith](https://github.com/andersmurphy/hyperlith)
 - [sqlite4clj](https://github.com/andersmurphy/sqlite4clj)
 - [datastar core team](https://github.com/sponsors/starfederation)
 
-###  Demos
+###  Fun Demos
 
-<iframe src="https://checkboxes.andersmurphy.com/embed" title="On billion checkboxes"
-style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
-
-[source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/billion_checkboxes_blob/src/app/main.clj)
+- [Game of Life (Multiplayer)](https://example.andersmurphy.com)
+- [One billion checkboxes (Multiplayer)](https://checkboxes.andersmurphy.com)
 
 ### Speaking
 
