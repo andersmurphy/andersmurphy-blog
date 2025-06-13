@@ -16,7 +16,7 @@ These days my main focus is rapid production ready prototyping with Clojure and 
 style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
 
 <iframe src="https://example.andersmurphy.com" title="Game of Life"
-style="width: 100%;	aspect-ratio: 4/5;	max-width: 600px"></iframe>
+style="width: 100%;	aspect-ratio: 5/6;	max-width: 600px"></iframe>
 
 ### Speaking
 

@@ -104,7 +104,7 @@ script-src      'self';
 img-src         'self';
 font-src        'self';
 connect-src     'self';
-frame-src       https://example.andersmurphy.com https://checkboxes.andersmurphy.com https://www.youtube-nocookie.com;
+frame-src       https://example.andersmurphy.com https://checkboxes.andersmurphy.com https://www.youtube-nocookie.com https://github.com/andersmurphy;
 style-src       'self' 'unsafe-inline'
 "}]
    [:meta
