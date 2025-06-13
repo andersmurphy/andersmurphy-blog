@@ -12,11 +12,15 @@ These days my main focus is rapid production ready prototyping with Clojure and 
 
 ###  Demos
 
-<iframe src="https://checkboxes.andersmurphy.com" title="On billion checkboxes"
+<iframe src="https://checkboxes.andersmurphy.com/embed" title="On billion checkboxes"
 style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
 
-<iframe src="https://example.andersmurphy.com" title="Game of Life"
+[source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/billion_checkboxes/src/app/main.clj)
+
+<iframe src="https://example.andersmurphy.com/embed" title="Game of Life"
 style="width: 100%;	aspect-ratio: 5/6;	max-width: 600px"></iframe>
+
+[source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj)
 
 ### Speaking
 
