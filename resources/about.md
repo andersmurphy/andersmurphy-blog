@@ -1,6 +1,6 @@
-# 👋 Hi! I'm Anders. 
+# About
 
-I'm a Fullstack Developer, Product Engineer, Fractional CTO and Startup Founder. I've spent most of my career building consumer facing apps. 
+👋 Hi! I'm Anders. A Fullstack Developer, Product Engineer, Fractional CTO and Startup Founder. I've spent most of my career building consumer facing apps. 
 
 These days my main focus is rapid production ready prototyping with Clojure and Datastar.
 
