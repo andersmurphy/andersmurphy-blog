@@ -154,6 +154,9 @@ style-src       'self' 'unsafe-inline'
             :aria-label "Home"}]]]]
     [:ul
      [:li [:a.contrast.no-chaos
+           {:href       "/about"
+            :aria-label "about"} icons/about-svg]]
+     [:li [:a.contrast.no-chaos
            {:href       site-github
             :aria-label "Github"} icons/github-svg]]
      [:li [:a.contrast.no-chaos
