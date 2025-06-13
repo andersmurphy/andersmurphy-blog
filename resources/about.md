@@ -17,11 +17,6 @@ style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
 
 [source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/billion_checkboxes_blob/src/app/main.clj)
 
-<iframe src="https://example.andersmurphy.com/embed" title="Game of Life"
-style="width: 100%;	aspect-ratio: 8/9;	max-width: 600px"></iframe>
-
-[source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj)
-
 ### Speaking
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/xzC3g0qIRro?si=JD7dn7lfArB43TRq" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
