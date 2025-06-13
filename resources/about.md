@@ -18,7 +18,7 @@ style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
 [source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/billion_checkboxes_blob/src/app/main.clj)
 
 <iframe src="https://example.andersmurphy.com/embed" title="Game of Life"
-style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>
+style="width: 100%;	aspect-ratio: 8/9;	max-width: 600px"></iframe>
 
 [source code](https://github.com/andersmurphy/hyperlith/blob/master/examples/game_of_life/src/app/main.clj)
 
