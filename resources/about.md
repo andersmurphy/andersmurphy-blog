@@ -8,7 +8,6 @@ I do consulting work on: Clojure, JVM, SQLite, product design, rapid prototyping
 
 - [hyperlith](https://github.com/andersmurphy/hyperlith)
 - [sqlite4clj](https://github.com/andersmurphy/sqlite4clj)
-- [datastar core team](https://github.com/sponsors/starfederation)
 
 ###  Fun Demos
 
