@@ -55,7 +55,7 @@ For the Clojure programmers among you `future` has been altered to use virtual t
   (Executors/newVirtualThreadPerTaskExecutor))
 ```
 
-We'll be using Postgres as our network database with a high performance connection pool optimised for our number of cores. 
+We'll be using Postgres  as our network database (I'm using Postgres, but the same applies to MySQL etc) with a high performance connection pool optimised for our number of cores. 
 
 ```clojure
 (defonce pg-db
@@ -139,7 +139,7 @@ The reason we are using a power law, is that's a very common distribution for a 
 
 ## Network database
 
-Let's start with a network database (I'm using Postgres, but the same applies to MySQL etc).
+Let's start with a network database.
 
 ```clojure
 (tx-per-second 100000
@@ -214,7 +214,7 @@ What if the interactive transaction has an extra query (an extra network hop)?
 ;; => 348 TPS
 ```
 
-348 TPS! What's going on here? [Amdahl's Law](https://en.wikipedia.org/wiki/Power_law) strikes!
+348 TPS! What's going on here? [Amdoahl's Law](https://en.wikipedia.org/wiki/Power_law) strikes!
 
 >the overall performance improvement gained by optimizing a single part of a system is limited by the fraction of time that the improved part is actually used.
 
@@ -346,3 +346,7 @@ If you still don't think a single machine can handle your workload it's worth re
 
 **Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
 
+**Discussion**
+
+- [hackernews](https://news.ycombinator.com/item?id=46124205)
+- [reddit](https://www.reddit.com/r/Clojure/comments/1pchdr3/sqlite4clj_100k_tps_over_a_billion_rows_the/)
