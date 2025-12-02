@@ -1,6 +1,6 @@
 title: 100000 TPS over a billion rows: the unreasonable effectiveness of SQLite
 
-SQLite doesn't have MVCC! It only has a single writer! SQLite is for phones and mobile apps (and the occasional airliner)! For web servers use a proper database like Postgres! In this article I'll go over why  being embedded and a single writer are not deficiencies but actually allow SQLite can scale so unreasonably well.
+SQLite doesn't have MVCC! It only has a single writer! SQLite is for phones and mobile apps (and the occasional airliner)! For web servers use a proper database like Postgres! In this article I'll go over why  being embedded and a single writer are not deficiencies but actually allow SQLite to scale so unreasonably well.
 
 ## Prelude
 
@@ -45,7 +45,7 @@ To simulate requests we spin up `n` virtual threads (green threads) that each ex
      (int (/ ~n (/ (double (- (. System (nanoTime)) start#)) 1000000000.0)))))
 ```
 
-For the Clojure programmers among you `future` has been altered to use virtual threads. So we can spin up millions if we need to.
+For the Clojure programmers among you `future` has been altered to use virtual threads. So, we can spin up millions if we need to.
 
 ```clojure
 ;; Make futures use virtual threads
@@ -178,7 +178,7 @@ What if we increase that latency to 10ms?
 ;; => 702 TPS
 ```
 
-But, wait our transactions are not, which they need to be if we want consistent transaction processing (SQLite is isolation serialisable by design). Better fix that and handle retries.
+But, wait our transactions are not serialisable, which they need to be if we want consistent transaction processing (SQLite is isolation serialisable by design). We better fix that and handle retries.
 
 ```clojure
 (tx-per-second 10000
@@ -214,17 +214,17 @@ What if the interactive transaction has an extra query (an extra network hop)?
 ;; => 348 TPS
 ```
 
-348 TPS! What's going on here? [Amdahl's law](https://en.wikipedia.org/wiki/Power_law) strikes!
+348 TPS! What's going on here? [Amdahl's Law](https://en.wikipedia.org/wiki/Power_law) strikes!
 
 >the overall performance improvement gained by optimizing a single part of a system is limited by the fraction of time that the improved part is actually used.
 
-We're holding transactions with row locks across a network with high contention because of the power law. What's terrifying about this is no amount of additional (cpu/servers/memory) is going to save us. This is a hard limit caused by the network. What's worse in any unexpected increase in latency will exacerbate the problem. Which also means you can't have application servers in different data centres than your database (because of the increased latency). 
+We're holding transactions with row locks across a network with high contention because of the power law. What's terrifying about this is no amount of additional (cpu/servers/memory) is going to save us. This is a hard limit caused by the network. What's worse, in any unexpected increase in latency will exacerbate the problem. Which also means you can't have application servers in different data centres than your database (because of the increased latency). 
 
 I learnt this the hard way building an emoji based tipping bot for discord. At the time I didn't understand why we were hitting this hard limit in TPS. We ended up sacrificing the convenience of interactive transactions and moving everything into stored procedures (meaning no locks across the network). However, in a lot of domains this isn't possible.
 
 ## Embedded means no network
 
-Let's see how SQLite fairs.
+Let's see how SQLite fares.
 
 ```clojure
 (tx-per-second 1000000
@@ -281,11 +281,11 @@ But, wait I hear you cry! That's cheating we now don't have isolated transaction
 ;; => 121922 TPS
 ```
 
-SQLite supports nested transactions with `SAVEPOINT` this lets us have fine grained transaction rollback whilst still batching our writes. If a transaction fails it won't cause the batch to fail. The only case where the whole batch will fail is in the case of power loss/or a hard crash.
+SQLite supports nested transactions with `SAVEPOINT` this lets us have fine-grained transaction rollback whilst still batching our writes. If a transaction fails it won't cause the batch to fail. The only case where the whole batch will fail is in the case of power loss/or a hard crash.
 
 ## What about concurrent reads?
 
-Generally systems have a mix of reads and writes, somewhere in the region of 75% reads to 25% writes. So lets add some writes.
+Generally systems have a mix of reads and writes, somewhere in the region of 75% reads to 25% writes. So let's add some writes.
 
 ```clojure
 (tx-per-second 1000000
@@ -335,12 +335,12 @@ The full benchmark code [can be found here](https://github.com/andersmurphy/clj-
 
 **Further Reading:**
 
-If you want to learn more about Amdahl's law, power laws and how they interact with network databases I highly recommend listening to [this interview Joran Greef](https://www.youtube.com/watch?v=9oyhNDv882U) and watching his talk
+If you want to learn more about Amdahl's law, power laws and how they interact with network databases I highly recommend listening to [this interview with Joran Greef](https://www.youtube.com/watch?v=9oyhNDv882U) and watching his talk
 [1000x: The Power of an Interface for Performance by Joran Dirk Greef](https://www.youtube.com/watch?v=yKgfk8lTQuE).
   
 If you want to read about how much further you can scale SQLite checkout [Scaling SQLite to 4M QPS on a single server (EC2 vs Bare Metal)](https://use.expensify.com/blog/scaling-sqlite-to-4m-qps-on-a-single-server).
 
-If you're thinking of running SQLite in production and wondering how create streaming replicas, backups and projections checkout [litestream](https://litestream.io).
+If you're thinking of running SQLite in production and wondering how to create streaming replicas, backups and projections checkout [litestream](https://litestream.io).
 
 If you still don't think a single machine can handle your workload it's worth reading [Scalability! But at what COST?](https://www.usenix.org/system/files/conference/hotos15/hotos15-paper-mcsherry.pdf).
 
