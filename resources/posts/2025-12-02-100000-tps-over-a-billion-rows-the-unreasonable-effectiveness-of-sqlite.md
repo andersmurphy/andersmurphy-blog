@@ -214,7 +214,7 @@ What if the interactive transaction has an extra query (an extra network hop)?
 ;; => 348 TPS
 ```
 
-348 TPS! What's going on here? [Amdoahl's Law](https://en.wikipedia.org/wiki/Power_law) strikes!
+348 TPS! What's going on here? [Amdahl's Law](https://en.wikipedia.org/wiki/Amdahl%27s_law) strikes!
 
 >the overall performance improvement gained by optimizing a single part of a system is limited by the fraction of time that the improved part is actually used.
 
