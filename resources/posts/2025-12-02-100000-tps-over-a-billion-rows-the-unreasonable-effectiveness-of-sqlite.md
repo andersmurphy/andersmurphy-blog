@@ -285,7 +285,7 @@ SQLite supports nested transactions with `SAVEPOINT` this lets us have fine-grai
 
 ## What about concurrent reads?
 
-Generally systems have a mix of reads and writes, somewhere in the region of 75% reads to 25% writes. So let's add some writes.
+Generally systems have a mix of reads and writes, somewhere in the region of 75% reads to 25% writes. So let's add some writes reads.
 
 ```clojure
 (tx-per-second 1000000
@@ -355,7 +355,7 @@ Interestingly, you can see the power of dynamic batching here. The addition of c
 
 ### You don't need isolation serializable (you really do for a ledger)
 
-[Some comments on hackernew](https://news.ycombinator.com/item?id=46126804) argued you don't need isolation serializable. In the context of this example you very much do. But let's covers all the number. I've also added results for 1ms latency for those who wanted to see that.
+[Some comments on hackernews](https://news.ycombinator.com/item?id=46126804) argued you don't need isolation serializable. In the context of this example you very much do. But let's covers all the numbers. I've also added results for 1ms latency for those who wanted to see that.
 
 |                         | Postgres | SQLite   |
 | ----------------------- | -------- | -------- |
@@ -395,7 +395,7 @@ Also checkout [this article on connection pool sizing](https://github.com/brettw
 
 If you are not in the business of running on a single monolithic server. Or not confident handling backups. Or do not fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
 
-**Further Reading:**
+### Further Reading:
 
 If you want to learn more about Amdahl's law, power laws and how they interact with network databases I highly recommend listening to [this interview with Joran Greef](https://www.youtube.com/watch?v=9oyhNDv882U) and watching his talk
 [1000x: The Power of an Interface for Performance by Joran Dirk Greef](https://www.youtube.com/watch?v=yKgfk8lTQuE).
@@ -406,9 +406,9 @@ If you're thinking of running SQLite in production and wondering how to create s
 
 If you still don't think a single machine can handle your workload it's worth reading [Scalability! But at what COST?](https://www.usenix.org/system/files/conference/hotos15/hotos15-paper-mcsherry.pdf).
 
-**Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
-
-**Discussion**
+### Discussion
 
 - [hackernews](https://news.ycombinator.com/item?id=46124205)
 - [reddit](https://www.reddit.com/r/Clojure/comments/1pchdr3/sqlite4clj_100k_tps_over_a_billion_rows_the/)
+
+**Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
