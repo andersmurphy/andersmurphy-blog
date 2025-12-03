@@ -393,7 +393,7 @@ Also checkout [this article on connection pool sizing](https://github.com/brettw
 
 ### Disclaimer: There's nothing wrong with Postgres
 
-If you are not in the business of running on a single monolithic server. Or not confident handling backups. Or fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
+If you are not in the business of running on a single monolithic server. Or not confident handling backups. Or do not fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
 
 **Further Reading:**
 
