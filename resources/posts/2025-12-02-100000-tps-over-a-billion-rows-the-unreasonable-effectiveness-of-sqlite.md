@@ -237,7 +237,7 @@ Let's see how SQLite fares.
 
 44096 TPS! By eliminating the network SQLite massively reduces the impact of Amdahl's law.
 
-## Single writer lets you batch
+## Single writer lets you batch (trivially)
 
 We don't need to stop there though. Because, SQLite is a single writer we can batch. [sqlite4clj](https://github.com/andersmurphy/sqlite4clj) provides a convenient dynamic batching function. Batch size grows dynamically with the workload and producers don't have to block when the consumer is busy. Effectively it self optimises for latency and throughput.
 
@@ -332,6 +332,68 @@ Generally systems have a mix of reads and writes, somewhere in the region of 75%
 Hopefully, this post helps illustrate the unreasonable effectiveness of SQLite as well as the challenges you can run in with Amdahl's law and network databases like postgres.
 
 The full benchmark code [can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite-vs-postgres).
+
+## Epilogue
+
+### Pragma synchronous  "FULL"
+
+Some [smart hackers on hackernnews](https://news.ycombinator.com/item?id=46127511) pointed out that using synchronous normal was not a fair comparison as technically under [some conditions is can sacrifice some durability](https://sqlite.org/pragma.html#pragma_synchronous).
+
+So here are the updated numbers.
+
+|                         | Postgres | SQLite   |
+| ----------------------- | -------- | -------- |
+| no network              | 13756    | 20654    |
+| 5ms                     | 1214     | n/a      |
+| 10ms                    | 702      | n/a      |
+| 10ms serializable       | 660      | n/a      |
+| batch                   | n/a      | 161868   |
+| batch savepoint         | n/a      | 98163    |
+| batch savepoint + reads | n/a      | 100405   |
+
+Interestingly, you can see the power of dynamic batching here. The addition of concurrent reads means the batches have time to get larger so we have less writes and are therefore less impacted by `synchronous "FULL"`. This is why `batch savepoint` is slower than `batch savepoint + reads`.  What the numbers don't show is there will be a fractional latency increase.
+
+### You don't need isolation serializable (you really do for a ledger)
+
+[Some comments on hackernew](https://news.ycombinator.com/item?id=46126804) argued you don't need isolation serializable. In the context of this example you very much do. But let's covers all the number. I've also added results for 1ms latency for those who wanted to see that.
+
+|                         | Postgres | SQLite   |
+| ----------------------- | -------- | -------- |
+| no net                  | 13756    | 20654    |
+| 1ms                     | 5428     | n/a      |
+| 5ms                     | 1214     | n/a      |
+| 10ms                    | 702      | n/a      |
+| no net serializable     | 10026    | 20654    |
+| 1ms    serializable     | 4691     | n/a      |
+| 5ms    serializable     | 1182     | n/a      |
+| 10ms   serializable     | 660      | n/a      |
+| batch                   | n/a      | 161868   |
+| batch savepoint         | n/a      | 98163    |
+| batch savepoint + reads | n/a      | 100405   |
+
+### Give postgres a bigger connection pool!
+
+[Some comments on hackernews](https://news.ycombinator.com/item?id=46126662) argued that increasing postgres' connection pool size to 64 would improve the numbers. It made some better and some worse (note there was a larger number of queries exceeding 30s and ability to handle burst was reduced). Serializable results became much worse.
+
+|                         | Postgres | SQLite   |
+| ----------------------- | -------- | -------- |
+| no net                  | 17399    | 20654    |
+| 1ms                     |  8430    | n/a      |
+| 5ms                     |  7563    | n/a      |
+| 10ms                    |  5574    | n/a      |
+| no net serializable     | 10283    | 20654    |
+| 1ms    serializable     |    83    | n/a      |
+| 5ms    serializable     |    75    | n/a      |
+| 10ms   serializable     |    66    | n/a      |
+| batch                   | n/a      | 161868   |
+| batch savepoint         | n/a      | 98163    |
+| batch savepoint + reads | n/a      | 100405   |
+
+Also checkout [this article on connection pool sizing](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing).
+
+### Disclaimer: There's nothing wrong with Postgres
+
+If you are not in the business of running on a single monolithic server. Or not confident handling backups. Or fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
 
 **Further Reading:**
 
