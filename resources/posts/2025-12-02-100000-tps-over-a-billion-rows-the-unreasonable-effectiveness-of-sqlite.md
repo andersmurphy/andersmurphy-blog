@@ -409,7 +409,7 @@ Also checkout [this article on connection pool sizing](https://github.com/brettw
 
 ### Why didn't you batch with postgres?
 
-There's no benefit batching interactive over the network as you still have to do as many network trips as there are statements because application code is being run between statements. This means you cannot amortise the network by batching.
+There's no benefit to batching interactive transactions over the network as you still have to do as many network trips as there are statements because application code is being run between statements. This means you cannot amortise the network by batching.
 
 ### Further Reading:
 
