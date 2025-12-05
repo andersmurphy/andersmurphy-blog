@@ -335,6 +335,22 @@ The full benchmark code [can be found here](https://github.com/andersmurphy/clj-
 
 ## Epilogue
 
+### This article is not intended as a comparison between SQLite and Postgres
+
+It is intended to highlight:
+
+A. You can handle more TPS than most applications will need with SQLite.
+
+B. Networks can cause brutal hard limits when you use interactive transactions and hit a power law. This includes SQLite if you're using a network drive (a lot of permanent storage in the cloud is networked). This hard limit can kill your product if you run into it, there's no way to scale out of it. You have to fundamentally change your design.
+
+C. The concern often raised with Sqlite that it's a single writer is not a problem in practice.
+
+However, I clearly failed to convey this.
+
+### Disclaimer: There's nothing wrong with Postgres
+
+If you are not in the business of running on a single monolithic server. Or need a network database. Or not confident handling backups. Or do not fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
+
 ### Pragma synchronous  "FULL"
 
 Some [smart hackers on hackernnews](https://news.ycombinator.com/item?id=46127511) pointed out that using synchronous normal was not a fair comparison as technically under [some conditions is can sacrifice some durability](https://sqlite.org/pragma.html#pragma_synchronous).
@@ -391,9 +407,9 @@ Interestingly, you can see the power of dynamic batching here. The addition of c
 
 Also checkout [this article on connection pool sizing](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing).
 
-### Disclaimer: There's nothing wrong with Postgres
+### Why didn't you batch with postgres?
 
-If you are not in the business of running on a single monolithic server. Or not confident handling backups. Or do not fully understand the nuances and limitations of SQLite DO NOT USE IT. There's nothing wrong with a managed postgres service.
+There's no benefit batching interactive over the network as you still have to do as many network trips as there are statements because application code is being run between statements. This means you cannot amortise the network by batching.
 
 ### Further Reading:
 
