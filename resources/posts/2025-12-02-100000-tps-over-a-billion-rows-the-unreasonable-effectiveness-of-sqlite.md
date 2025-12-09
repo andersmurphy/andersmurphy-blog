@@ -371,7 +371,7 @@ Interestingly, you can see the power of dynamic batching here. The addition of c
 
 ### You don't need isolation serializable (you really do for a ledger)
 
-[Some comments on hackernews](https://news.ycombinator.com/item?id=46126804) argued you don't need isolation serializable. In the context of this example you very much do. But let's covers all the numbers. I've also added results for 1ms latency for those who wanted to see that.
+[Some comments on hackernews](https://news.ycombinator.com/item?id=46126804) argued you don't need isolation serializable. In the context of this example you very much do (see [Testing the “I” in ACID — Martin Kleppmann](https://martin.kleppmann.com/2014/11/25/hermitage-testing-the-i-in-acid.html)). But let's covers all the numbers. I've also added results for 1ms latency for those who wanted to see that.
 
 |                         | Postgres | SQLite   |
 | ----------------------- | -------- | -------- |
