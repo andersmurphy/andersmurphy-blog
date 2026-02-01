@@ -14,7 +14,7 @@ I do consulting work on: Clojure, JVM, SQLite, product design, rapid prototyping
 - [Game of Life (Multiplayer)](https://example.andersmurphy.com)
 - [One billion checkboxes (Multiplayer)](https://checkboxes.andersmurphy.com)
 
-## Socials 
+### Socials 
 
 [Twitter](https://x.com/anders_murphy) - [Bluesky](https://bsky.app/profile/andersmurphy.bsky.social)
 
