@@ -333,7 +333,7 @@ style-src       'self' 'unsafe-inline'
   (with-open [out-file (java.io.FileWriter. "docs/sitemap.xml")]
     (xml/emit xml out-file)))
 
-(def html-about
+(defn html-about [path]
   (->>
     (html
       [:html html-props
@@ -341,12 +341,12 @@ style-src       'self' 'unsafe-inline'
        [:body navbar
         [:main.container
          [:article
-          (-> (slurp "resources/about.md")
+          (-> (slurp path)
             (md-to-html-string-with-meta :heading-anchors true)
             :html)]]]])
     prepend-doctype-header))
 
-(defn write-about! [s] (let [path-name "docs/about.html"] (spit path-name s)))
+(defn write-about! [s path] (let [path-name path] (spit path-name s)))
 
 (defn generate-site
   []
@@ -354,7 +354,8 @@ style-src       'self' 'unsafe-inline'
     (->>  (page-html {:page-content posts :page-path-name "index.html"})
       write-page!)
     (-> html-404 write-404!)
-    (-> html-about write-about!)
+    (-> (html-about "resources/about.md") (write-about! "docs/about.html"))
+    (-> (html-about "resources/clojuredays2026.md") (write-about! "docs/clojuredays2026.html"))
     (run! write-post! posts)
     (-> (generate-rss-feed posts)
       write-rss!)
