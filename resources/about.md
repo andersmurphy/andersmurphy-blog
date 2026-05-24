@@ -2,7 +2,7 @@
 
 👋 Hi! I'm Anders. A Fullstack Developer, Product Engineer and Startup Founder. I've spent most of my career building consumer facing apps. 
 
-I do consulting work on: Clojure, JVM, SQLite, product design, rapid prototyping and performance tuning (with a focus on vertical scaling).
+I do consulting work on: Clojure, Datastar, JVM, SQLite, product design, rapid prototyping and performance tuning (with a focus on vertical scaling).
 
 ### Open Source
 
