@@ -4,6 +4,10 @@
 
 I do consulting work on: Clojure, Datastar, JVM, SQLite, product design, rapid prototyping and performance tuning (with a focus on vertical scaling).
 
+### Writing
+
+[Blog posts](https://andersmurphy.com/)
+
 ### Open Source
 
 - [hyperlith](https://github.com/andersmurphy/hyperlith)
