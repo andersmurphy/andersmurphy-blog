@@ -427,4 +427,4 @@ If you still don't think a single machine can handle your workload it's worth re
 - [hackernews](https://news.ycombinator.com/item?id=46124205)
 - [reddit](https://www.reddit.com/r/Clojure/comments/1pchdr3/sqlite4clj_100k_tps_over_a_billion_rows_the/)
 
-**Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
+
