@@ -28,9 +28,9 @@ Let's establish a performance baseline with regular rowid int primary key. We'll
 
 ```clojure
 (d/q writer
-  ["CREATE TABLE IF NOT EXISTS event(id INT PRIMARY KEY, data BLOB)"])
+  ["CREATE TABLE IF NOT EXISTS event(id INTEGER PRIMARY KEY, data BLOB)"])
       
-(dotimes [_ 100]
+(dotimes [_ 10]
   (time
     (d/with-write-tx [db writer]
       (dotimes [_ 1000000]
@@ -41,20 +41,20 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-|  10000000  | 1208       |
-|  20000000  | 1102       |
-|  30000000  | 1177       |
-|  40000000  | 1138       |
-|  50000000  | 1086       |
-|  60000000  | 1101       |
-|  70000000  | 1070       |
-|  80000000  | 1069       |
-|  90000000  | 1079       |
-| 100000000  | 1081       |
+|  10000000  | 838        |
+|  20000000  | 762        |
+|  30000000  | 819        |
+|  40000000  | 713        |
+|  50000000  | 721        |
+|  60000000  | 757        |
+|  70000000  | 692        |
+|  80000000  | 702        |
+|  90000000  | 696        |
+| 100000000  | 715        |
 
 Roughly a million inserts per second.
 
-## UUID4
+## UUID4 WITHOUT ROW ID
 
 Now lets try UUID4.
 
@@ -85,22 +85,22 @@ Results:
 | 90000000   | 11668      |
 | 100000000  | 12586      |
 
-Oh no! What's happened here the inserts are 10-12x slower?!
+Oh no! What's happened here the inserts are 14-16x slower?!
 
 ## Profile
 
 That's a big difference. But, lets not guess when we can profile.
 
-Below is a normalised diffgraph. A diffgraph compares two profiling snapshots (in this case INT vs UUID4) and displays the differences in a flamegraph structure. Unlike a regular diffgraph that shows absolute changes, a normalised view adjusts the total number of samples between the two compared profiles to be the same. This means we can see the relative differences as a percentage. This matters because our profiles will run for different amounts of time.
+Below is a normalised diffgraph. A diffgraph compares two profiling snapshots (in this case INTEGER vs UUID4) and displays the differences in a flamegraph structure. Unlike a regular diffgraph that shows absolute changes, a normalised view adjusts the total number of samples between the two compared profiles to be the same. This means we can see the relative differences as a percentage. This matters because our profiles will run for different amounts of time.
 
 <img src="/assets/diffgraph_perils.png" alt="diffgraph" style="width: 100%;"/>
 <br/>
 
-The colour signifies the direction of the change: a blue frame means less time was spent in this function in the second profile (UUID4) compared to the first (INT); a red frame means more time was spent in the second profile. The colour intensity indicates the relative change in the number of samples for the frame itself (self time delta).
+The colour signifies the direction of the change: a blue frame means less time was spent in this function in the second profile (UUID4) compared to the first (INTEGER); a red frame means more time was spent in the second profile. The colour intensity indicates the relative change in the number of samples for the frame itself (self time delta).
 
 We can see from the diffgraph that we are spending a lot more time balancing the tree, reading and writing. This is because the unordered nature of UUID4 means they are ordered randomly which is forcing SQLite to constantly re-balance the Btree.
 
-## UUID7
+## UUID7 WITHOUT ROWID
 
 We can theoretically fix this with UUID7 which is time ordered eliminating the ordering problem of UUID4. Let's see if this improves things.
 
@@ -131,7 +131,40 @@ Results:
 |  90000000  | 1245       |
 | 100000000  | 1258       |
 
-Back to a more reasonable number. Slightly slower than our baseline. UUID blob primary keys are 16 bytes vs int primary keys which are 8 bytes.
+Back to a more reasonable number. Still slower than our baseline. UUID blob primary keys are 16 bytes vs int primary keys which are 8 bytes.
+
+## UUID4 WITH ROWID
+
+Now lets try UUID4 WITH ROWID. This means the hidden rowid will be the clustered index. The upside of this is rowid is sequential. The downside is that the table now has two indexes so there will be write amplification.
+
+```clojure
+(d/q writer
+  ["CREATE TABLE IF NOT EXISTS event(id BLOB PRIMARY KEY, data BLOB)"])
+
+(dotimes [_ 10]
+  (time
+    (d/with-write-tx [db writer]
+      (dotimes [_ 1000000]
+        (d/q db ["INSERT INTO event (id, data) values (?, ?)"
+                 (random-uuid4-bytes) data])))))
+```
+
+Results:
+
+| total rows | time in ms |
+| ---------- | ---------- |
+| 10000000   | 2003       |
+| 20000000   | 2324       |
+| 30000000   | 3285       |
+| 40000000   | 4399       |
+| 50000000   | 5194       |
+| 60000000   | 5659       |
+| 70000000   | 6215       |
+| 80000000   | 6467       |
+| 90000000   | 6924       |
+| 100000000  | 7119       |
+
+This doesn't perform as well as UUID7 WITHOUT ROWID partly because you still building an index with random insertions (even though it's not the clustered index).
 
 ## Conclusion
 
