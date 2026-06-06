@@ -153,4 +153,5 @@ If you enjoyed this post you might like this one [100000 TPS with SQLite](https:
 
 ### Discussion
 
-- [hackernews](https://andersmurphy.com/2026/06/05/the-perils-of-uuid-primary-keys-in-sqlite.html)
+- [hackernews](https://news.ycombinator.com/item?id=48419571)
+- [reddit](https://www.reddit.com/r/programming/comments/1tyalr6/the_perils_of_uuid_primary_keys_in_sqlite/)
