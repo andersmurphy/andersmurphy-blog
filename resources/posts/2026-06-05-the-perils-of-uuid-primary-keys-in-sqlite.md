@@ -6,19 +6,21 @@ While this post is about SQLite specifically, the problem of random UUIDs also e
 
 ## What is a clustered index?
 
-A clustered index determines the physical storage order of the rows in a table. The table's data rows are stored in the index's leaf pages, sorted by the indexed key. Because of this:
+A clustered index determines the physical storage order of the rows in a table. Because of this:
 
 - There can be only one clustered index per table (rows can only be physically sorted one way).
-- A clustered index is the table. The leaf nodes contain the full row data
+- A clustered index is the table.
 - A non-clustered index, by contrast, stores only the indexed columns plus a pointer to the actual row data, which lives elsewhere.
 
 ## Rowid
 
-Every ordinary SQLite table has an implicit 64-bit integer primary key called rowid. The table's data is stored in a B-tree ordered by rowid. This is effectively SQLite's clustered index. The physical storage order of rows follows rowid sequence.
+Every ordinary SQLite table has an implicit 64-bit integer primary key called rowid. The table's data is stored in a B-tree structure containing one entry for each table row, using the rowid value as the key. This is effectively SQLite's clustered index. The physical storage order of rows follows rowid sequence.
 
 ## Without rowid 
 
 SQLite also supports WITHOUT ROWID tables. These tables have no implicit rowid. Instead, the primary key you declare becomes the clustered index.
+
+*Note: In SQLite rowid tables are implemented as B*-Trees where all content is stored in the leaves of the tree, whereas WITHOUT ROWID tables are implemented using ordinary B-Trees with content stored on both leaves and intermediate nodes.*
 
 ## Baseline
 
@@ -83,7 +85,7 @@ Results:
 | 90000000   | 11668      |
 | 100000000  | 12586      |
 
-Oh no! What's happened here 10-12x slower?!
+Oh no! What's happened here the inserts are 10-12x slower?!
 
 ## Profile
 
@@ -148,3 +150,7 @@ If you enjoyed this post you might like this one [100000 TPS with SQLite](https:
 - [Diffgraphs](https://clojure-goes-fast.com/kb/profiling/clj-async-profiler/diffgraphs/)
 
 **Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
+
+### Discussion
+
+- [hackernews](https://andersmurphy.com/2026/06/05/the-perils-of-uuid-primary-keys-in-sqlite.html)
