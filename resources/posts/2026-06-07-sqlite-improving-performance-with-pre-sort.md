@@ -1,4 +1,4 @@
-title: SQLlite improving performance with pre-sort
+title: SQLite improving performance with pre-sort
 
 In the last post we showed how the randomness of [UUID4 can have a large impact on insert speed](https://andersmurphy.com/2026/06/05/the-perils-of-uuid-primary-keys-in-sqlite.html) and how UUID7 can help. But, what about other data that might have random qualities? Where we can't reach for UUID7 to solve our problems?
 
