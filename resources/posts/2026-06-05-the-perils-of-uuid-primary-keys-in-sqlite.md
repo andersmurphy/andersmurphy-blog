@@ -20,7 +20,7 @@ Every ordinary SQLite table has an implicit 64-bit integer primary key called ro
 
 SQLite also supports WITHOUT ROWID tables. These tables have no implicit rowid. Instead, the primary key you declare becomes the clustered index.
 
-*Note: In SQLite rowid tables are implemented as B*-Trees where all content is stored in the leaves of the tree, whereas WITHOUT ROWID tables are implemented using ordinary B-Trees with content stored on both leaves and intermediate nodes.*
+*Note: In SQLite rowid tables are implemented as B+-Trees where all content is stored in the leaves of the tree, whereas WITHOUT ROWID tables are implemented using ordinary B-Trees with content stored on both leaves and intermediate nodes.*
 
 ## Baseline
 
@@ -41,16 +41,16 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-|  10000000  | 838        |
-|  20000000  | 762        |
-|  30000000  | 819        |
-|  40000000  | 713        |
-|  50000000  | 721        |
-|  60000000  | 757        |
-|  70000000  | 692        |
-|  80000000  | 702        |
-|  90000000  | 696        |
-| 100000000  | 715        |
+|  1000000   | 838        |
+|  2000000   | 762        |
+|  3000000   | 819        |
+|  4000000   | 713        |
+|  5000000   | 721        |
+|  6000000   | 757        |
+|  7000000   | 692        |
+|  8000000   | 702        |
+|  9000000   | 696        |
+| 10000000   | 715        |
 
 Roughly a million inserts per second.
 
@@ -74,16 +74,16 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-| 10000000   | 2649       |
-| 20000000   | 5644       |
-| 30000000   | 7137       |
-| 40000000   | 8352       |
-| 50000000   | 9359       |
-| 60000000   | 9817       |
-| 70000000   | 10490      |
-| 80000000   | 11130      |
-| 90000000   | 11668      |
-| 100000000  | 12586      |
+| 1000000    | 2649       |
+| 2000000    | 5644       |
+| 3000000    | 7137       |
+| 4000000    | 8352       |
+| 5000000    | 9359       |
+| 6000000    | 9817       |
+| 7000000    | 10490      |
+| 8000000    | 11130      |
+| 9000000    | 11668      |
+| 10000000   | 12586      |
 
 Oh no! What's happened here the inserts are 14-16x slower?!
 
@@ -120,16 +120,16 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-|  10000000  | 1372       |
-|  20000000  | 1280       |
-|  30000000  | 1365       |
-|  40000000  | 1250       |
-|  50000000  | 1256       |
-|  60000000  | 1270       |
-|  70000000  | 1246       |
-|  80000000  | 1257       |
-|  90000000  | 1245       |
-| 100000000  | 1258       |
+|  1000000   | 1372       |
+|  2000000   | 1280       |
+|  3000000   | 1365       |
+|  4000000   | 1250       |
+|  5000000   | 1256       |
+|  6000000   | 1270       |
+|  7000000   | 1246       |
+|  8000000   | 1257       |
+|  9000000   | 1245       |
+| 10000000   | 1258       |
 
 Back to a more reasonable number. Still slower than our baseline. UUID blob primary keys are 16 bytes vs int primary keys which are 8 bytes.
 
@@ -153,16 +153,16 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-| 10000000   | 2003       |
-| 20000000   | 2324       |
-| 30000000   | 3285       |
-| 40000000   | 4399       |
-| 50000000   | 5194       |
-| 60000000   | 5659       |
-| 70000000   | 6215       |
-| 80000000   | 6467       |
-| 90000000   | 6924       |
-| 100000000  | 7119       |
+| 1000000    | 2003       |
+| 2000000    | 2324       |
+| 3000000    | 3285       |
+| 4000000    | 4399       |
+| 5000000    | 5194       |
+| 6000000    | 5659       |
+| 7000000    | 6215       |
+| 8000000    | 6467       |
+| 9000000    | 6924       |
+| 10000000   | 7119       |
 
 This doesn't perform as well as UUID7 WITHOUT ROWID partly because you still building an index with random insertions (even though it's not the clustered index).
 
