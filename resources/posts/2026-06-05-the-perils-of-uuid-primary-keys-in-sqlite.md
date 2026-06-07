@@ -18,7 +18,7 @@ Every ordinary SQLite table has an implicit 64-bit integer primary key called ro
 
 ## Without rowid 
 
-SQLite also supports WITHOUT ROWID tables. These tables have no implicit rowid. Instead, the primary key you declare becomes the clustered index.
+SQLite also supports WITHOUT ROWID tables. These tables have no implicit rowid. Instead, the primary key you declare becomes the clustered index. Why would you use without rowid? Simply, because it avoids you having a rowid index and a primary key index. This causes write amplification. But, also an additional lookup even when using the primary key as the rowid needs to be used to retrieve the actual data (unless the index is covering).
 
 *Note: In SQLite rowid tables are implemented as B+-Trees where all content is stored in the leaves of the tree, whereas WITHOUT ROWID tables are implemented using ordinary B-Trees with content stored on both leaves and intermediate nodes.*
 
