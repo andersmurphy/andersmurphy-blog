@@ -114,3 +114,6 @@ The full benchmark code [can be found here](https://github.com/andersmurphy/clj-
 
 **Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
     
+### Discussion
+- [hackernews](https://news.ycombinator.com/item?id=48458938)
+- [reddit](https://www.reddit.com/r/programming/comments/1u10n7z/sqlite_improving_performance_with_presort/)
