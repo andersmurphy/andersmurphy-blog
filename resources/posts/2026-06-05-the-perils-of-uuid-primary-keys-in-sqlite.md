@@ -172,7 +172,9 @@ Hopefully, this post helps illustrate some of the pitfalls with UUID primary key
 
 The full benchmark code [can be found here](https://github.com/andersmurphy/clj-cookbook/tree/master/sqlite-perils-of-uuid).
 
-If you enjoyed this post you might like this one [100000 TPS with SQLite](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html)
+If you enjoyed this post you might like this one [100000 TPS with SQLite](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html).
+
+There's also a subsequent [article on pre-sorting ids to improve insert performance](https://andersmurphy.com/2026/06/07/sqlite-improving-performance-with-pre-sort.html).
 
 ## Further reading
 
@@ -188,3 +190,4 @@ If you enjoyed this post you might like this one [100000 TPS with SQLite](https:
 - [hackernews](https://news.ycombinator.com/item?id=48419571)
 - [reddit](https://www.reddit.com/r/programming/comments/1tyalr6/the_perils_of_uuid_primary_keys_in_sqlite/)
 - [lobsters](https://lobste.rs/s/76plqm/perils_uuid_primary_keys_sqlite)
+p
