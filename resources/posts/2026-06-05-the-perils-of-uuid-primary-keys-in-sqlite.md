@@ -190,4 +190,3 @@ There's also a subsequent [article on pre-sorting ids to improve insert performa
 - [hackernews](https://news.ycombinator.com/item?id=48419571)
 - [reddit](https://www.reddit.com/r/programming/comments/1tyalr6/the_perils_of_uuid_primary_keys_in_sqlite/)
 - [lobsters](https://lobste.rs/s/76plqm/perils_uuid_primary_keys_sqlite)
-p
