@@ -59,9 +59,8 @@ First we need a fast way to compare our random id. It's 20 bytes, we don't want 
 
 ```clojure
 (defn bytes->long [^bytes bytes]
-  (let [bb (ByteBuffer/allocate (count bytes))]
-    (ByteBuffer/.put bb bytes)
-    (ByteBuffer/.getLong bb 0)))
+  (-> (ByteBuffer/wrap bytes 0 8)
+    (ByteBuffer/.getLong 0)))
     
 (defn byte-compare
   "Compares the first 8 most significant bytes of a byte array.
@@ -93,18 +92,18 @@ Results:
 
 | total rows | time in ms |
 | ---------- | ---------- |
-|  1000000   | 2638       |
-|  2000000   | 2846       |
-|  3000000   | 2976       |
-|  4000000   | 3125       |
-|  5000000   | 3309       |
-|  6000000   | 3898       |
-|  7000000   | 3749       |
-|  8000000   | 3984       |
-|  9000000   | 4054       |
-| 10000000   | 4332       |
+|  1000000   | 1987       |
+|  2000000   | 2251       |
+|  3000000   | 2296       |
+|  4000000   | 2614       |
+|  5000000   | 2687       |
+|  6000000   | 3244       |
+|  7000000   | 3118       |
+|  8000000   | 3311       |
+|  9000000   | 3485       |
+| 10000000   | 3835       |
 
-Fun! Despite the overhead, sorting the batch improves performance by around 2-2.5x.
+Fun! Despite the overhead, sorting the batch improves performance by around 2-3x.
 
 ## Conclusion
 
