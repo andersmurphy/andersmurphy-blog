@@ -4,7 +4,7 @@ In this post I'm going to dive into some of the fun emergent properties of serve
 
 ## Quick overview of this architecture
 
-In this model almost all state is on the server. We stream the next frame to every connected client every X ms (a tick). This style of rendering is often referred to as immediate mode (fat morph in the [Datastar discord](https://discord.com/invite/bnRNgZjgPh)). These frames are streamed to each client over a long lived SSE connection with streaming compression (Brolti or Zstandard).
+In this model almost all state is on the server. We stream the next frame (when I say frame I mean the next version of the html page generated on the server) to every connected client every X ms (a tick). This style of rendering is often referred to as immediate mode (fat morph in the [Datastar discord](https://discord.com/invite/bnRNgZjgPh)). These frames are streamed to each client over a long lived SSE connection with streaming compression (Brolti or Zstandard).
 
 Think `view = f(state)` just on the server rather than the client.
 
@@ -22,9 +22,9 @@ Batch your writes -> batch your renders -> ...
 
 This lets you batch your renders. This can be as simple as iterating over all your long lived connections and generating the HTML they need to render.  Or if you want get slightly fancier pinning each connection group to a core and iterating over them. This allows each group to have their own thread local resources (buffers, caches, database connection). Which can be great for making your system more deterministic and bounding memory usage. 
 
-Before you might have had a 64kb buffer for each connection's template generation, but with batched renders, that ends up being 64kb per batching thread. Say you have 10000 concurrent users, that would be 640mb. Even worse if you're not using buffer, you'd be generation 640mb of garbage every render. With the batching model you'd have 64kb per thread, so in a 4 core system that would be a minuscule 256 kb!
+Before you might have had a 64kb buffer for each connection's template generation, but with batched renders, that ends up being 64kb per batching thread. Say you have 10000 concurrent users, that would be 640mb. Even worse if you're not using buffer, you'd be generating 640mb of garbage every render. With the batching model you'd have 64kb per thread, so in a 4 core system that would be a minuscule 256 kb!
 
-In the case of caches (particularly ones that are accessed frequently) and database connections you eliminate contention. Each render thread has it's own resources so there's no need for coordination.
+In the case of caches (particularly ones that are accessed frequently) and database connections you eliminate contention ([see this LMAX talk for more on why this is important](https://www.youtube.com/watch?v=qDhTjE0XmkE)) . Each render thread has it's own resources so there's no need for coordination.
 
 ## Compression and bandwidth 
 
@@ -35,6 +35,8 @@ In the case of caches (particularly ones that are accessed frequently) and datab
 But doesn't a tick based model involve querying the database every tick? In my case yes, yes it does. But, if you're using an embedded database like SQLite for projections then your projections are laid out so that they are quick to query. If you're worried about write throughput you should check out this post [100000 TPS over a billion rows: the unreasonable effectiveness of SQLite](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html).
 
 ## HTML templating
+
+DEEP BREATH. We are breathing rare air here.  String generation, concatenation, encoding, and escaping is our bottleneck. 
 
 So with ticks, barriers, compression and sqlite we've eliminated a load of work. We'll that leaves one last bottleneck. With thousands of concurrent users being updated 10 times a second, HTML templating ends up occupying a lot of our frame budget. 
 
@@ -80,9 +82,9 @@ There's two small changes with this hiccup interpreter. If it encounters a funct
     :else (write-escaped-string (str node) out)))
 ```
 
-The main benefit of this is you scan delay work until the interpreter reaches that point. So your database queries can be streaming strait into your output byte buffer without materialising the full result of the query.
+The main benefit of this is you scan delay work until the interpreter reaches that point. So your database queries can be streaming straight into your output byte buffer without materialising the full result of the query.
 
-If it encounters a element who's first argument is a function it will apply the rest of the elements content to that function as arguments (think of them as components). 
+If it encounters an element who's first argument is a function it will apply the rest of the elements content to that function as arguments (think of them as components). 
 
 ```clojure
 (fn write-collection
@@ -124,7 +126,7 @@ What's cool is we can wrap these "components" in a cache and key their output by
      (subvec states 1))])
 ```
 
-And we can reference them in hiccup similar to components in Reagent (although I might change his to chassis style aliases in future):
+And we can reference them in hiccup similar to components in Reagent (although I might change this to chassis style aliases in future):
 
 ```clojure
 [:div
@@ -141,13 +143,13 @@ They can be nested just fine, because our interpreter is recursive.
 
 But, what about thrashing the cache? We've got automatic component level content addressable caching. A bunch of small components that are all different could push out our more valuable cache entries!
 
-This is where we lean on [WTinyLFU](https://github.com/ben-manes/caffeine/wiki/Efficiency). WTinyLFU is a really cool caching algorithm implemented by the [caffein caching library](https://github.com/ben-manes/caffeine).
+This is where we lean on [WTinyLFU](https://github.com/ben-manes/caffeine/wiki/Efficiency). WTinyLFU is a really cool caching algorithm implemented by the [caffeine caching library](https://github.com/ben-manes/caffeine).
 
-It has two really cool features. Entries are only admitted if they are seen with a certain frequency. This means all those small entries that are all different. They never make it in.
+It has two really cool features. Entries are only admitted if they are seen with a certain frequency. This means all those small entries that are all different: they never make it in.
 
 But, the other interesting property is entries that are not requested often naturally drop out of the cache.
 
-This leads to really interesting emergent optimisation behaviour. Say we have a nested components. They present a problem. If we cache all the children and the parent (including all the children). We have roughly doubled the amount of space we take in the cache. But, with WTinyLFU if the wrapping component always changes, it never gets cached cause of the admission mechanism . If the wrapper component is stable and sticks around all the cached sub components drop out of the cache because they never requested.
+This leads to really interesting emergent optimisation behaviour. Say we have a nested components. They present a problem. If we cache all the children and the parent (including all the children). We have roughly doubled the amount of space we take in the cache. But, with WTinyLFU if the wrapping component always changes, it never gets cached cause of the admission mechanism. If the wrapper component is stable and sticks around all the cached sub components drop out of the cache because they are never requested.
 
 ## Conclusion
 
