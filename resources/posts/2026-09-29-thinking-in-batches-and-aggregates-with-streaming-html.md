@@ -36,7 +36,7 @@ But doesn't a tick based model involve querying the database every tick? In my c
 
 ## HTML templating
 
-DEEP BREATH. We are breathing rare air here.  String generation, concatenation, encoding, and escaping is our bottleneck. 
+DEEP BREATH. We are breathing rare air here.  String generation, concatenation, encoding, and escaping are our bottlenecks (and some iterating). 
 
 So with ticks, barriers, compression and sqlite we've eliminated a load of work. We'll that leaves one last bottleneck. With thousands of concurrent users being updated 10 times a second, HTML templating ends up occupying a lot of our frame budget. 
 
