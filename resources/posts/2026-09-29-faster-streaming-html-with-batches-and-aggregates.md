@@ -88,7 +88,7 @@ But doesn't a tick based model involve querying the database every tick? In my c
 
 DEEP BREATH. We are breathing rare air here.  String generation, concatenation, encoding, escaping and some iterating are our bottlenecks.
 
-So with ticks, barriers, compression and sqlite we've eliminated a load of work. We'll that leaves one last bottleneck. With thousands of concurrent users being updated 10 times a second, HTML templating ends up occupying a lot of our frame budget. 
+So with ticks, barriers, compression and sqlite we've eliminated a load of work. Well that leaves one last bottleneck. With thousands of concurrent users being updated 10 times a second, HTML templating ends up occupying a lot of our frame budget. 
 
 You could do something clever like only update users who need to be updated. But, that doesn't solve all users having a shared widget and all needing to be updated anyway. Or dynamic content that changes all the time etc. The goal here is to not be accidentally quadratic. Any optimisation that helps the happy path but doesn't improve our worse case is just overhead when things go wrong.
 
