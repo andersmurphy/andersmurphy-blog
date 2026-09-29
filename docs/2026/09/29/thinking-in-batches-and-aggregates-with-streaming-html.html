@@ -44,13 +44,13 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
                <span class="dim">&#40;</span>write-element lane-ctx out iterator item<span class="dim">&#41;</span>
 
                <span class="dim">&#40;</span>fn? item<span class="dim">&#41;</span>
-               <span class="dim">&#40;</span>.put out &#94;bytes
-                 <span class="dim">&#40;</span>cache/lookup-or-miss
-                   <span class="dim">&#40;</span>.fragment-cache lane-ctx<span class="dim">&#41;</span>
-                   collection
-                   <span class="dim">&#40;</span>fn &#91;&#95;&#93;
-                     <span class="dim">&#40;</span>html-&gt;bytes <span class="dim">&#40;</span>apply item <span class="dim">&#40;</span>subvec collection 1<span class="dim">&#41;&#41;</span>
-                       lane-ctx<span class="dim">&#41;&#41;&#41;&#41;</span>
+               <span class="dim">&#40;</span>let &#91;cache <span class="dim">&#40;</span>.fragment-cache lane-ctx<span class="dim">&#41;</span>
+                           b     <span class="dim">&#40;</span>or <span class="dim">&#40;</span>cache/get cache collection<span class="dim">&#41;</span>
+                                   <span class="dim">&#40;</span>cache/put cache collection
+                                     <span class="dim">&#40;</span>html-&gt;bytes <span class="dim">&#40;</span>apply item
+                                                    <span class="dim">&#40;</span>subvec collection 1<span class="dim">&#41;&#41;</span>
+                                       lane-ctx<span class="dim">&#41;&#41;&#41;</span>&#93;
+                       <span class="dim">&#40;</span>.put out &#94;bytes b<span class="dim">&#41;&#41;</span>
 
                :else
                <span class="dim">&#40;</span>do <span class="dim">&#40;</span>write-node lane-ctx item out<span class="dim">&#41;</span>
