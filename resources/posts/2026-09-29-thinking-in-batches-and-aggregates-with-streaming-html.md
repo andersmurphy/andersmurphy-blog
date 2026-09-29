@@ -82,7 +82,7 @@ There's two small changes with this hiccup interpreter. If it encounters a funct
     :else (write-escaped-string (str node) out)))
 ```
 
-The main benefit of this is you scan delay work until the interpreter reaches that point. So your database queries can be streaming straight into your output byte buffer without materialising the full result of the query.
+The main benefit of this is you can delay work until the interpreter reaches that point. So your database queries can be streaming straight into your output byte buffer without materialising the full result of the query.
 
 If it encounters an element who's first argument is a function it will apply the rest of the elements content to that function as arguments (think of them as components). 
 

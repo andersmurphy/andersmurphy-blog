@@ -35,7 +35,7 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
     <span class="dim">&#40;</span>write-node lane-ctx <span class="dim">&#40;</span>node<span class="dim">&#41;</span> out<span class="dim">&#41;</span>
 
     :else <span class="dim">&#40;</span>write-escaped-string <span class="dim">&#40;</span>str node<span class="dim">&#41;</span> out<span class="dim">&#41;&#41;&#41;</span>
-</code></pre><p>The main benefit of this is you scan delay work until the interpreter reaches that point. So your database queries can be streaming straight into your output byte buffer without materialising the full result of the query.</p><p>If it encounters an element who's first argument is a function it will apply the rest of the elements content to that function as arguments (think of them as components). </p><pre><code class="clojure"><span class="dim">&#40;</span>fn write-collection
+</code></pre><p>The main benefit of this is you can delay work until the interpreter reaches that point. So your database queries can be streaming straight into your output byte buffer without materialising the full result of the query.</p><p>If it encounters an element who's first argument is a function it will apply the rest of the elements content to that function as arguments (think of them as components). </p><pre><code class="clojure"><span class="dim">&#40;</span>fn write-collection
   &#91;&#94;LaneCtx lane-ctx &#94;ByteBuffer out &#94;Iterable collection&#93;
   <span class="dim">&#40;</span>let &#91;&#94;Iterator iterator <span class="dim">&#40;</span>.iterator collection<span class="dim">&#41;</span>&#93;
     <span class="dim">&#40;</span>when <span class="dim">&#40;</span>.hasNext iterator<span class="dim">&#41;</span>
