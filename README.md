@@ -7,7 +7,7 @@ To build content run `(generate-site)` from the repl (see `core.clj`).
 To run locally: 
 
 ```
-clj -M:serve :port 1339 :dir "docs" :headers '{"Cross-Origin-Opener-Policy" "same-origin"}'
+clojure -M:serve :port 1339 :dir "docs" :headers '{"Cross-Origin-Opener-Policy" "same-origin"}'
 ```
 
 

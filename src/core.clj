@@ -348,6 +348,15 @@ style-src       'self' 'unsafe-inline'
 
 (defn write-about! [s path] (let [path-name path] (spit path-name s)))
 
+(defn write-html-redirect-page!
+  [path-name redirect-path]
+  (let [s (html
+            [:html html-props
+             (head site-title)
+             [:meta {:http-equiv "refresh"
+                     :content    (str"0;'" site-url redirect-path "'")}]])]
+    (spit (str "docs/" path-name) s)))
+
 (defn generate-site
   []
   (let [posts (get-posts (files))]
@@ -356,7 +365,10 @@ style-src       'self' 'unsafe-inline'
     (-> html-404 write-404!)
     (-> (html-about "resources/about.md") (write-about! "docs/about.html"))
     (-> (html-about "resources/clojuredays2026.md") (write-about! "docs/clojuredays2026.html"))
-    (run! write-post! posts)
+    (run! write-post! posts)    
+    (write-html-redirect-page!
+      "2026/09/29/thinking-in-batches-and-aggregates-with-streaming-html.html"
+      "2026/09/29/faster-streaming-html-with-batches-and-aggregates.html")
     (-> (generate-rss-feed posts)
       write-rss!)
     (-> (generate-sitemap posts)
