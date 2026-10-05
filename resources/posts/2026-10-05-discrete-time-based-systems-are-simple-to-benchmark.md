@@ -183,7 +183,7 @@ About 43% faster. Obviously this is an extreme example. But, we are looking for 
 
 ## Why not just use a ThreadPoolExecutor?
 
-In a lot of cases you could just use an `ThreadPoolExecutor`, with a custom thread factory for thread relevant context, and call `invokeAll`. However, executors don't let you run batch specific code. In this app it's important we wrap each batch for each thread with a SQLite read transaction. Because each query is it's own implicit transaction at 12000 connections we are doing 3,000,000 queries per second (each render is 25 queries). Without the wrapped read transaction that means acquiring a lock on the WAL file 3 million times a second. By wrapping the whole batch, we reduce that to 1 lock per core per tick.
+In a lot of cases you could just use a `ThreadPoolExecutor`, with a custom thread factory for thread relevant context, and call `invokeAll`. However, executors don't let you run batch specific code. In this app it's important we wrap each batch for each thread with a SQLite read transaction. Because each query is it's own implicit transaction at 12000 connections we are doing 3,000,000 queries per second (each render is 25 queries). Without the wrapped read transaction that means acquiring a lock on the WAL file 3 million times a second. By wrapping the whole batch, we reduce that to 1 lock per core per tick.
 
 ## Conclusion
 
