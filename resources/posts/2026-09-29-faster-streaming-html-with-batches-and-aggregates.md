@@ -4,7 +4,7 @@ In this post I'm going to dive into some of the fun emergent properties of serve
 
 ## Quick overview of this architecture
 
-In this model almost all state is on the server. We stream the next frame (when I say frame I mean the next version of the html page generated on the server) to every connected client every X ms (a tick). This style of rendering is often referred to as immediate mode (fat morph in the [Datastar discord](https://discord.com/invite/bnRNgZjgPh)). These frames are streamed to each client over a long lived SSE connection with streaming compression (Brolti or Zstandard).
+In this model almost all state is on the server. We stream the next frame (when I say frame I mean the next version of the html page generated on the server) to every connected client every X ms (a tick). This style of rendering is often referred to as immediate mode (fat morph in the [Datastar discord](https://discord.com/invite/bnRNgZjgPh)). These frames are streamed to each client over a long lived SSE connection with streaming compression (Brotli or Zstandard).
 
 Think `view = f(state)` just on the server rather than the client.
 
