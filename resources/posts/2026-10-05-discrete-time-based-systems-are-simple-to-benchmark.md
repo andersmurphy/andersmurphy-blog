@@ -2,7 +2,7 @@ title:  Discrete time based systems are simple to benchmark
 
 In the previous post [I briefly discussed a tick based batching system for streaming HTML](https://andersmurphy.com/2026/09/29/faster-streaming-html-with-batches-and-aggregates.html). In this post I'm going to dive deeper in one of the many benefits of a discrete time (tick) based system is simplified profiling, benchmarking and load testing.
 
-## Non-Uniform Work Distributions
+## Non-uniform work distributions
 
 In the previous post we covered reducing contention by sharing less between threads. This generally involves threads having their own resources (buffers, caches, database connection). This is powerful, but assumes each render task takes the same amount of work which is not always the true. In this app connections are long lived which means that over time (as users disconnect) we can end up with some render threads having more connections to render for than others.
 
