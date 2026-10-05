@@ -52,21 +52,21 @@ style-src       &apos;self&apos; &apos;unsafe-inline&apos;
 
   <span class="dim">&#41;</span>
 </code></pre><p>The reason we are using a <code>ConcurrentLinkedQueue</code> is because we can poll without blocking. This fits well with our model where we drain the queue until it's empty.</p><p><em>Note: We could use a LMAX disruptor style ring buffer for even more speed (I might revisit ring buffers in a future post). But, for now a ConcurrentlLinkedQueue is fast enough.</em></p><pre><code class="clojure"><span class="dim">&#40;</span>let &#91;cache <span class="dim">&#40;</span>cache/init
-{:max-weight fragment-cache-size
-:weigher    <span class="dim">&#40;</span>fn &#91;&#95;k &#94;bytes v&#93; <span class="dim">&#40;</span>alength v<span class="dim">&#41;&#41;</span>}<span class="dim">&#41;</span>&#93;
-<span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>range render-pool-size<span class="dim">&#41;</span>
-<span class="dim">&#40;</span>mapv <span class="dim">&#40;</span>fn &#91;&#95;&#93;
-<span class="dim">&#40;</span>let &#91;lane-ctx &#94;LaneCtx
-<span class="dim">&#40;</span>lc/new-lane-ctx
-{:dbs            <span class="dim">&#40;</span>sqlite/create-read-connections! dbs<span class="dim">&#41;</span>
-:html-dst-buf   <span class="dim">&#40;</span>ByteBuffer/allocateDirect
-render-buffer-size<span class="dim">&#41;</span>
-:fragment-cache cache}<span class="dim">&#41;</span>&#93;
-<span class="dim">&#40;</span>-&gt; <span class="dim">&#40;</span>Thread.
-&#94;Runnable
-<span class="dim">&#40;</span>bound-fn&#42; <span class="dim">;; binding conveyance
-</span><span class="dim">&#40;</span>fn render-thread &#91;&#93;
-<span class="dim">&#40;</span>while <span class="dim">&#40;</span>not <span class="dim">&#40;</span>Thread/interrupted<span class="dim">&#41;&#41;</span>
+              {:max-weight fragment-cache-size
+               :weigher    <span class="dim">&#40;</span>fn &#91;&#95;k &#94;bytes v&#93; <span class="dim">&#40;</span>alength v<span class="dim">&#41;&#41;</span>}<span class="dim">&#41;</span>&#93;
+  <span class="dim">&#40;</span>-&gt;&gt; <span class="dim">&#40;</span>range render-pool-size<span class="dim">&#41;</span>
+    <span class="dim">&#40;</span>mapv <span class="dim">&#40;</span>fn &#91;&#95;&#93;
+            <span class="dim">&#40;</span>let &#91;lane-ctx &#94;LaneCtx
+                  <span class="dim">&#40;</span>lc/new-lane-ctx
+                    {:dbs            <span class="dim">&#40;</span>sqlite/create-read-connections! dbs<span class="dim">&#41;</span>
+                     :html-dst-buf   <span class="dim">&#40;</span>ByteBuffer/allocateDirect
+                                       render-buffer-size<span class="dim">&#41;</span>
+                     :fragment-cache cache}<span class="dim">&#41;</span>&#93;
+              <span class="dim">&#40;</span>-&gt; <span class="dim">&#40;</span>Thread.
+                    &#94;Runnable
+                    <span class="dim">&#40;</span>bound-fn&#42; <span class="dim">;; binding conveyance
+</span>                      <span class="dim">&#40;</span>fn render-thread &#91;&#93;
+                        <span class="dim">&#40;</span>while <span class="dim">&#40;</span>not <span class="dim">&#40;</span>Thread/interrupted<span class="dim">&#41;&#41;</span>
                           <span class="dim">&#40;</span>.await &#94;CyclicBarrier start-barrier<span class="dim">&#41;</span>
                           <span class="dim">&#40;</span>run! sqlite/start-read-tx
                             <span class="dim">&#40;</span>vals <span class="dim">&#40;</span>.dbs lane-ctx<span class="dim">&#41;&#41;&#41;</span>

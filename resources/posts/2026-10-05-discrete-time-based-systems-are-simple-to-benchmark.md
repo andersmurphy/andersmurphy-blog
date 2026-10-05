@@ -106,21 +106,21 @@ The reason we are using a `ConcurrentLinkedQueue` is because we can poll without
 
 ```clojure
 (let [cache (cache/init
-{:max-weight fragment-cache-size
-:weigher    (fn [_k ^bytes v] (alength v))})]
-(->> (range render-pool-size)
-(mapv (fn [_]
-(let [lane-ctx ^LaneCtx
-(lc/new-lane-ctx
-{:dbs            (sqlite/create-read-connections! dbs)
-:html-dst-buf   (ByteBuffer/allocateDirect
-render-buffer-size)
-:fragment-cache cache})]
-(-> (Thread.
-^Runnable
-(bound-fn* ;; binding conveyance
-(fn render-thread []
-(while (not (Thread/interrupted))
+              {:max-weight fragment-cache-size
+               :weigher    (fn [_k ^bytes v] (alength v))})]
+  (->> (range render-pool-size)
+    (mapv (fn [_]
+            (let [lane-ctx ^LaneCtx
+                  (lc/new-lane-ctx
+                    {:dbs            (sqlite/create-read-connections! dbs)
+                     :html-dst-buf   (ByteBuffer/allocateDirect
+                                       render-buffer-size)
+                     :fragment-cache cache})]
+              (-> (Thread.
+                    ^Runnable
+                    (bound-fn* ;; binding conveyance
+                      (fn render-thread []
+                        (while (not (Thread/interrupted))
                           (.await ^CyclicBarrier start-barrier)
                           (run! sqlite/start-read-tx
                             (vals (.dbs lane-ctx)))
