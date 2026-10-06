@@ -181,9 +181,15 @@ Shared task queue (fast threads grab more tasks):
 
 About 43% faster. Obviously this is an extreme example. But, we are looking for consistent tail latency and we are not using thread local caches that benefit from a render happening on the same thread each tick. The core count is also low, so contention is less of a concern. The numbers might be completely different on a 96 core machine.
 
+## Law of large numbers
+
+This situation is unlikely to happen in practice. But it is conceivable, i.e a bunch of users connect and then leave and the ones that leave happen to be on the same thread, or you just get unlucky with the distribution of pages users are viewing.
+
+Law of large numbers should protect you somewhat once you're at 1000+ users. Then the difference is likely to be closer to 3-5% on average. But there's still a wicked tail.
+
 ## Why not just use a ThreadPoolExecutor?
 
-In a lot of cases you could just use a `ThreadPoolExecutor`, with a custom thread factory for thread relevant context, and call `invokeAll`. However, executors don't let you run batch specific code. In this app it's important we wrap each batch for each thread with a SQLite read transaction. Because, if we don't each query is it's own implicit transaction. So at 12000 connections we would be doing 3,000,000 queries per second (each render is 25 queries). That means acquiring a lock on the WAL file 3 million times a second. By wrapping the whole batch, we reduce that to 1 lock per core per tick.
+In a lot of cases you could just use a `ThreadPoolExecutor`, with a custom thread factory for thread relevant context, and call `invokeAll`. However, executors don't let you run batch specific code. In this app it's important we wrap each batch for each thread with a SQLite read transaction. Because, if we don't each query is it's own implicit transaction. So at 12000 connections we would be doing 3,000,000 queries per second (we are only hitting 25% of that in this test). That means acquiring a lock on the WAL file 3 million times a second. By wrapping the whole batch, we reduce that to 1 lock per core per tick.
 
 ## Conclusion
 
@@ -192,4 +198,3 @@ Hopefully, this post helps show you how discrete time based systems dramatically
 Code [can be found here](https://github.com/andersmurphy/hyperlith).
 
 **Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
-p
