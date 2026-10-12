@@ -18,6 +18,53 @@ From the Java docs:
 
 *Note: you know it's good when you start reaching for concurrency tools that sound like they are out of StarTrek (CyclicBarrier, Phaser and Disruptor)*
 
+## Lockstep vs Pipeline
+
+Lockstep tick model looks like this:
+
+```
+  READ ─▶ WRITE ─┐ 
+   ▲             │ TICK
+   └─────────────┘
+```
+
+Pipeline tick model looks like this:
+
+``` 
+  ┌──▶ READ ───┐ 
+  │    WRITE ──┐
+  │            │ TICK
+  └────────────┘
+```
+
+With lockstep tick time is effectively:
+
+```clojure
+(max tick-time (+ write-time read-time))
+```
+
+So if `tick-time` was 100 and `write-time` was 90 and `read-time` was 100. A tick would take 190:
+
+```clojure
+(max 100 (+ 90 100)) ;; => 190
+```
+
+With pipeline tick time is effectively:
+
+```clojure
+(max tick-time write-time read-time)
+```
+
+So if `tick-time` was 100 and `write-time` was 90 and `read-time` was 100. A tick would take 100:
+
+```clojure
+(max 100 90 100) ;; => 100
+```
+
+With a pipeline read batch and write batches overlap. That's why they must be wrapped in transactions, so the reads don't see future writes until the next tick (or use the same basis-t if you're using a datomic-like).
+
+But, you still have a tick barrier so that both must complete before the next tick. This gives you the same back pressure and the same overrun tracking as the lockstep model.
+
 ## Lockstep is evolving! Congratulations you now have a Pipelining!
 
 Spoiler it was a 3 line diff:

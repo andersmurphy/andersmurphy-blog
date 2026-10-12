@@ -175,6 +175,12 @@ style-src       'self' 'unsafe-inline'
         ;; adjacent inserts.  
         (str/replace #"\n(\+.*)\n"
           "\n<ins>$1</ins>\n")
+        (str/replace #"\n(\-\s.*)\n"
+          "\n<del>$1</del>\n")
+        ;; We need this replacement twice to handle
+        ;; adjacent deletions.  
+        (str/replace #"\n(\-\s.*)\n"
+          "\n<del>$1</del>\n")
         (str/replace #"(&#40;def[a-z\-]* |ns )(\S+)"
           "$1<strong>$2</strong>")
         (str/replace #"((?:&#40;)+|(?:&#41;)+)"

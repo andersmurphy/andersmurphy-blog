@@ -95,9 +95,8 @@
   margin: 0;
 }
 
-.turbo-progress-bar {
-  background-color: var(--pico-primary);
-  visibility: hidden;
+del {
+  text-decoration: none;
 }
 
 .icon {
