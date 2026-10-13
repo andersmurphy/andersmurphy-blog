@@ -1,14 +1,14 @@
 title:  Lockstep to pipeline in almost one line
 
-In the previous post [I talked about some of the benefits of a discrete time (tick) based system](https://andersmurphy.com/2026/10/05/discrete-time-based-systems-are-simple-to-benchmark.html). In this post I'm going to cover one of the other boons of a simple lockstep tick system is it's easy to change it into a pipelining tick system.
+In the previous post [I talked about some of the benefits of a discrete time (tick) based system](https://andersmurphy.com/2026/10/05/discrete-time-based-systems-are-simple-to-benchmark.html). In this post I'm going to cover one of the other boons of a simple lockstep tick system. It's easy to change it into a pipelining tick system.
 
 ## Why did we start with lockstep?
 
-Game loops are normally lockstep because it makes sense to do your updates and then render. It makes it easy to define your game (or app) as a sequence of phases which greatly simplifies reason about things like concurrency. Most of the time this is enough. However, even though [single writer systems can scale incredibly well](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html) you ideally want to be writing all the time. In a lockstep system you are by definition not writing when you are rendering. With a single writer that also means you only have one core doing work while you're writing.
+Game loops are normally lockstep because it makes sense to do your updates and then render. It makes it easy to define your game (or app) as a sequence of phases which greatly simplifies reasoning about things like concurrency. Most of the time this is enough. However, even though [single writer systems can scale incredibly well](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html) you ideally want to be writing all the time. In a lockstep system you are by definition not writing when you are rendering. With a single writer that also means you only have one core doing work while you're writing.
 
 ## Pipelining
 
-Pipelining is when you move phases to run in parallel instead of in sequence. Haven't we basically gone back to event based continuous time system? No, not quite, the phases are still running on their own cores/threads in batches. They also cannot race ahead of each other, they all wait at a barrier before the next tick. This means we still have back pressure, and we can still track tick overruns as normal.
+Pipelining is when you move phases to run in parallel instead of in sequence. Haven't we basically gone back to an event based continuous time system? No, not quite, the phases are still running on their own cores/threads in batches. They also cannot race ahead of each other, they all wait at a barrier before the next tick. This means we still have back pressure, and we can still track tick overruns as normal.
 
 ## What's a barrier?
 
@@ -88,9 +88,9 @@ Spoiler it was a 3 line diff:
       )))
 ```
 
-Yeah, that's it we just move the `done-barrier` and kick it off with a `(.await ^CyclicBarrier start-barrier)` outside the loop.
+Yeah, that's it. We move the `done-barrier` and kick it off with a `(.await ^CyclicBarrier start-barrier)` outside the while loop.
 
-We simulate a sequence of slow write transactions.
+We can simulate a sequence of slow write transactions.
 
 ```clojure
 (do (dotimes [_ 300]
@@ -115,7 +115,7 @@ WARNING: tick overrun
 
 ## Read consistency
 
-We are now writing at the same time as reading. What about read consistency? Thankfully each of our render batches is wrapped in a read transaction, so the whole batch sees a consistent view. All the batches start before write batch so there's no read skew (this can be strictly enforced by adding a third barrier if desired). For a given tick everyone is still seeing the same view of the database.
+We are now writing at the same time as reading. What about read consistency? Thankfully each of our render batches is wrapped in a read transaction, so the whole batch sees a consistent view. All the batches start before the write batch so there's no read skew (this can be strictly enforced by adding a third barrier if desired). For a given tick everyone is still seeing the same view of the database.
 
 ## Conclusion
 

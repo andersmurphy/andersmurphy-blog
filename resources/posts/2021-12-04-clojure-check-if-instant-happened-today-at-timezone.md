@@ -44,7 +44,7 @@ If we evaluate the `instant->localDate-at-timezone` definition again we will get
 
 ```Clojure
 Reflection warning ...
-- call to method atZone can't be resolved
+ - call to method atZone can't be resolved
 (target class is unknown)
 ```
 This can easily be fixed by adding the `^java.time.Instant` type hint:
