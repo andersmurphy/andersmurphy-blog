@@ -90,7 +90,7 @@ Spoiler it was a 3 line diff:
 
 Yeah, that's it. We move the `done-barrier` and kick it off with a `(.await ^CyclicBarrier start-barrier)` outside the while loop.
 
-We can simulate a sequence of slow write transactions.
+We open up 1000 SSE read connections to the server and keep them open. We then simulate a sequence of slow write transactions.
 
 ```clojure
 (do (dotimes [_ 300]
@@ -115,7 +115,7 @@ WARNING: tick overrun
 
 ## Read consistency
 
-We are now writing at the same time as reading. What about read consistency? Thankfully each of our render batches is wrapped in a read transaction, so the whole batch sees a consistent view. All the batches start before the write batch so there's no read skew (this can be strictly enforced by adding a third barrier if desired). For a given tick everyone is still seeing the same view of the database.
+We are now writing at the same time as reading. What about read consistency? Thankfully each of our render batches is wrapped in a read transaction, so the whole batch sees a consistent view. All the batches start before the write batch completes so there's no read skew (this can be strictly enforced by adding a third barrier if desired). For a given tick everyone is still seeing the same view of the database.
 
 ## Conclusion
 
