@@ -4,6 +4,8 @@
 
 I do consulting work on: Clojure, Datastar, JVM, SQLite, product design, rapid prototyping and performance tuning (with a focus on vertical scaling).
 
+*Note: all my public writing and code is handcrafted by me.*
+
 ### Writing
 
 [Blog posts](https://andersmurphy.com/)
