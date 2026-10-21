@@ -2,6 +2,8 @@ title:  Faster streaming HTML with batches and aggregates
 
 In this post I'm going to dive into some of the fun emergent properties of server based streaming HTML. In some ways this is a long overdue follow up of this post: [Realtime collaborative web apps without ClojureScript](https://andersmurphy.com/2025/04/07/clojure-realtime-collaborative-web-apps-without-clojurescript.html).
 
+*Note: all my public writing and code is handcrafted by me.*
+
 ## Quick overview of this architecture
 
 In this model almost all state is on the server. We stream the next frame (when I say frame I mean the next version of the html page generated on the server) to every connected client every X ms (a tick). This style of rendering is often referred to as immediate mode (fat morph in the [Datastar discord](https://discord.com/invite/bnRNgZjgPh)). These frames are streamed to each client over a long lived SSE connection with streaming compression (Brotli or Zstandard).

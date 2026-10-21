@@ -2,6 +2,8 @@ title:  Lockstep to pipeline in almost one line
 
 In the previous post [I talked about some of the benefits of a discrete time (tick) based system](https://andersmurphy.com/2026/10/05/discrete-time-based-systems-are-simple-to-benchmark.html). In this post I'm going to cover one of the other boons of a simple lockstep tick system. It's easy to change it into a pipelining tick system.
 
+*Note: all my public writing and code is handcrafted by me.*
+
 ## Why did we start with lockstep?
 
 Game loops are normally lockstep because it makes sense to do your updates and then render. It makes it easy to define your game (or app) as a sequence of phases which greatly simplifies reasoning about things like concurrency. Most of the time this is enough. However, even though [single writer systems can scale incredibly well](https://andersmurphy.com/2025/12/02/100000-tps-over-a-billion-rows-the-unreasonable-effectiveness-of-sqlite.html) you ideally want to be writing all the time. In a lockstep system you are by definition not writing when you are rendering. With a single writer that also means you only have one core doing work while you're writing.
