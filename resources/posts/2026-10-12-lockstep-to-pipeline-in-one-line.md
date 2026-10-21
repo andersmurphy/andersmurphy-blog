@@ -2,7 +2,7 @@ title:  Lockstep to pipeline in almost one line
 
 In the previous post [I talked about some of the benefits of a discrete time (tick) based system](https://andersmurphy.com/2026/10/05/discrete-time-based-systems-are-simple-to-benchmark.html). In this post I'm going to cover one of the other boons of a simple lockstep tick system. It's easy to change it into a pipelining tick system.
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 ## Why did we start with lockstep?
 

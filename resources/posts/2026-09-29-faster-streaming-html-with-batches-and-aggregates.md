@@ -2,7 +2,7 @@ title:  Faster streaming HTML with batches and aggregates
 
 In this post I'm going to dive into some of the fun emergent properties of server based streaming HTML. In some ways this is a long overdue follow up of this post: [Realtime collaborative web apps without ClojureScript](https://andersmurphy.com/2025/04/07/clojure-realtime-collaborative-web-apps-without-clojurescript.html).
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 ## Quick overview of this architecture
 

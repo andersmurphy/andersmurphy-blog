@@ -2,7 +2,7 @@ title: Clojure: Realtime collaborative web apps without ClojureScript
 
 Last week I made a fun little multiplayer web app. I've embedded it below:
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 <iframe src="https://example.andersmurphy.com/embed" title="Game of Life"
 style="width: 100%;	aspect-ratio: 1;	max-width: 600px"></iframe>

@@ -2,7 +2,7 @@ title: The perils of UUID primary keys in SQLite
 
 It's common to use random UUIDs as a primary key in databases. One of the known downsides of random UUIDs is that their unordered nature (UUID4) can cause a lot of extra paging for the clustered index because you are inserting rows randomly into the Btree and having to re-balance it. This post tries to help us develop a more visceral understanding of the performance cost of all that extra paging.
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 While this post is about SQLite specifically, the problem of random UUIDs also extends to other databases that use clustered indexes.
 

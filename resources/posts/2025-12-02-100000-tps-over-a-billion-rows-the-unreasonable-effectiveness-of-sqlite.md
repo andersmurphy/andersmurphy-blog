@@ -2,7 +2,7 @@ title: 100000 TPS over a billion rows: the unreasonable effectiveness of SQLite
 
 SQLite doesn't have MVCC! It only has a single writer! SQLite is for phones and mobile apps (and the occasional airliner)! For web servers use a proper database like Postgres! In this article I'll go over why  being embedded and a single writer are not deficiencies but actually allow SQLite to scale so unreasonably well.
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 ## Prelude
 

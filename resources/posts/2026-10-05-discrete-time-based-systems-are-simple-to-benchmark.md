@@ -2,7 +2,7 @@ title:  Discrete time based systems are simple to benchmark
 
 In the previous post [I briefly discussed a tick based batching system for streaming HTML](https://andersmurphy.com/2026/09/29/faster-streaming-html-with-batches-and-aggregates.html). In this post I'm going to dive deeper in one of the many benefits of a discrete time (tick) based system is simplified profiling, benchmarking and load testing.
 
-*Note: all my public writing and code is handcrafted by me.*
+> Note: all my public writing and code is handcrafted by me.
 
 ## Non-uniform work distributions
 
