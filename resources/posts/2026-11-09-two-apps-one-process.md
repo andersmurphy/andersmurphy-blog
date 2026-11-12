@@ -142,5 +142,6 @@ Code [can be found here](https://github.com/andersmurphy/hyperlith). All three a
 
 **Thanks to** Everyone on the [Datastar discord](https://discord.gg/bnRNgZjgPh) who read drafts of this and gave me feedback.
 
-
-
+### Discussion
+- [reddit](https://www.reddit.com/r/Clojure/comments/1xs5dv3/two_apps_one_process/)
+- [lobsters](https://lobste.rs/s/sifkms/two_apps_one_process)
